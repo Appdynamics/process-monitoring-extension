@@ -1,0 +1,35 @@
+<monitor>
+        <name>ProcessMonitor</name>
+        <type>managed</type>
+        <description>Processes monitor</description>
+        <monitor-configuration></monitor-configuration>
+        <monitor-run-task>
+                <execution-style>continuous</execution-style>
+                <name>Processes Monitor Run Task</name>
+                <display-name>Processes Monitor Task</display-name>
+                <description>Processes Monitor Task</description>
+                <type>java</type>
+                <java-task>
+                        <classpath>processes.jar;lib/dom4j-2.0.0-ALPHA-2.jar</classpath>
+                        <impl-class>main.java.com.appdynamics.monitors.processes.ProcessMonitor</impl-class>
+                </java-task>
+                
+                <task-arguments>
+               		<!-- CONFIGURE IF NECESSARY:
+                		this is the path to the file properties.xml
+                		i.e.: if you created a directory in 'monitors' named other than 'ProcessMonitor',
+                	 	change the field 'default-value' to the appropriate directory.
+                	-->
+                    <argument name="properties-path" is-required="true" default-value="monitors/ProcessMonitor/properties.xml"/>
+                    
+                	<!-- CONFIGURE METRIC PATH (OPTIONAL):
+                     		You can configure a metric path, such that only one tier is going to receive
+                     		metrics from this monitor. The pattern is: Server|Component:<id or name>
+                     		Component id or name is the id or name of the tier.
+                     		Default (if default-value="") is "Custom Metrics|<Windows/Linux> Processes" under 
+                     		Application Infrastructure Performance in every tier
+                	-->
+                    <argument name="metric-path" is-required="false" default-value=""/>
+                </task-arguments>
+        </monitor-run-task>
+</monitor>
