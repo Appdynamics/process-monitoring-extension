@@ -1,7 +1,7 @@
 <project default="build">
     <property name="build.dir" value="dist" />
     <property name="conf.dir" value="conf" />
-    <property name="project.name" value="processes"/>
+    <property name="project.name" value="ProcessMonitor"/>
     <property name="lib.dir" value="lib"/>
     <path id="cp">
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -9,19 +9,27 @@
     <target name="build">
         <mkdir dir="${build.dir}/classes"/>
         <javac destdir="${build.dir}/classes" srcdir="src/main/java" classpathref="cp" debug="on"/>
-        <jar destfile="${build.dir}/${project.name}.jar">
+        <mkdir dir="${build.dir}/ProcessMonitor"/>
+        <mkdir dir="${build.dir}/ProcessMonitor/lib"/>
+        <jar destfile="${build.dir}/ProcessMonitor/${project.name}.jar">
             <fileset dir="${build.dir}/classes"/>
         </jar>
-    	<copy todir="${build.dir}/lib/">
-    	            <fileset dir="${lib.dir}" includes="dom4j-2.0.0-ALPHA-2.jar"/>
+    	<copy todir="${build.dir}/ProcessMonitor/lib/">
+    	            <fileset dir="${lib.dir}/dom4j" includes="dom4j-2.0.0-ALPHA-2.jar"/>
     	</copy>
-        <copy todir="${build.dir}/">
+        <copy todir="${build.dir}/ProcessMonitor/">
             <fileset dir="${conf.dir}" includes="monitor.xml"/>
         </copy>
-    	<copy todir="${build.dir}/">
+    	<copy todir="${build.dir}/ProcessMonitor/">
     	            <fileset dir="${conf.dir}" includes="properties.xml"/>
     	</copy>
         <delete dir="${build.dir}/classes"/>
+    </target>
+    <target name="package" depends="build">
+        <zip destfile="${build.dir}/ProcessMonitor.zip">
+            <zipfileset dir="${build.dir}/ProcessMonitor" filemode="755" prefix="ProcessMonitor/"/>
+        </zip>
+        <delete dir="${build.dir}/ProcessMonitor"/>
     </target>
     <target name="clean">
         <delete dir="${build.dir}"/>
