@@ -13,12 +13,12 @@ The Processes extension retrieves the following metrics of each process:
 -   Number of running instances. (If there are, for example, 3 Java processes running, this monitor will summarize them to one single report)
 
 
-##Files and Folders Included
+##Directory Structure
 
 <table><tbody>
 <tr>
-<th align = 'left'> File/Folder </th>
-<th align = 'left'> Description </th>
+<th align="left"> File/Folder </th>
+<th align="left"> Description </th>
 </tr>
 <tr>
 <td class='confluenceTd'> conf </td>
@@ -71,11 +71,15 @@ If this file is not found, the process monitor will output an error to the log f
 ![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/97iCA9AA07958232EAD/image-size/original?v=mpbl-1&px=-1)
 
 
+
 ##Contributing
 
-Always feel free to fork and contribute any changes directly via GitHub.
+Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/process-monitoring-extension).
 
+##Community
+
+Find out more in the [AppSphere](http://appsphere.appdynamics.com/t5/Extensions/Process-Monitoring-Extension/idi-p/1069) community.
 
 ##Support
 
-For any support questions, please contact ace@appdynamics.com.
+For any questions or feature request, please contact [AppDynamics Center of Excellence](mailto://ace-request@appdynamics.com).
