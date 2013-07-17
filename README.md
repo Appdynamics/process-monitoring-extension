@@ -1,4 +1,4 @@
-# AppDynamics Processes Monitoring Extension
+# AppDynamics Processes - Monitoring Extension
 
 
 ##Use Case
@@ -13,13 +13,11 @@ The Processes extension retrieves the following metrics of each process:
 -   Number of running instances. (If there are, for example, 3 Java processes running, this monitor will summarize them to one single report)
 
 
-##Files
-
-Files/Folders Included:
+##Files and Folders Included
 
 <table><tbody>
 <tr>
-<th align = 'left'> Directory/File </th>
+<th align = 'left'> File/Folder </th>
 <th align = 'left'> Description </th>
 </tr>
 <tr>
@@ -64,13 +62,13 @@ If this file is not found, the process monitor will output an error to the log f
 
 ##Custom Dashboard
 
-![](images/Screen Shot 2013-06-11 at 5.52.20 PM.png)
+![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/95i5C555106398901A2/image-size/original?v=mpbl-1&px=-1)
 
 ##Metric Browser
 
-![](images/Screen Shot 2013-06-11 at 5.52.20 PM.png)
+![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/93iED3BE531B3AE0FFC/image-size/original?v=mpbl-1&px=-1)
 
-![](images/Screen Shot 2013-06-11 at 5.24.41 PM.png)
+![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/97iCA9AA07958232EAD/image-size/original?v=mpbl-1&px=-1)
 
 ##Metrics
 
