@@ -56,7 +56,13 @@ The Processes extension retrieves the following metrics of each process:
 In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Custom Metrics | \<Windows/Linux\> Processes
 or your specified path under Application Infrastructure Performance  | \<Tier\> |.
 
-![](images/emoticons/information.gif) If you are running Windows,  make sure that the file 'csv.xsl' is in 'C:\Windows\System32' for 32bit or 'C:\Windows\SysWOW64' for 64bit OS versions (standard under Windows Server 2003).
+###XML files to modify
+<ul>
+<li>monitor.xml: This is used to execute the Java code which starts the extension. You might need to configure the path to the other xml file (see <a href="http://docs.appdynamics.com/display/ACE/Processes?sortBy=name#Processes-monitor.xml" target="_blank">monitor.xml</a> (requires login)).</li>
+<li>properties.xml: This file enables you to filter out which metrics are going to be reported and displayed on the metric browser (see <a href="http://docs.appdynamics.com/display/ACE/Processes?sortBy=name#Processes-properties.xml" target="_blank">properties.xml</a> (requires login)).</li>
+</ul>
+
+**Note**: If you are running Windows,  make sure that the file 'csv.xsl' is in 'C:\Windows\System32' for 32bit or 'C:\Windows\SysWOW64' for 64bit OS versions (standard under Windows Server 2003).
 If this file is not found, the process monitor will output an error to the log file (logs/machine-agent.log) .
 
 
