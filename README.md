@@ -72,7 +72,7 @@ If this file is not found, the process monitor will output an error to the log f
 
 ##Metrics
 
-###For each process the monitor is reporting for:
+###For each process, the monitor is reporting for:
 
 
 <table><tbody>
