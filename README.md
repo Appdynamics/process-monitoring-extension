@@ -12,13 +12,6 @@ The Processes extension retrieves the following metrics of each process:
 -   Memory utilization in %
 -   Number of running instances. (If there are, for example, 3 Java processes running, this monitor will summarize them to one single report)
 
-XML files:
-
--   monitor.xml: This is used to execute the Java code which starts
-    the extension.
--   properties.xml: This file enables you to filter out
-    which metrics are going to be reported and displayed on the metric
-    browser.
 
 ##Files
 
@@ -68,89 +61,6 @@ or your specified path under Application Infrastructure Performance  | \<Tier\> 
 ![](images/emoticons/information.gif) If you are running Windows,  make sure that the file 'csv.xsl' is in 'C:\Windows\System32' for 32bit or 'C:\Windows\SysWOW64' for 64bit OS versions (standard under Windows Server 2003).
 If this file is not found, the process monitor will output an error to the log file (logs/machine-agent.log) .
 
-##XML Examples
-
-###monitor.xml
-
-| Param | Description |
-| --- | --- |
-| properties\_path | Location of the properties.xml |
-| metric\_path | Configuring this will limit the report of the metrics to one single tier |
-
-~~~~
-<monitor>
-        <name>ProcessMonitor</name>
-        <type>managed</type>
-        <description>Processes monitor</description>
-        <monitor-configuration></monitor-configuration>
-        <monitor-run-task>
-                <execution-style>continuous</execution-style>
-                <name>Processes Monitor Run Task</name>
-                <display-name>Processes Monitor Task</display-name>
-                <description>Processes Monitor Task</description>
-                <type>java</type>
-                <java-task>
-                        <classpath>ProcessMonitor.jar;lib/dom4j-2.0.0-ALPHA-2.jar</classpath>
-                        <impl-class>main.java.com.appdynamics.monitors.processes.ProcessMonitor</impl-class>
-                </java-task>
-                
-                <task-arguments>
-               		<!-- CONFIGURE IF NECESSARY:
-                		this is the path to the file properties.xml
-                		i.e.: if you created a directory in 'monitors' named other than 'ProcessMonitor',
-                	 	change the field 'default-value' to the appropriate directory.
-                	-->
-                    <argument name="properties-path" is-required="true" default-value="monitors/ProcessMonitor/properties.xml"/>
-                    
-                	<!-- CONFIGURE METRIC PATH (OPTIONAL):
-                     		You can configure a metric path, such that only one tier is going to receive
-                     		metrics from this monitor. The pattern is: Server|Component:<id or name>
-                     		Component id or name is the id or name of the tier.
-                     		Default (if default-value="") is "Custom Metrics|<Windows/Linux> Processes" under 
-                     		Application Infrastructure Performance in every tier
-                	-->
-                    <argument name="metric-path" is-required="false" default-value=""/>
-                </task-arguments>
-        </monitor-run-task>
-</monitor>
-~~~~
-
-###properties.xml
-
-| Param | Description |
-| --- | --- |
-| \<exclude-processes\> | A comma-separated list of *names of processes* you want to exclude from the reported metrics |
-| \<exclude-pids\> | A comma-separated list of *Process IDs (PIDs)* you want to exclude from the reported metrics |
-| \<memory-threshold\> | (MB) - Processes with an aggregated absolute memory consumption of less than this number will be excluded from the reported metrics |
-
-
-~~~~
-<process-monitor>
-	<!-- fill this tag with comma-separated names of processes you want to
-		 be filtered out of the reported metrics. (OPTIONAL)
-		 Example Linux  : <exclude-processes>java,bash,sshd</exclude-processes>
-		 Example Windows: <exclude-processes>java.exe,chrome.exe</exclude-processes>
-		 DO NOT include spaces or quotes in this tag! 
-	-->
-	<exclude-processes></exclude-processes>
-	
-	<!-- fill this tag with comma-separated Process IDs (pids) you want to
-		 be filtered out of the reported metrics. (OPTIONAL)
-		 Example: <exclude-processes>2,343,1235,34</exclude-processes>
-		 DO NOT include spaces or quotes in this tag! 
-	-->
-	<exclude-pids></exclude-pids>
-	
-	<!-- fill this tag with a non-negative whole number. (OPTIONAL)
-		 Processes with an aggregated absolute memory consumption of LESS
-		 than this number in Megabytes will be filtered out of the
-		 reported metrics.
-		 (Fill with 0 to turn off filtering. Default value is 100 [MB])
-		 Example: <memory-threshold>250</memory-threshold> 
-	-->
-	<memory-threshold></memory-threshold>
-</process-monitor>
-~~~~
 
 ##Custom Dashboard
 
