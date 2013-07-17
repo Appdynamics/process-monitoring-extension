@@ -70,34 +70,6 @@ If this file is not found, the process monitor will output an error to the log f
 
 ![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/97iCA9AA07958232EAD/image-size/original?v=mpbl-1&px=-1)
 
-##Metrics
-
-###For each process, the monitor is reporting for:
-
-
-<table><tbody>
-<tr>
-<th align = 'left'> Metric Name </th>
-<th align = 'left'> Description </th>
-</tr>
-<tr>
-<td class='confluenceTd'> CPU utilization in Percent </td>
-<td class='confluenceTd'></td>
-</tr>
-<tr>
-<td class='confluenceTd'> Memory Utilization Absolute (MB) </td>
-<td class='confluenceTd'></td>
-</tr>
-<tr>
-<td class='confluenceTd'> Memory Utilization in Percent </td>
-<td class='confluenceTd'></td>
-</tr>
-<tr>
-<td class='confluenceTd'> Number of running instances </td>
-<td class='confluenceTd'> Often there are multiple processes running under the same name, and this is their count. </td>
-</tr>
-</tbody>
-</table>
 
 ##Contributing
 
