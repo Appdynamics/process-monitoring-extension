@@ -15,9 +15,7 @@
  */
 
 
-
-
-package main.java.com.appdynamics.monitors.processes.processdata;
+package com.appdynamics.monitors.processes.processdata;
 
 public class ProcessData {
 	public String name;

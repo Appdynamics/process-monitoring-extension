@@ -11,7 +11,7 @@
                 <type>java</type>
                 <java-task>
                         <classpath>ProcessMonitor.jar;lib/dom4j-2.0.0-ALPHA-2.jar</classpath>
-                        <impl-class>main.java.com.appdynamics.monitors.processes.ProcessMonitor</impl-class>
+                        <impl-class>com.appdynamics.monitors.processes.ProcessMonitor</impl-class>
                 </java-task>
                 
                 <task-arguments>

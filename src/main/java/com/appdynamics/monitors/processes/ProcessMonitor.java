@@ -17,19 +17,18 @@
 
 
 
-package main.java.com.appdynamics.monitors.processes;
+package com.appdynamics.monitors.processes;
 
 import java.util.Map;
-
-import main.java.com.appdynamics.monitors.processes.parser.LinuxParser;
-import main.java.com.appdynamics.monitors.processes.parser.Parser;
-import main.java.com.appdynamics.monitors.processes.parser.WindowsParser;
-import main.java.com.appdynamics.monitors.processes.processdata.ProcessData;
-import main.java.com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
 
 import org.apache.log4j.Logger;
 import org.dom4j.DocumentException;
 
+import com.appdynamics.monitors.processes.parser.LinuxParser;
+import com.appdynamics.monitors.processes.parser.Parser;
+import com.appdynamics.monitors.processes.parser.WindowsParser;
+import com.appdynamics.monitors.processes.processdata.ProcessData;
+import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
 import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
@@ -48,6 +47,10 @@ public class ProcessMonitor extends AManagedMonitor{
 	private boolean running;
 	
 	Logger logger;
+	
+	public static void main(String[] args){
+		System.out.println("running");
+	}
 
 
 	/**
@@ -81,11 +84,15 @@ public class ProcessMonitor extends AManagedMonitor{
 			String os = System.getProperty("os.name").toLowerCase();
 			logger = Logger.getLogger(ProcessMonitor.class);	
 			running = true;
+			
+			logger.debug("Process Monitor in Debug mode started.");
 
 			if(os.contains("win")){
 				parser = new WindowsParser(logger, REPORT_INTERVAL_SECS, FETCHES_PER_INTERVAL);
+				logger.debug("OS System detected: Windows");
 			} else if(os.contains("linux")){
 				parser = new LinuxParser(logger);
+				logger.debug("OS System detected: Linux");
 			} else {
 				logger.error("Your OS (" + os + ") is not supported. Quitting Process Monitor");
 				return null;
@@ -99,6 +106,7 @@ public class ProcessMonitor extends AManagedMonitor{
 			
 			if(taskArguments.containsKey("metric-path") && !taskArguments.get("metric-path").equals("")){
 				metricPath = taskArguments.get("metric-path");
+				logger.debug("Metric path: " + metricPath);
 				if(!metricPath.endsWith("|")){
 					metricPath += "|";
 				}
@@ -107,6 +115,7 @@ public class ProcessMonitor extends AManagedMonitor{
 			parser.initialize();
 			try{
 				parser.parseXML(taskArguments.get("properties-path"));
+				logger.debug("finished reading properties.xml at " + taskArguments.get("properties-path"));
 			} catch (DocumentException e) {
 				logger.error("Unable to read " + taskArguments.get("properties-path") + ". setting properties to default values" +
 						"\nError message: " + e.getMessage());
@@ -117,12 +126,15 @@ public class ProcessMonitor extends AManagedMonitor{
 
 			// working with threads to ensure a more accurate sleep time.
 			while(running) {
+				
+				logger.debug("New round of metric collection started");
 				for(int i = 0; i < FETCHES_PER_INTERVAL; i++){
 					Thread.sleep(REPORT_INTERVAL_SECS / FETCHES_PER_INTERVAL * 1000);
 					(new ParseThread()).start();					
 				}
-
+				
 				(new PrintMetricsClearHashmapThread()).start();
+				
 
 			}
 
@@ -139,6 +151,8 @@ public class ProcessMonitor extends AManagedMonitor{
 
 	private void printAllMetrics(){
 		
+		logger.debug("This round of metric collection done. Starting to report metrics...");
+		
 		for(ProcessData procData : parser.getProcesses().values()){
 
 			float absoluteMem = (procData.memPercent/100 * parser.getTotalMemSizeMB()) / FETCHES_PER_INTERVAL;
@@ -146,30 +160,46 @@ public class ProcessMonitor extends AManagedMonitor{
 			if(absoluteMem >= parser.getMemoryThreshold() || parser.getIncludeProcesses().contains(procData.name)){
 				
 				parser.addIncludeProcesses(procData.name);
+				
+				int cpuPercent = (int) (procData.CPUPercent / FETCHES_PER_INTERVAL);
+				int memPercent = (int) (procData.memPercent / FETCHES_PER_INTERVAL);
+				int memAbsolute = (int) (Math.round(absoluteMem));
+				int numOfInst = procData.numOfInstances / FETCHES_PER_INTERVAL;
 
-				printMetric(procData.name + "|CPU Utilization in Percent", (int) (procData.CPUPercent / FETCHES_PER_INTERVAL),
+				printMetric(procData.name + "|CPU Utilization in Percent", cpuPercent,
+						MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
+						MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
+						MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
+				
+				logger.debug("Metric reported: " + procData.name + ", CPU Utilization in Percent: " + cpuPercent);
+
+				printMetric(procData.name + "|Memory Utilization in Percent", memPercent,
 						MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
 						MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
 						MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
 
-				printMetric(procData.name + "|Memory Utilization in Percent", (int) (procData.memPercent / FETCHES_PER_INTERVAL),
+				logger.debug("Metric reported: " + procData.name + ", Memory Utilization in Percent: " + memPercent);
+				
+				printMetric(procData.name + "|Memory Utilization Absolute (MB)", memAbsolute, // divided through above
 						MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
 						MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
 						MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
 
-				printMetric(procData.name + "|Memory Utilization Absolute (MB)", (int) (Math.round(absoluteMem)), // divided through above
+				logger.debug("Metric reported: " + procData.name + ", Memory Utilization Absolute (MB): " + memAbsolute);
+				
+				printMetric(procData.name + "|Number of running instances", numOfInst,
 						MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
 						MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
 						MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
+				
+				logger.debug("Metric reported: " + procData.name + ", Number of running instances: " + numOfInst);
 
-				printMetric(procData.name + "|Number of running instances", (procData.numOfInstances / FETCHES_PER_INTERVAL),
-						MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
-						MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
-						MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
 
 			}
 
 		}
+		
+		logger.debug("Finished reporting metrics");
 	}
 
 
@@ -207,6 +237,7 @@ public class ProcessMonitor extends AManagedMonitor{
 	private class PrintMetricsClearHashmapThread extends Thread{
 		public void run(){
 			printAllMetrics();		
+			
 			parser.getProcesses().clear();
 		}
 	}

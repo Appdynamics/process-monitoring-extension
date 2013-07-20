@@ -15,9 +15,7 @@
  */
 
 
-
-
-package main.java.com.appdynamics.monitors.processes.processexception;
+package com.appdynamics.monitors.processes.processexception;
 
 public class ProcessMonitorException extends Exception {
 
