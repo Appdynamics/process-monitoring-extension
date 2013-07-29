@@ -19,6 +19,14 @@
 
 package com.appdynamics.monitors.processes;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -50,6 +58,39 @@ public class ProcessMonitor extends AManagedMonitor{
 	
 	public static void main(String[] args){
 		System.out.println("running");
+		
+		try {
+			BufferedWriter wr = new BufferedWriter(new FileWriter(".file"));
+			wr.write("hello");
+			wr.newLine();
+			
+			wr.write("world");
+			wr.newLine();
+			wr.write("again");
+			
+			wr.flush();
+			
+			wr.close();
+			
+			
+			BufferedReader br = new BufferedReader(new FileReader(".file"));
+			List<String> fileContent = new ArrayList<String>();
+			String entry;
+			while((entry = br.readLine()) != null){
+				fileContent.add(entry);
+			}
+			
+			for(String entry2 : fileContent){
+				System.out.println(entry2);
+			}
+			
+			br.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("done");
 	}
 
 
@@ -153,6 +194,9 @@ public class ProcessMonitor extends AManagedMonitor{
 		
 		logger.debug("This round of metric collection done. Starting to report metrics...");
 		
+		logger.debug("Reading in the set of monitored processes");
+		parser.readProcsFromFile();
+		
 		for(ProcessData procData : parser.getProcesses().values()){
 
 			float absoluteMem = (procData.memPercent/100 * parser.getTotalMemSizeMB()) / FETCHES_PER_INTERVAL;
@@ -198,6 +242,9 @@ public class ProcessMonitor extends AManagedMonitor{
 			}
 
 		}
+		
+		logger.debug("Writing monitored processes out to file");
+		parser.writeProcsToFile();
 		
 		logger.debug("Finished reporting metrics");
 	}

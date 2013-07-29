@@ -20,6 +20,12 @@
 package com.appdynamics.monitors.processes.parser;
 
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +125,43 @@ public abstract class Parser {
 			}
 		}
 	}
+	
+	public void readProcsFromFile(){
+		try {
+			BufferedReader br = new BufferedReader(new FileReader("monitors/ProcessMonitor/.monitored-processes"));
+			String line;
+			includeProcesses.clear();
+			while((line = br.readLine()) != null){
+				includeProcesses.add(line);
+			}
+		} catch (FileNotFoundException e) {
+			logger.debug("the file .monitoredProcesses.txt could not be found. " +
+					"This might be the first time trying to read in from the file, " +
+					"and the set of monitored processes is set to be empty.");
+		} catch (IOException e) {
+			logger.warn("A problem occured reading from the .monitoredProcesses file.");
+		}
+	}
+	
+	public void writeProcsToFile(){
+		
+		try {
+			BufferedWriter wr = new BufferedWriter(new FileWriter("monitors/ProcessMonitor/.monitored-processes"));
+			wr.write("");
+			wr.close();
+			
+			wr = new BufferedWriter(new FileWriter("monitors/ProcessMonitor/.monitored-processes"));
+			for(String process : includeProcesses){
+				wr.write(process);
+				wr.newLine();
+			}
+			wr.close();
+			
+		} catch (IOException e) {
+			logger.warn("Can't write process names to/create file '.monitored-processes' in ProcessMonitor directory.");
+		}
+		
+	}
 
 	public int getDefaultMemoryThreshold() {
 		return DEFAULT_MEM_THRESHOLD;
@@ -181,10 +224,9 @@ public abstract class Parser {
 	}
 
 	public void addIncludeProcesses(String name){
-		if(!this.includeProcesses.contains(name)){
+		if(this.includeProcesses.add(name)){
 			logger.debug("New Process added to the list of metrics to be permanently" +
 					"reported, even if falling back below threshold: " + name);
 		}
-		this.includeProcesses.add(name);
 	}
 }
