@@ -57,40 +57,8 @@ public class ProcessMonitor extends AManagedMonitor{
 	Logger logger;
 	
 	public static void main(String[] args){
-		System.out.println("running");
 		
-		try {
-			BufferedWriter wr = new BufferedWriter(new FileWriter(".file"));
-			wr.write("hello");
-			wr.newLine();
-			
-			wr.write("world");
-			wr.newLine();
-			wr.write("again");
-			
-			wr.flush();
-			
-			wr.close();
-			
-			
-			BufferedReader br = new BufferedReader(new FileReader(".file"));
-			List<String> fileContent = new ArrayList<String>();
-			String entry;
-			while((entry = br.readLine()) != null){
-				fileContent.add(entry);
-			}
-			
-			for(String entry2 : fileContent){
-				System.out.println(entry2);
-			}
-			
-			br.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.println("done");
+		System.out.println("main");
 	}
 
 
