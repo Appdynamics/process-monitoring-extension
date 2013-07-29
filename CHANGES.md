@@ -10,4 +10,4 @@ configure the log4j.xml file in your MachineAgent.
 
 ### Version 1.2.0
 
-* Continued reporting of processes that fell below the memory threshold, even after restarting of the machine agent. 
+* Continued reporting of processes that fell below the memory threshold, even after restarting the machine agent. 
