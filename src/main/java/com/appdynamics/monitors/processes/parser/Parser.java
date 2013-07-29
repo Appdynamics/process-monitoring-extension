@@ -134,6 +134,7 @@ public abstract class Parser {
 			while((line = br.readLine()) != null){
 				includeProcesses.add(line);
 			}
+			br.close();
 		} catch (FileNotFoundException e) {
 			logger.debug("the file .monitoredProcesses.txt could not be found. " +
 					"This might be the first time trying to read in from the file, " +
