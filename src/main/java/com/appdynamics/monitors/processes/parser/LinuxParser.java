@@ -92,15 +92,22 @@ public class LinuxParser extends Parser {
 	}
 
 	public String getNameOfProcess(int pid) throws IOException{
-		String line;
-		Process allProcs = Runtime.getRuntime().exec("cat /proc/" + pid + "/status");
-		BufferedReader input = new BufferedReader(new InputStreamReader(allProcs.getInputStream()));
-		if((line = input.readLine()) != null){
-			String[] words = line.split("\\s+");
-			input.close();
-			return words[1];
-		}
-		input.close();
+		BufferedReader input = null;
+        try {
+            String line;
+            Process allProcs = Runtime.getRuntime().exec("cat /proc/" + pid + "/status");
+            input = new BufferedReader(new InputStreamReader(allProcs.getInputStream()));
+            if((line = input.readLine()) != null){
+                String[] words = line.split("\\s+");
+                return words[1];
+            }
+        }
+        catch(Exception e) {
+            logger.error("Exception: ", e);
+        }
+        finally {
+            input.close();
+        }
 		return null;
 	}
 
@@ -109,10 +116,11 @@ public class LinuxParser extends Parser {
 	 * @throws NumberFormatException
 	 */
 	public void parseProcesses() throws NumberFormatException{
-		try{
+        BufferedReader input = null;
+        try{
 			String processLine;
 			Process allProcs = Runtime.getRuntime().exec("ps aux");
-			BufferedReader input = new BufferedReader(new InputStreamReader(allProcs.getInputStream()));
+			input = new BufferedReader(new InputStreamReader(allProcs.getInputStream()));
 
 			// there seems to be a single process, probably ps aux itself,
 			// for which information can't be retrieved after it is terminated.
@@ -128,8 +136,14 @@ public class LinuxParser extends Parser {
 
 				// retrieve single process information
 				int pid = Integer.parseInt(words[posPID]);
-				String procName = getNameOfProcess(pid);
-				float cpu = Float.parseFloat(words[posCPU]);
+
+                //logger.info("Process name: " + new StringBuilder(getNameOfProcess(pid)).append(" (PID: ").append(pid).append(")").toString());
+                String procName = null;
+                if (getNameOfProcess(pid) != null) {
+                    StringBuilder sb = new StringBuilder(getNameOfProcess(pid));
+                    procName = sb.append("|PID|").append(pid).toString();
+                }
+                float cpu = Float.parseFloat(words[posCPU]);
 				float mem = Float.parseFloat(words[posMem]);
 
 				if(procName != null){
@@ -155,8 +169,15 @@ public class LinuxParser extends Parser {
 			input.close();
 			
 		} catch (IOException e) {
-			logger.error("Unable to read output from ps aux command");
+			logger.error("Unable to read output from ps aux command", e);
 		}
+        finally {
+            try {
+                input.close();
+            } catch (IOException e) {
+                logger.error("IOException: ", e);
+            }
+        }
 	}
 
 }

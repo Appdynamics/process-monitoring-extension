@@ -57,10 +57,11 @@ public class WindowsParser extends Parser{
 
 	@Override
 	public void initialize() throws ProcessMonitorException {
-		try{
+		BufferedReader input = null;
+        try{
 			String line;			
 			Process p = Runtime.getRuntime().exec("tasklist /fo csv");
-			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			//first line, parse positions of data (in case this will change over time)
 			if((line = input.readLine()) != null){
 				String[] words = line.replaceAll("\"", "").trim().split(",");
@@ -99,8 +100,18 @@ public class WindowsParser extends Parser{
 			throw new ProcessMonitorException("Unable to retrieve total physical memory size (not a number: " + e.getMessage() +
 					"). Terminating Process Monitor");
 		} catch (NullPointerException e){
-			logger.error(e.getMessage());
+            throw new ProcessMonitorException("NullPointerException: " + e.getMessage());
 		}
+        finally {
+            try {
+                input.close();
+            } catch (IOException e) {
+                logger.error("IOException - Problem closing the input stream: ", e);
+            }
+            catch (NullPointerException e) {
+                logger.error("NullPointerException: input is null", e);
+            }
+        }
 	}
 
 	/**
@@ -109,10 +120,11 @@ public class WindowsParser extends Parser{
 	 */
 	@Override
 	public void parseProcesses() throws ProcessMonitorException {
-		try{
+		BufferedReader input = null;
+        try{
 			String processLine;			
 			Process p = Runtime.getRuntime().exec("tasklist /fo csv");
-			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			// skipping csv header
 			input.readLine();
@@ -150,7 +162,19 @@ public class WindowsParser extends Parser{
 		} catch (NumberFormatException e){
 			throw new ProcessMonitorException("Unable to retrieve percentual memory consumption: " + e.getMessage() + 
 					". This is not a number. Terminating Process Monitor");
-		}
+		} catch (NullPointerException e){
+            throw new ProcessMonitorException("NullPointerException: " + e.getMessage());
+        }
+        finally {
+            try {
+                input.close();
+            } catch (IOException e) {
+                logger.error("IOException - Problem closing the input stream: ", e);
+            }
+            catch (NullPointerException e) {
+                logger.error("NullPointerException: input is null", e);
+            }
+        }
 	}
 
 	/**
@@ -158,11 +182,12 @@ public class WindowsParser extends Parser{
 	 * @throws ProcessMonitorException 
 	 */
 	private void calcCPUTime() throws ProcessMonitorException{
-		try{
+		BufferedReader input = null;
+        try{
 			String cpudata;			
 			int cpuPosName = -1, cpuPosUserModeTime = -1, cpuPosKernelModeTime = -1;
 			Process p = Runtime.getRuntime().exec("wmic process get name,usermodetime,kernelmodetime /format:csv");
-			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			//skipping first lines
 			if(input.readLine().toLowerCase().contains("invalid xsl format")){
@@ -239,7 +264,19 @@ public class WindowsParser extends Parser{
 
 		} catch(IOException e) {
 			throw new ProcessMonitorException("Unable to read output from 'wmic' command. Terminating Process Monitor");
-		}
+		} catch (NullPointerException e){
+            throw new ProcessMonitorException("NullPointerException: " + e.getMessage());
+        }
+        finally {
+            try {
+                input.close();
+            } catch (IOException e) {
+                logger.error("IOException - Problem closing the input stream: ", e);
+            }
+            catch (NullPointerException e) {
+                logger.error("NullPointerException: input is null", e);
+            }
+        }
 	}
 
 }

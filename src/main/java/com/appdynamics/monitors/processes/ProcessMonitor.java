@@ -19,16 +19,10 @@
 
 package com.appdynamics.monitors.processes;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.dom4j.DocumentException;
 
@@ -91,7 +85,7 @@ public class ProcessMonitor extends AManagedMonitor{
 		try {
 
 			String os = System.getProperty("os.name").toLowerCase();
-			logger = Logger.getLogger(ProcessMonitor.class);	
+			logger = Logger.getLogger(ProcessMonitor.class);
 			running = true;
 			
 			logger.debug("Process Monitor in Debug mode started.");
@@ -135,16 +129,19 @@ public class ProcessMonitor extends AManagedMonitor{
 
 			// working with threads to ensure a more accurate sleep time.
 			while(running) {
-				
+				CountDownLatch latch = new CountDownLatch(FETCHES_PER_INTERVAL);
 				logger.debug("New round of metric collection started");
 				for(int i = 0; i < FETCHES_PER_INTERVAL; i++){
 					Thread.sleep(REPORT_INTERVAL_SECS / FETCHES_PER_INTERVAL * 1000);
-					(new ParseThread()).start();					
+					Thread parseThread = new ParseThread(latch);
+                    parseThread.start();
 				}
-				
-				(new PrintMetricsClearHashmapThread()).start();
-				
-
+                latch.await();
+                logger.debug("Finished collecting metrics...");
+				Thread printMetricsClearHashmapThread= new PrintMetricsClearHashmapThread();
+                printMetricsClearHashmapThread.start();
+                printMetricsClearHashmapThread.join();
+                logger.debug("Finished printing metrics...");
 			}
 
 		} catch (InterruptedException e) {
@@ -164,9 +161,7 @@ public class ProcessMonitor extends AManagedMonitor{
 		
 		logger.debug("Reading in the set of monitored processes");
 		parser.readProcsFromFile();
-		
 		for(ProcessData procData : parser.getProcesses().values()){
-
 			float absoluteMem = (procData.memPercent/100 * parser.getTotalMemSizeMB()) / FETCHES_PER_INTERVAL;
 	
 			if(absoluteMem >= parser.getMemoryThreshold() || parser.getIncludeProcesses().contains(procData.name)){
@@ -239,13 +234,21 @@ public class ProcessMonitor extends AManagedMonitor{
 	}
 
 	private class ParseThread extends Thread{
-		public void run(){
+
+        private CountDownLatch latch;
+
+        public ParseThread(CountDownLatch latch) {
+            this.latch = latch;
+        }
+
+        public void run(){
 			try {
 				parser.parseProcesses();
-			}  catch (ProcessMonitorException e) {
+			}  catch (Exception e) {
 				logger.error(e.getMessage());
 				running = false;
-			}				
+			}
+            latch.countDown();
 		}
 	}
 

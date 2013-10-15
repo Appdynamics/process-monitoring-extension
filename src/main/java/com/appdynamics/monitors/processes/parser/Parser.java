@@ -40,8 +40,6 @@ import org.dom4j.io.SAXReader;
 import com.appdynamics.monitors.processes.processdata.ProcessData;
 import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
 
-
-
 public abstract class Parser {
 
 	private final int DEFAULT_MEM_THRESHOLD = 100;
@@ -127,27 +125,37 @@ public abstract class Parser {
 	}
 	
 	public void readProcsFromFile(){
-		try {
-			BufferedReader br = new BufferedReader(new FileReader("monitors/ProcessMonitor/.monitored-processes"));
+		BufferedReader br = null;
+        try {
+			br = new BufferedReader(new FileReader("monitors/ProcessMonitor/.monitored-processes"));
 			String line;
 			includeProcesses.clear();
 			while((line = br.readLine()) != null){
 				includeProcesses.add(line);
 			}
-			br.close();
 		} catch (FileNotFoundException e) {
 			logger.debug("the file .monitoredProcesses.txt could not be found. " +
 					"This might be the first time trying to read in from the file, " +
 					"and the set of monitored processes is set to be empty.");
 		} catch (IOException e) {
-			logger.warn("A problem occured reading from the .monitoredProcesses file.");
+			logger.warn("A problem occurred reading from the .monitoredProcesses file.");
 		}
+        finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                logger.error("IOException: ", e);
+            }
+            catch (NullPointerException e) {
+                logger.error("NullPointerException: ", e);
+            }
+        }
 	}
 	
 	public void writeProcsToFile(){
-		
+		BufferedWriter wr = null;
 		try {
-			BufferedWriter wr = new BufferedWriter(new FileWriter("monitors/ProcessMonitor/.monitored-processes"));
+			wr = new BufferedWriter(new FileWriter("monitors/ProcessMonitor/.monitored-processes"));
 			wr.write("");
 			wr.close();
 			
@@ -156,12 +164,24 @@ public abstract class Parser {
 				wr.write(process);
 				wr.newLine();
 			}
-			wr.close();
-			
+
 		} catch (IOException e) {
 			logger.warn("Can't write process names to/create file '.monitored-processes' in ProcessMonitor directory.");
 		}
-		
+        catch(NullPointerException e) {
+            logger.error("NullPointerException: ", e);
+        }
+        finally {
+            try {
+                wr.close();
+            } catch (IOException e) {
+                logger.error("IOException: ", e);
+            }
+            catch(NullPointerException e) {
+                logger.error("This exception is expected the first time because the file '.monitored-processes' does not exist yet and hence the BufferedWriter is null");
+                logger.error("NullPointerException: ", e);
+            }
+        }
 	}
 
 	public int getDefaultMemoryThreshold() {
