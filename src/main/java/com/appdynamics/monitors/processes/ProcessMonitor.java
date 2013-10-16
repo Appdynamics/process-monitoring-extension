@@ -85,7 +85,7 @@ public class ProcessMonitor extends AManagedMonitor{
 
 			String os = System.getProperty("os.name").toLowerCase();
 			logger = Logger.getLogger(ProcessMonitor.class);
-//            logger.setLevel(Level.DEBUG);
+            logger.setLevel(Level.INFO);
 			running = true;
 			
 			logger.debug("Process Monitor in Debug mode started.");
