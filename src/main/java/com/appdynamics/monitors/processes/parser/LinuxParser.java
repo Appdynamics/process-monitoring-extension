@@ -16,17 +16,16 @@
 
 package com.appdynamics.monitors.processes.parser;
 
+import com.appdynamics.monitors.processes.processdata.ProcessData;
+import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-
-import org.apache.log4j.Logger;
-
-import com.appdynamics.monitors.processes.processdata.ProcessData;
-import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
 
 public class LinuxParser extends Parser {
 
@@ -67,7 +66,7 @@ public class LinuxParser extends Parser {
 			}
 
 			if(posMem == -1 || posCPU == -1 || posMem == -1){
-				p.destroy();
+				cleanUpProcess(p);
                 input.close();
 				throw new ProcessMonitorException("Can't find correct process stats from 'ps aux' command. Terminating Process Monitor");
 	

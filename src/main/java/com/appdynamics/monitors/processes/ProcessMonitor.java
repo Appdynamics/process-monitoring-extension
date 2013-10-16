@@ -19,13 +19,6 @@
 
 package com.appdynamics.monitors.processes;
 
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.dom4j.DocumentException;
-
 import com.appdynamics.monitors.processes.parser.LinuxParser;
 import com.appdynamics.monitors.processes.parser.Parser;
 import com.appdynamics.monitors.processes.parser.WindowsParser;
@@ -36,6 +29,12 @@ import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.TaskOutput;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.dom4j.DocumentException;
+
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 public class ProcessMonitor extends AManagedMonitor{
 
@@ -86,7 +85,7 @@ public class ProcessMonitor extends AManagedMonitor{
 
 			String os = System.getProperty("os.name").toLowerCase();
 			logger = Logger.getLogger(ProcessMonitor.class);
-            //logger.setLevel(Level.DEBUG);
+//            logger.setLevel(Level.DEBUG);
 			running = true;
 			
 			logger.debug("Process Monitor in Debug mode started.");
@@ -117,6 +116,7 @@ public class ProcessMonitor extends AManagedMonitor{
 			}
 
 			parser.initialize();
+            logger.info("Parser Initialized...");
 			try{
 				parser.parseXML(taskArguments.get("properties-path"));
 				logger.debug("finished reading properties.xml at " + taskArguments.get("properties-path"));
@@ -131,17 +131,17 @@ public class ProcessMonitor extends AManagedMonitor{
 			// working with threads to ensure a more accurate sleep time.
 			while(running) {
 				CountDownLatch latch = new CountDownLatch(FETCHES_PER_INTERVAL);
-				logger.debug("New round of metric collection started");
+				logger.info("New round of metric collection started");
 				for(int i = 0; i < FETCHES_PER_INTERVAL; i++){
 					Thread.sleep(REPORT_INTERVAL_SECS / FETCHES_PER_INTERVAL * 1000);
 					Thread parseThread = new ParseThread(latch);
                     parseThread.start();
 				}
                 latch.await();
-                logger.debug("Finished collecting metrics...");
-				Thread printMetricsClearHashmapThread= new PrintMetricsClearHashmapThread();
-                printMetricsClearHashmapThread.start();
-                printMetricsClearHashmapThread.join();
+                logger.info("Finished collecting metrics...");
+				printAllMetrics();
+                logger.info("Finished printing metrics...");
+                parser.getProcesses().clear();
 			}
 
 		} catch (InterruptedException e) {
@@ -257,13 +257,4 @@ public class ProcessMonitor extends AManagedMonitor{
             }
 		}
 	}
-
-	private class PrintMetricsClearHashmapThread extends Thread{
-		public void run(){
-			printAllMetrics();		
-			
-			parser.getProcesses().clear();
-		}
-	}
-
 }

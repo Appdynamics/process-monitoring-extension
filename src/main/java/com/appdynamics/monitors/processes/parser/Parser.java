@@ -15,25 +15,21 @@
  */
 
 
-
-
 package com.appdynamics.monitors.processes.parser;
 
-
-import java.io.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.appdynamics.monitors.processes.processdata.ProcessData;
+import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import com.appdynamics.monitors.processes.processdata.ProcessData;
-import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
+import java.io.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class Parser {
 
@@ -129,7 +125,7 @@ public abstract class Parser {
 				includeProcesses.add(line);
 			}
 		} catch (FileNotFoundException e) {
-			logger.debug("the file .monitoredProcesses.txt could not be found. " +
+			logger.warn("the file .monitoredProcesses.txt could not be found. " +
 					"This might be the first time trying to read in from the file, " +
 					"and the set of monitored processes is set to be empty.");
 		} catch (IOException e) {
