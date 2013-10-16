@@ -86,6 +86,7 @@ public class ProcessMonitor extends AManagedMonitor{
 
 			String os = System.getProperty("os.name").toLowerCase();
 			logger = Logger.getLogger(ProcessMonitor.class);
+            //logger.setLevel(Level.DEBUG);
 			running = true;
 			
 			logger.debug("Process Monitor in Debug mode started.");
@@ -141,7 +142,6 @@ public class ProcessMonitor extends AManagedMonitor{
 				Thread printMetricsClearHashmapThread= new PrintMetricsClearHashmapThread();
                 printMetricsClearHashmapThread.start();
                 printMetricsClearHashmapThread.join();
-                logger.debug("Finished printing metrics...");
 			}
 
 		} catch (InterruptedException e) {
@@ -151,6 +151,10 @@ public class ProcessMonitor extends AManagedMonitor{
 			logger.error(e.getMessage());
 			return null;
 		}
+        catch (Exception e) {
+            logger.error("Task has failed with exception: ", e);
+            return new TaskOutput("Failed with error: " + e.getMessage());
+        }
 		
 		return null;
 	}
@@ -248,7 +252,9 @@ public class ProcessMonitor extends AManagedMonitor{
 				logger.error(e.getMessage());
 				running = false;
 			}
-            latch.countDown();
+            finally {
+                latch.countDown();
+            }
 		}
 	}
 

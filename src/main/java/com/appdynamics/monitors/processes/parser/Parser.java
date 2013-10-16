@@ -20,12 +20,7 @@
 package com.appdynamics.monitors.processes.parser;
 
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -141,14 +136,7 @@ public abstract class Parser {
 			logger.warn("A problem occurred reading from the .monitoredProcesses file.");
 		}
         finally {
-            try {
-                br.close();
-            } catch (IOException e) {
-                logger.error("IOException: ", e);
-            }
-            catch (NullPointerException e) {
-                logger.error("NullPointerException: ", e);
-            }
+            closeBufferedReader(br);
         }
 	}
 	
@@ -172,15 +160,7 @@ public abstract class Parser {
             logger.error("NullPointerException: ", e);
         }
         finally {
-            try {
-                wr.close();
-            } catch (IOException e) {
-                logger.error("IOException: ", e);
-            }
-            catch(NullPointerException e) {
-                logger.error("This exception is expected the first time because the file '.monitored-processes' does not exist yet and hence the BufferedWriter is null");
-                logger.error("NullPointerException: ", e);
-            }
+            closeBufferedWriter(wr);
         }
 	}
 
@@ -250,4 +230,41 @@ public abstract class Parser {
 					"reported, even if falling back below threshold: " + name);
 		}
 	}
+
+    protected void cleanUpProcess(Process p) {
+        try {
+            p.waitFor();
+            p.getInputStream().close();
+            p.getOutputStream().close();
+            p.getErrorStream().close();
+            p.destroy();
+        } catch(IOException e) {
+            logger.error("IOException: ", e);
+        } catch(InterruptedException e) {
+            logger.error("InterruptedException: ", e);
+        } catch(NullPointerException e) {
+            logger.error("NullPointerException: ", e);
+        } catch(Exception e) {
+            logger.error("Exception: ", e);
+        }
+    }
+    protected void closeBufferedReader(BufferedReader reader) {
+        try {
+            reader.close();
+        } catch (IOException e) {
+            logger.error("IOException: ", e);
+        } catch(NullPointerException e) {
+            logger.error("NullPointerException: ", e);
+        }
+    }
+
+    protected void closeBufferedWriter(BufferedWriter writer) {
+        try {
+            writer.close();
+        } catch (IOException e) {
+            logger.error("IOException: ", e);
+        } catch(NullPointerException e) {
+            logger.error("NullPointerException: ", e);
+        }
+    }
 }

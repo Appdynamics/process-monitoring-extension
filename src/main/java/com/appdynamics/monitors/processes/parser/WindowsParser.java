@@ -58,9 +58,10 @@ public class WindowsParser extends Parser{
 	@Override
 	public void initialize() throws ProcessMonitorException {
 		BufferedReader input = null;
+        Process p = null;
         try{
 			String line;			
-			Process p = Runtime.getRuntime().exec("tasklist /fo csv");
+			p = Runtime.getRuntime().exec("tasklist /fo csv");
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			//first line, parse positions of data (in case this will change over time)
 			if((line = input.readLine()) != null){
@@ -77,14 +78,15 @@ public class WindowsParser extends Parser{
 				}
 			}
 			
-			input.close();
+			cleanUpProcess(p);
+            input.close();
 			
 			if(posName == -1 || posPID == -1 || posMem == -1){
 				throw new ProcessMonitorException("Could not find correct header information of 'tasklist -fo csv'. Terminating Process Monitor");
 			}
 
-			Process pMem = Runtime.getRuntime().exec("wmic OS get TotalVisibleMemorySize");
-			input = new BufferedReader(new InputStreamReader(pMem.getInputStream()));	
+			p = Runtime.getRuntime().exec("wmic OS get TotalVisibleMemorySize");
+			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			//skipping first lines
 			input.readLine();
@@ -103,14 +105,8 @@ public class WindowsParser extends Parser{
             throw new ProcessMonitorException("NullPointerException: " + e.getMessage());
 		}
         finally {
-            try {
-                input.close();
-            } catch (IOException e) {
-                logger.error("IOException - Problem closing the input stream: ", e);
-            }
-            catch (NullPointerException e) {
-                logger.error("NullPointerException: input is null", e);
-            }
+            cleanUpProcess(p);
+            closeBufferedReader(input);
         }
 	}
 
@@ -121,9 +117,10 @@ public class WindowsParser extends Parser{
 	@Override
 	public void parseProcesses() throws ProcessMonitorException {
 		BufferedReader input = null;
+        Process p = null;
         try{
 			String processLine;			
-			Process p = Runtime.getRuntime().exec("tasklist /fo csv");
+			p = Runtime.getRuntime().exec("tasklist /fo csv");
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			// skipping csv header
@@ -166,14 +163,8 @@ public class WindowsParser extends Parser{
             throw new ProcessMonitorException("NullPointerException: " + e.getMessage());
         }
         finally {
-            try {
-                input.close();
-            } catch (IOException e) {
-                logger.error("IOException - Problem closing the input stream: ", e);
-            }
-            catch (NullPointerException e) {
-                logger.error("NullPointerException: input is null", e);
-            }
+            cleanUpProcess(p);
+            closeBufferedReader(input);
         }
 	}
 
@@ -183,10 +174,11 @@ public class WindowsParser extends Parser{
 	 */
 	private void calcCPUTime() throws ProcessMonitorException{
 		BufferedReader input = null;
+        Process p = null;
         try{
 			String cpudata;			
 			int cpuPosName = -1, cpuPosUserModeTime = -1, cpuPosKernelModeTime = -1;
-			Process p = Runtime.getRuntime().exec("wmic process get name,usermodetime,kernelmodetime /format:csv");
+			p = Runtime.getRuntime().exec("wmic process get name,usermodetime,kernelmodetime /format:csv");
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			//skipping first lines
@@ -268,15 +260,8 @@ public class WindowsParser extends Parser{
             throw new ProcessMonitorException("NullPointerException: " + e.getMessage());
         }
         finally {
-            try {
-                input.close();
-            } catch (IOException e) {
-                logger.error("IOException - Problem closing the input stream: ", e);
-            }
-            catch (NullPointerException e) {
-                logger.error("NullPointerException: input is null", e);
-            }
+           cleanUpProcess(p);
+           closeBufferedReader(input);
         }
 	}
-
 }

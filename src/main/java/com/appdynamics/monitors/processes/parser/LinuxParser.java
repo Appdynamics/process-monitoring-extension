@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-
-
-
 package com.appdynamics.monitors.processes.parser;
 
 import java.io.BufferedReader;
@@ -31,7 +28,6 @@ import org.apache.log4j.Logger;
 import com.appdynamics.monitors.processes.processdata.ProcessData;
 import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
 
-
 public class LinuxParser extends Parser {
 
 	private int posPID = -1, posCPU = -1, posMem = -1; // used for parsing 
@@ -43,7 +39,6 @@ public class LinuxParser extends Parser {
 		includeProcesses = new HashSet<String>();
 		excludeProcesses = new ArrayList<String>();
 		excludePIDs = new ArrayList<Integer>();
-
 	}
 
 	/**
@@ -51,10 +46,12 @@ public class LinuxParser extends Parser {
 	 * @throws ProcessMonitorException 
 	 */
 	public void initialize() throws ProcessMonitorException{		
-		try{
+		BufferedReader input = null;
+        Process p = null;
+        try{
 			String line;
-			Process p = Runtime.getRuntime().exec("ps aux");
-			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			p = Runtime.getRuntime().exec("ps aux");
+			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			//first line, parse positions of data (in case this will change over time)
 			if((line = input.readLine()) != null){
 				String[] words = line.split("\\s+");
@@ -70,12 +67,13 @@ public class LinuxParser extends Parser {
 			}
 
 			if(posMem == -1 || posCPU == -1 || posMem == -1){
-				input.close();
+				p.destroy();
+                input.close();
 				throw new ProcessMonitorException("Can't find correct process stats from 'ps aux' command. Terminating Process Monitor");
 	
 			}
-			input.close();
-
+            cleanUpProcess(p);
+            input.close();
 
 			p = Runtime.getRuntime().exec("cat /proc/meminfo");
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -83,30 +81,39 @@ public class LinuxParser extends Parser {
 				String[] words = line.split("\\s+");
 				setTotalMemSizeMB(Integer.parseInt(words[1]) / 1024);
 			}		
-			input.close();
 		} catch (IOException e) {
 			throw new ProcessMonitorException("Unable to read output from ps aux command");
 		} catch (NumberFormatException e){
 			throw new ProcessMonitorException("Unable to retrieve total physical memory size (not a number: " + e.getMessage() + "). Terminating Process Monitor");
-		}
+		}  catch(NullPointerException e) {
+            throw new NullPointerException("NullPointerException " + e.getMessage());
+        }
+        finally {
+            cleanUpProcess(p);
+            closeBufferedReader(input);
+        }
 	}
 
-	public String getNameOfProcess(int pid) throws IOException{
+	public String getNameOfProcess(int pid) {
 		BufferedReader input = null;
+        Process allProcs = null;
         try {
             String line;
-            Process allProcs = Runtime.getRuntime().exec("cat /proc/" + pid + "/status");
+            allProcs = Runtime.getRuntime().exec("cat /proc/" + pid + "/status");
             input = new BufferedReader(new InputStreamReader(allProcs.getInputStream()));
             if((line = input.readLine()) != null){
                 String[] words = line.split("\\s+");
                 return words[1];
             }
         }
-        catch(Exception e) {
-            logger.error("Exception: ", e);
+        catch(IOException e) {
+            logger.error("IOException: ", e);
+        } catch(NullPointerException e) {
+            logger.error("NullPointerException: ", e);
         }
         finally {
-            input.close();
+            cleanUpProcess(allProcs);
+            closeBufferedReader(input);
         }
 		return null;
 	}
@@ -117,9 +124,10 @@ public class LinuxParser extends Parser {
 	 */
 	public void parseProcesses() throws NumberFormatException{
         BufferedReader input = null;
+        Process allProcs = null;
         try{
 			String processLine;
-			Process allProcs = Runtime.getRuntime().exec("ps aux");
+			allProcs = Runtime.getRuntime().exec("ps aux");
 			input = new BufferedReader(new InputStreamReader(allProcs.getInputStream()));
 
 			// there seems to be a single process, probably ps aux itself,
@@ -166,18 +174,14 @@ public class LinuxParser extends Parser {
 					hasReadOwn = true;
 				}
 			}
-			input.close();
-			
 		} catch (IOException e) {
 			logger.error("Unable to read output from ps aux command", e);
-		}
+		} catch (NullPointerException e) {
+            logger.error("NullPointerException: ", e);
+        }
         finally {
-            try {
-                input.close();
-            } catch (IOException e) {
-                logger.error("IOException: ", e);
-            }
+            cleanUpProcess(allProcs);
+            closeBufferedReader(input);
         }
 	}
-
 }
