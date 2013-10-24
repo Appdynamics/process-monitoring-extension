@@ -50,7 +50,6 @@ public class ProcessMonitor extends AManagedMonitor{
 	Logger logger;
 	
 	public static void main(String[] args){
-		
 		System.out.println("main");
 	}
 
@@ -69,16 +68,15 @@ public class ProcessMonitor extends AManagedMonitor{
 		for(int pid : parser.getExcludePIDs()){
 			exclPIDs = exclPIDs.concat(pid + ", ");
 		}
-		if(!exclProcs.isEmpty()){
+		if(!"".equals(exclProcs)){
 			logger.info("Ignoring processes:      " + exclProcs.substring(0, exclProcs.length() - 2));
 		}
-		if(!exclPIDs.isEmpty()){
+		if(!"".equals(exclPIDs)){
 			logger.info("Ignoring pids:           " + exclPIDs.substring(0, exclPIDs.length() - 2));
 		}
 	}
 
 
-	@Override
 	public TaskOutput execute(Map<String, String> taskArguments,
 			TaskExecutionContext taskContext) throws TaskExecutionException {
 		try {
@@ -150,8 +148,7 @@ public class ProcessMonitor extends AManagedMonitor{
 		} catch (ProcessMonitorException e) {
 			logger.error(e.getMessage());
 			return null;
-		}
-        catch (Exception e) {
+		} catch (Exception e) {
             logger.error("Task has failed with exception: ", e);
             return new TaskOutput("Failed with error: " + e.getMessage());
         }

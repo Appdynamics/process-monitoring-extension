@@ -15,13 +15,13 @@
             <fileset dir="${build.dir}/classes"/>
         </jar>
     	<copy todir="${build.dir}/ProcessMonitor/lib/">
-    	            <fileset dir="${lib.dir}/dom4j" includes="dom4j-2.0.0-ALPHA-2.jar"/>
+            <fileset dir="${lib.dir}/dom4j" includes="dom4j-2.0.0-ALPHA-2.jar"/>
     	</copy>
         <copy todir="${build.dir}/ProcessMonitor/">
             <fileset dir="${conf.dir}" includes="monitor.xml"/>
         </copy>
     	<copy todir="${build.dir}/ProcessMonitor/">
-    	            <fileset dir="${conf.dir}" includes="properties.xml"/>
+            <fileset dir="${conf.dir}" includes="properties.xml"/>
     	</copy>
         <delete dir="${build.dir}/classes"/>
     </target>
