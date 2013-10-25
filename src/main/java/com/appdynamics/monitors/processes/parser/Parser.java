@@ -132,6 +132,7 @@ public abstract class Parser {
 			logger.warn("A problem occurred reading from the .monitoredProcesses file.");
 		}
         finally {
+        	if(br !=null)
             closeBufferedReader(br);
         }
 	}
