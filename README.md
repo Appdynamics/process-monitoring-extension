@@ -57,6 +57,8 @@ The Processes extension retrieves the following metrics of each process:
 In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Custom Metrics | \<Windows/Linux\> Processes
 or your specified path under Application Infrastructure Performance  | \<Tier\> |.
 
+NOTE: If there are multiple processes with the same name (i.e. 3 "java.exe" processes), they will be identified by their PID in the Metric Browser.
+
 ###XML files to modify
 <ul>
 <li>monitor.xml: This is used to execute the Java code which starts the extension. You might need to configure the path to the other xml file (see <a href="http://docs.appdynamics.com/display/ACE/Processes?sortBy=name#Processes-monitor.xml" target="_blank">monitor.xml</a> (requires login)).</li>
