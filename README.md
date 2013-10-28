@@ -51,7 +51,7 @@ The Processes extension retrieves the following metrics of each process:
 3. Unzip the downloaded file
 4. In \<machineagent install dir\>/monitors/ProcessMonitor/, open monitor.xml and configure the path to the properties.xml.
 5. Optional but recommended. Configure a custom metric path (in monitor.xml).
-6. Optional. Open properties.xml and configure the filter values.
+6. Optional. Open properties.xml and configure the filter values. NOTE: If the memory threshold is not specified in properties.xml, then a default value of 100MB will be used by the extension. This means that any processes below this threshold will not appear in the Metric Browser.
 7. Restart the Machine Agent.
 
 In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Custom Metrics | \<Windows/Linux\> Processes
