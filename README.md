@@ -11,7 +11,7 @@ The Processes extension retrieves the following metrics of each process:
 -   CPU utilization in %
 -   Memory utilization in MB
 -   Memory utilization in %
--   Number of running instances. (If there are, for example, 3 Java processes running, this monitor will summarize them to one single report)
+-   Number of running instances. (If there are, for example, 3 Java processes running, this monitor will report them individually)
 
 
 ##Directory Structure
