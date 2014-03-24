@@ -19,6 +19,7 @@ package com.appdynamics.monitors.processes.parser;
 
 import com.appdynamics.monitors.processes.processdata.ProcessData;
 import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
+
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -36,7 +37,7 @@ public abstract class Parser {
 	private final int DEFAULT_MEM_THRESHOLD = 100;
 	private String properties;
 	private int memoryThreshold;
-
+	
 	protected Set<String> includeProcesses;
 	protected List<String> excludeProcesses;
 	protected List<Integer> excludePIDs;
@@ -45,6 +46,7 @@ public abstract class Parser {
 	Logger logger;
 
 	public String processGroupName;
+	public String monitoredProcessFilePath;
 
 	public abstract void initialize() throws ProcessMonitorException;
 
@@ -118,7 +120,7 @@ public abstract class Parser {
 	public void readProcsFromFile(){
 		BufferedReader br = null;
         try {
-			br = new BufferedReader(new FileReader("monitors/ProcessMonitor/.monitored-processes"));
+			br = new BufferedReader(new FileReader(monitoredProcessFilePath));
 			String line;
 			includeProcesses.clear();
 			while((line = br.readLine()) != null){
@@ -140,11 +142,11 @@ public abstract class Parser {
 	public void writeProcsToFile(){
 		BufferedWriter wr = null;
 		try {
-			wr = new BufferedWriter(new FileWriter("monitors/ProcessMonitor/.monitored-processes"));
+			wr = new BufferedWriter(new FileWriter(monitoredProcessFilePath));
 			wr.write("");
 			wr.close();
 			
-			wr = new BufferedWriter(new FileWriter("monitors/ProcessMonitor/.monitored-processes"));
+			wr = new BufferedWriter(new FileWriter(monitoredProcessFilePath));
 			for(String process : includeProcesses){
 				wr.write(process);
 				wr.newLine();

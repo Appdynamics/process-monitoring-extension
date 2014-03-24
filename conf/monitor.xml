@@ -22,6 +22,13 @@
                 	-->
                     <argument name="properties-path" is-required="true" default-value="monitors/ProcessMonitor/properties.xml"/>
                     
+                    <!-- CONFIGURE PATH TO PROCESSES FILE 
+                    	this is the path to the file .monitored-processes
+                    	Default value is "monitors/ProcessMonitor/.monitored-processes"
+                    	Change the field 'default-value' to have your own custom path to the file
+                     -->
+                    <argument name="monitored-processes-path" is-required="true" default-value="monitors/ProcessMonitor/.monitored-processes"/>
+                    
                 	<!-- CONFIGURE METRIC PATH (OPTIONAL):
                      		You can configure a metric path, such that only one tier is going to receive
                      		metrics from this monitor. The pattern is: Server|Component:<id or name>

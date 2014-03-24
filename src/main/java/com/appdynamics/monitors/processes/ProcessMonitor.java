@@ -29,6 +29,7 @@ import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.TaskOutput;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.dom4j.DocumentException;
@@ -102,6 +103,22 @@ public class ProcessMonitor extends AManagedMonitor{
 			if(!taskArguments.containsKey("properties-path")){
 				logger.error("monitor.xml needs to contain a task-argument 'properties-path' describing" +
 						"the path to the xml-file with the properties. Quitting Process Monitor");
+				return null;
+			}
+			
+			if(taskArguments.containsKey("monitored-processes-path")){
+				String filePath = taskArguments.get("monitored-processes-path").trim();
+				if(!"".equals(filePath)) {
+					parser.monitoredProcessFilePath = filePath;
+					logger.debug("Monitored Processes File path : " + parser.monitoredProcessFilePath);
+				} else {
+					logger.error("In monitor.xml the task-argument 'monitored-processes-path' is empty. Please specify a valid path to the file. Quitting Process Monitor");
+					return null;
+				}
+				
+			} else {
+				logger.error("monitor.xml needs to contain a task-argument 'monitored-processes-path' describing " +
+						"the path to the file where monitored processes are written. Quitting Process Monitor");
 				return null;
 			}
 			

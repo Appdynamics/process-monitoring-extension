@@ -49,7 +49,7 @@ The Processes extension retrieves the following metrics of each process:
 1. Run 'ant package' from the process-monitoring-extension directory
 2. Download the file ProcessMonitor.zip located in the 'dist' directory into \<machineagent install dir\>/monitors/
 3. Unzip the downloaded file
-4. In \<machineagent install dir\>/monitors/ProcessMonitor/, open monitor.xml and configure the path to the properties.xml.
+4. In \<machineagent install dir\>/monitors/ProcessMonitor/, open monitor.xml and configure the path to the properties.xml and monitored-processes.
 5. Optional but recommended. Configure a custom metric path (in monitor.xml).
 6. Optional. Open properties.xml and configure the filter values. NOTE: If the memory threshold is not specified in properties.xml, then a default value of 100MB will be used by the extension. This means that any processes below this threshold will not appear in the Metric Browser.
 7. Restart the Machine Agent.
