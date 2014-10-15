@@ -17,11 +17,7 @@
 
 
 
-package com.appdynamics.monitors.processes.parser;
-
-import com.appdynamics.monitors.processes.processdata.ProcessData;
-import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
-import org.apache.log4j.Logger;
+package com.appdynamics.extensions.process.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,6 +26,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+
+import com.appdynamics.extensions.process.processdata.ProcessData;
+import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 
 
 public class WindowsParser extends Parser{

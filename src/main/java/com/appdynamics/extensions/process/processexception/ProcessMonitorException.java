@@ -15,18 +15,17 @@
  */
 
 
-package com.appdynamics.monitors.processes.processdata;
+package com.appdynamics.extensions.process.processexception;
 
-public class ProcessData {
-	public String name;
-	public int numOfInstances;
-	public float memPercent;
-	public float CPUPercent;
+public class ProcessMonitorException extends Exception {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
-	public ProcessData(String name, float CPUPercent, float memPercent){
-		this.name = name;
-		this.numOfInstances = 1;
-		this.memPercent = memPercent;
-		this.CPUPercent = CPUPercent;	
+	public ProcessMonitorException(String message){
+		super(message);
 	}
+	
 }

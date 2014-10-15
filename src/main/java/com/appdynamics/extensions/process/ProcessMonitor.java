@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.appdynamics.extensions.process;
 
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
+import org.apache.log4j.Logger;
+import org.dom4j.DocumentException;
 
-
-package com.appdynamics.monitors.processes;
-
-import com.appdynamics.monitors.processes.parser.LinuxParser;
-import com.appdynamics.monitors.processes.parser.Parser;
-import com.appdynamics.monitors.processes.parser.WindowsParser;
-import com.appdynamics.monitors.processes.processdata.ProcessData;
-import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
+import com.appdynamics.extensions.process.parser.LinuxParser;
+import com.appdynamics.extensions.process.parser.Parser;
+import com.appdynamics.extensions.process.parser.WindowsParser;
+import com.appdynamics.extensions.process.processdata.ProcessData;
+import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
 import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.TaskOutput;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.dom4j.DocumentException;
-
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 public class ProcessMonitor extends AManagedMonitor{
 
@@ -48,7 +43,13 @@ public class ProcessMonitor extends AManagedMonitor{
 
 	private boolean running;
 	
-	Logger logger;
+	private static final Logger logger = Logger.getLogger("com.singularity.extensions.ProcessMonitor");
+	
+	public ProcessMonitor() {
+		String msg = "Using Monitor Version [" + getImplementationVersion() + "]";
+		logger.info(msg);
+		System.out.println(msg);
+	}
 	
 	public static void main(String[] args){
 		System.out.println("main");
@@ -83,8 +84,6 @@ public class ProcessMonitor extends AManagedMonitor{
 		try {
 
 			String os = System.getProperty("os.name").toLowerCase();
-			logger = Logger.getLogger(ProcessMonitor.class);
-            logger.setLevel(Level.INFO);
 			running = true;
 			
 			logger.debug("Process Monitor in Debug mode started.");
@@ -270,5 +269,9 @@ public class ProcessMonitor extends AManagedMonitor{
                 latch.countDown();
             }
 		}
+	}
+	
+	private static String getImplementationVersion() {
+		return ProcessMonitor.class.getPackage().getImplementationTitle();
 	}
 }

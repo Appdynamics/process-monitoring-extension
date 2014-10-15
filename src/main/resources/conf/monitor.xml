@@ -4,16 +4,11 @@
         <description>Processes monitor</description>
         <monitor-configuration></monitor-configuration>
         <monitor-run-task>
-                <execution-style>continuous</execution-style>
                 <name>Processes Monitor Run Task</name>
                 <display-name>Processes Monitor Task</display-name>
                 <description>Processes Monitor Task</description>
                 <type>java</type>
-                <java-task>
-                        <classpath>ProcessMonitor.jar;lib/dom4j-2.0.0-ALPHA-2.jar</classpath>
-                        <impl-class>com.appdynamics.monitors.processes.ProcessMonitor</impl-class>
-                </java-task>
-                
+                <execution-style>continuous</execution-style>
                 <task-arguments>
                		<!-- CONFIGURE IF NECESSARY:
                 		this is the path to the file properties.xml
@@ -38,5 +33,9 @@
                 	-->
                     <argument name="metric-path" is-required="false" default-value=""/>
                 </task-arguments>
+                <java-task>
+                        <classpath>process-monitoring-extension.jar</classpath>
+                        <impl-class>com.appdynamics.extensions.process.ProcessMonitor</impl-class>
+                </java-task>
         </monitor-run-task>
 </monitor>

@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.appdynamics.extensions.process.parser;
 
-package com.appdynamics.monitors.processes.parser;
-
-import com.appdynamics.monitors.processes.processdata.ProcessData;
-import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
+import com.appdynamics.extensions.process.processdata.ProcessData;
+import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;

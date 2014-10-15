@@ -15,10 +15,10 @@
  */
 
 
-package com.appdynamics.monitors.processes.parser;
+package com.appdynamics.extensions.process.parser;
 
-import com.appdynamics.monitors.processes.processdata.ProcessData;
-import com.appdynamics.monitors.processes.processexception.ProcessMonitorException;
+import com.appdynamics.extensions.process.processdata.ProcessData;
+import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
