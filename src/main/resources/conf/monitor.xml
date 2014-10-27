@@ -8,30 +8,11 @@
                 <display-name>Processes Monitor Task</display-name>
                 <description>Processes Monitor Task</description>
                 <type>java</type>
-                <execution-style>continuous</execution-style>
+                <execution-style>periodic</execution-style>
+                <execution-frequency-in-seconds>60</execution-frequency-in-seconds>
+                <execution-timeout-in-secs>60</execution-timeout-in-secs>
                 <task-arguments>
-               		<!-- CONFIGURE IF NECESSARY:
-                		this is the path to the file properties.xml
-                		i.e.: if you created a directory in 'monitors' named other than 'ProcessMonitor',
-                	 	change the field 'default-value' to the appropriate directory.
-                	-->
-                    <argument name="properties-path" is-required="true" default-value="monitors/ProcessMonitor/properties.xml"/>
-                    
-                    <!-- CONFIGURE PATH TO PROCESSES FILE 
-                    	this is the path to the file .monitored-processes
-                    	Default value is "monitors/ProcessMonitor/.monitored-processes"
-                    	Change the field 'default-value' to have your own custom path to the file
-                     -->
-                    <argument name="monitored-processes-path" is-required="true" default-value="monitors/ProcessMonitor/.monitored-processes"/>
-                    
-                	<!-- CONFIGURE METRIC PATH (OPTIONAL):
-                     		You can configure a metric path, such that only one tier is going to receive
-                     		metrics from this monitor. The pattern is: Server|Component:<id or name>
-                     		Component id or name is the id or name of the tier.
-                     		Default (if default-value="") is "Custom Metrics|<Windows/Linux> Processes" under 
-                     		Application Infrastructure Performance in every tier
-                	-->
-                    <argument name="metric-path" is-required="false" default-value=""/>
+                    <argument name="config-file" is-required="true" default-value="monitors/ProcessMonitor/config.yml" />
                 </task-arguments>
                 <java-task>
                         <classpath>process-monitoring-extension.jar</classpath>

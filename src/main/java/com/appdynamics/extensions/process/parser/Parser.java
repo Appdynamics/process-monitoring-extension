@@ -14,181 +14,94 @@
  * limitations under the License.
  */
 
-
 package com.appdynamics.extensions.process.parser;
 
-import com.appdynamics.extensions.process.processdata.ProcessData;
-import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
-
-import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-
-import java.io.*;
-import java.util.Iterator;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+
+import com.appdynamics.extensions.process.ProcessMonitor;
+import com.appdynamics.extensions.process.config.Configuration;
+import com.appdynamics.extensions.process.processdata.ProcessData;
+import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 
 public abstract class Parser {
 
 	private final int DEFAULT_MEM_THRESHOLD = 100;
-	private String properties;
-	private int memoryThreshold;
-	
-	protected Set<String> includeProcesses;
-	protected List<String> excludeProcesses;
-	protected List<Integer> excludePIDs;
-	protected Map<String, ProcessData> processes;	
+	protected Set<String> includeProcesses = new HashSet<String>();
+	protected Map<String, ProcessData> processes = new HashMap<String, ProcessData>();
 	private int totalMemSizeMB;
-	Logger logger;
+	private static final Logger logger = Logger.getLogger("com.singularity.extensions.Parser");
 
 	public String processGroupName;
-	public String monitoredProcessFilePath;
+	protected Configuration config;
+	private String monitoredProcessFilePath;
 
-	public abstract void initialize() throws ProcessMonitorException;
-
-	public abstract void parseProcesses() throws ProcessMonitorException;	
-
-	public Parser(Logger logger){
-		this.logger = logger;
+	public Parser(Configuration config) {
+		this.config = config;
+		this.monitoredProcessFilePath = ProcessMonitor.getConfigFilename(this.config.getMonitoredProcessFilePath());
 	}
-	/**
-	 * Parses the properties file for the Process Monitor
-	 * @param xml: The path of the xml file
-	 * @throws DocumentException
-	 */
-	public void parseXML(String xml) throws DocumentException {
-		properties = xml;
-		SAXReader reader = new SAXReader();
-		Document document = reader.read(xml);
-		Element root = document.getRootElement();
-		String text;
-		// might be altered further down:
-		memoryThreshold = DEFAULT_MEM_THRESHOLD;
-		for (Iterator<Element> i = root.elementIterator(); i.hasNext();) {
-			Element element = (Element)i.next();
 
-			if (element.getName().equals("exclude-processes")){
-				if(!(text = element.getText()).equals("")) {					
-					String[] procs = text.split(",");
-					for(String proc : procs){
-						excludeProcesses.add(proc);
-					}
-				}
+	public abstract void retrieveMemoryMetrics() throws ProcessMonitorException;
 
-			} else if (element.getName().equals("exclude-pids")){
-				if(!(text = element.getText()).equals("")) {					
+	public abstract void parseProcesses() throws ProcessMonitorException;
 
-					String[] pids = text.split(",");
-					for(String pidword : pids){
-						try{
-							excludePIDs.add(Integer.parseInt(pidword));
-						} catch (NumberFormatException e){
-							logger.error(properties + ": You can only provide a whole number as a pid! " +
-									"Ignoring entry: " + pidword);						
-						}
-					}
-				}
-
-			} else if(element.getName().equals("memory-threshold")) {
-				if(!(text = element.getText().trim()).equals("")){
-					try{
-						memoryThreshold = Integer.parseInt(text);					
-						if(memoryThreshold < 0){
-							logger.error(properties + "You can only provide a non-negative whole number as a memory threshold! " +
-									"Threshold set to default (" + DEFAULT_MEM_THRESHOLD + "MB)");
-							memoryThreshold = DEFAULT_MEM_THRESHOLD;
-						} else {
-							logger.info("Memory threshold set to " + memoryThreshold + " MB");
-						}
-					} catch (NumberFormatException e){
-						logger.error(properties + "You can only provide a non-negative whole number as a memory threshold! " +
-								"Threshold set to default (" + DEFAULT_MEM_THRESHOLD + " MB)");
-						memoryThreshold = DEFAULT_MEM_THRESHOLD;
-					}
-				}
-
-			} else {
-				logger.warn("Unknown Element " + element.getName() + " found in " + properties);
-			}
-		}
-	}
-	
-	public void readProcsFromFile(){
+	public void readProcsFromFile() {
 		BufferedReader br = null;
-        try {
+		try {
 			br = new BufferedReader(new FileReader(monitoredProcessFilePath));
 			String line;
-			includeProcesses.clear();
-			while((line = br.readLine()) != null){
+			while ((line = br.readLine()) != null) {
 				includeProcesses.add(line);
 			}
 		} catch (FileNotFoundException e) {
-			logger.warn("the file .monitoredProcesses.txt could not be found. " +
-					"This might be the first time trying to read in from the file, " +
-					"and the set of monitored processes is set to be empty.");
+			logger.warn("the file .monitoredProcesses.txt could not be found. " + "This might be the first time trying to read in from the file, "
+					+ "and the set of monitored processes is set to be empty.");
 		} catch (IOException e) {
 			logger.warn("A problem occurred reading from the .monitoredProcesses file.");
+		} finally {
+			if (br != null)
+				closeBufferedReader(br);
 		}
-        finally {
-        	if(br !=null)
-            closeBufferedReader(br);
-        }
 	}
-	
-	public void writeProcsToFile(){
+
+	public void writeProcsToFile() {
 		BufferedWriter wr = null;
 		try {
 			wr = new BufferedWriter(new FileWriter(monitoredProcessFilePath));
 			wr.write("");
 			wr.close();
-			
+
 			wr = new BufferedWriter(new FileWriter(monitoredProcessFilePath));
-			for(String process : includeProcesses){
+			for (String process : includeProcesses) {
 				wr.write(process);
 				wr.newLine();
 			}
-
 		} catch (IOException e) {
-			logger.warn("Can't write process names to/create file '.monitored-processes' in ProcessMonitor directory.");
+			logger.warn("Can't write process names to/create file '.monitored-processes' in ProcessMonitor directory.", e);
+		} catch (Exception e) {
+			logger.error("Exception: ", e);
+		} finally {
+			closeBufferedWriter(wr);
 		}
-        catch(NullPointerException e) {
-            logger.error("NullPointerException: ", e);
-        }
-        finally {
-            closeBufferedWriter(wr);
-        }
-	}
-
-	public int getDefaultMemoryThreshold() {
-		return DEFAULT_MEM_THRESHOLD;
 	}
 
 	public int getMemoryThreshold() {
-		return memoryThreshold;
-	}
-
-	public void setMemoryThreshold(int memoryThreshold) {
-		this.memoryThreshold = memoryThreshold;
-	}
-
-	public List<String> getExcludeProcesses() {
-		return excludeProcesses;
-	}
-
-	public void setExcludeProcesses(List<String> excludeProcesses) {
-		this.excludeProcesses = excludeProcesses;
-	}
-
-	public List<Integer> getExcludePIDs() {
-		return excludePIDs;
-	}
-
-	public void setExcludePIDs(List<Integer> excludePIDs) {
-		this.excludePIDs = excludePIDs;
+		if (config.getMemoryThreshold() == 0) {
+			return DEFAULT_MEM_THRESHOLD;
+		} else {
+			return config.getMemoryThreshold();
+		}
 	}
 
 	public Map<String, ProcessData> getProcesses() {
@@ -198,14 +111,6 @@ public abstract class Parser {
 	public void setProcesses(Map<String, ProcessData> processes) {
 		this.processes = processes;
 	}
-
-	public Logger getLogger() {
-		return logger;
-	}
-
-	public void setLogger(Logger logger) {
-		this.logger = logger;
-	}	
 
 	public int getTotalMemSizeMB() {
 		return totalMemSizeMB;
@@ -223,47 +128,87 @@ public abstract class Parser {
 		this.includeProcesses = includeProcesses;
 	}
 
-	public void addIncludeProcesses(String name){
-		if(this.includeProcesses.add(name)){
-			logger.debug("New Process added to the list of metrics to be permanently" +
-					"reported, even if falling back below threshold: " + name);
+	public void addIncludeProcesses(String name) {
+		if (this.includeProcesses.add(name)) {
+			logger.debug("New Process added to the list of metrics to be permanently" + "reported, even if falling back below threshold: " + name);
 		}
 	}
 
-    protected void cleanUpProcess(Process p) {
-        try {
-            p.waitFor();
-            p.getInputStream().close();
-            p.getOutputStream().close();
-            p.getErrorStream().close();
-            p.destroy();
-        } catch(IOException e) {
-            logger.error("IOException: ", e);
-        } catch(InterruptedException e) {
-            logger.error("InterruptedException: ", e);
-        } catch(NullPointerException e) {
-            logger.error("NullPointerException: ", e);
-        } catch(Exception e) {
-            logger.error("Exception: ", e);
-        }
-    }
-    protected void closeBufferedReader(BufferedReader reader) {
-        try {
-            reader.close();
-        } catch (IOException e) {
-            logger.error("IOException: ", e);
-        } catch(NullPointerException e) {
-            logger.error("NullPointerException: ", e);
-        }
-    }
+	protected void cleanUpProcess(Process p, String cmd) {
+		try {
+			int exitValue = p.waitFor();
+			if(exitValue != 0) {
+				logger.error("Unable to terminate the command " + cmd + " normally. ExitValue = " + exitValue);
+			}
+			p.destroy();
+		} catch (InterruptedException e) {
+			logger.error("Execution of command got interrupted " + e);
+		}
+	}
 
-    protected void closeBufferedWriter(BufferedWriter writer) {
+	protected void closeBufferedReader(BufferedReader reader) {
+		if (reader != null) {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				logger.error("Exception while closing the reader: ", e);
+			}
+		}
+	}
+
+	protected void closeBufferedWriter(BufferedWriter writer) {
+		if (writer != null) {
+			try {
+				writer.close();
+			} catch (IOException e) {
+				logger.error("Exception while closing the writer: ", e);
+			}
+		}
+	}
+	
+	public void executeCommand(String command) throws ProcessMonitorException {
+		Runtime rt = Runtime.getRuntime();
+		Process p = null;
+		try {
+			p = rt.exec(command);
+			process(p);
+			int exitValue = p.waitFor();
+			if(exitValue != 0) {
+				logger.error("Unable to terminate the command normally. ExitValue = " + exitValue);
+			}
+			p.destroy();
+		} catch (IOException e) {
+			logger.error("Error in executing the command " + e);
+            throw new ProcessMonitorException("Execution failed with message "+ e.getMessage(), e);
+		} catch (InterruptedException e) {
+			logger.error("Execution of command got interrupted " + e);
+            throw new ProcessMonitorException("Execution of command got interrupted  "+ e.getMessage(), e);
+		}
+	}
+
+	private void process(Process p) {
+		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		
+		logger.debug("Output from the command:\n");
+        String s;
         try {
-            writer.close();
+            if ((s = stdInput.readLine()) != null) {
+                //System.out.println(s);
+            }
         } catch (IOException e) {
-            logger.error("IOException: ", e);
-        } catch(NullPointerException e) {
-            logger.error("NullPointerException: ", e);
+            logger.error("Error in accessing the stdInput stream " + e);
         }
-    }
+        // read any errors from the attempted command
+        logger.info("Error stream from the command:\n");
+        try {
+            while ((s = stdError.readLine()) != null) {
+            	logger.info(s);
+            }
+        } catch (IOException e) {
+            logger.error("Error in accessing the error stream " + e);
+        }
+		closeBufferedReader(stdInput);
+		closeBufferedReader(stdError);
+	}
 }

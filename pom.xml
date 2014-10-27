@@ -4,7 +4,7 @@
 
   <groupId>com.appdynamics.extensions</groupId>
   <artifactId>process-monitoring-extension</artifactId>
-  <version>1.0.1</version>
+  <version>1.1</version>
   <packaging>jar</packaging>
 
   <name>process-monitoring-extension</name>
@@ -24,15 +24,20 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.appdynamics</groupId>
+      <artifactId>appd-exts-commons</artifactId>
+      <version>1.0.8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.13</version>
+    </dependency>
+    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.17</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-      <version>1.6.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -113,8 +118,7 @@
                              <mkdir dir="${target.dir}"/>
                              <copy todir="${target.dir}">
                                  <fileset dir="src/main/resources/conf" includes="monitor.xml"/>
-                                 <fileset dir="src/main/resources/conf" includes="properties.xml"/>
-                                 <!-- <fileset dir="src/main/resources/conf" includes="config.yml"/> -->
+                                 <fileset dir="src/main/resources/conf" includes="config.yml"/>
                              </copy>
                              <copy todir="${target.dir}">
                                  <fileset dir="${project.build.directory}" includes="${project.artifactId}.${project.packaging}"/>

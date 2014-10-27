@@ -19,13 +19,17 @@ package com.appdynamics.extensions.process.processexception;
 
 public class ProcessMonitorException extends Exception {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = 8069820319694849033L;
+
 	public ProcessMonitorException(String message){
 		super(message);
 	}
 	
+	public ProcessMonitorException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	
+	public ProcessMonitorException(Throwable cause) {
+		super(cause);
+	}
 }

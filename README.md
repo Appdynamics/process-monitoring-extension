@@ -16,40 +16,74 @@ The Processes extension retrieves the following metrics of each process:
 ##Installation
 1. Run 'mvn clean install' from the process-monitoring-extension directory and find the ProcessMonitor.zip in the "target" folder.
 2. Unzip as "ProcessMonitor" and copy the "ProcessMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
-3. In `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/`, open monitor.xml and configure the path to the properties.xml and monitored-processes.
-4. Optional but recommended. Configure a custom metric path (in monitor.xml).
-5. Optional. Open properties.xml and configure the filter values. NOTE: If the memory threshold is not specified in properties.xml, then a default value of 100MB will be used by the extension. This means that any processes below this threshold will not appear in the Metric Browser.
-6. Restart the Machine Agent.
+3. Configure the extension by referring to the below section.
+4. Restart the Machine Agent.
 
 In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Custom Metrics | \<Windows/Linux\> Processes
 or your specified path under Application Infrastructure Performance  | \<Tier\> |.
 
 NOTE: If there are multiple processes with the same name (i.e. 3 "java.exe" processes), they will be identified by their PID in the Metric Browser.
 
-###XML files to modify
-<ul>
-<li>monitor.xml: This is used to execute the Java code which starts the extension. You might need to configure the path to the other xml file (see <a href="http://docs.appdynamics.com/display/ACE/Processes?sortBy=name#Processes-monitor.xml" target="_blank">monitor.xml</a> (requires login)).</li>
-<li>properties.xml: This file enables you to filter out which metrics are going to be reported and displayed on the metric browser (see <a href="http://docs.appdynamics.com/display/ACE/Processes?sortBy=name#Processes-properties.xml" target="_blank">properties.xml</a> (requires login)).</li>
-</ul>
+## Configuration ##
+Note : Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/)
+
+1. Configure the extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/`.
+
+   For eg.
+   ```
+        # No of times the commands are executed to fetch metrics in 1 min
+        fetchesPerInterval: 2
+
+        # comma-separated names of processes you want to exclude out of the reported metrics.
+        #Example Linux  : java,bash,sshd
+        #Example Windows: java.exe,chrome.exe
+        excludeProcesses: [ ]
+
+        # comma-separated Process IDs (pids) to be excluded out of the reported metrics.
+        # Example: 2,343,1235,34
+        excludePIDs: [ ]
+
+        # Processes with an aggregated absolute memory consumption of LESS than this number
+        # in Megabytes will be filtered out of the reported metrics. Default value is 100 [MB]
+        memoryThreshold: 100
+
+        # this is the path to the file .monitored-processes
+        monitoredProcessFilePath: "monitors/ProcessMonitor/.monitored-processes"
+
+        metricPrefix: "Custom Metrics|"
+
+   ```
+
+3. Configure the path to the config.yml file by editing the <task-arguments> in the monitor.xml file in the `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` directory. Below is the sample
+
+     ```
+     <task-arguments>
+         <!-- config file-->
+         <argument name="config-file" is-required="true" default-value="monitors/ProcessMonitor/config.yml" />
+          ....
+     </task-arguments>
+    ```
+
 
 **Note**: If you are running Windows,  make sure that the file 'csv.xsl' is in 'C:\Windows\System32' for 32bit or 'C:\Windows\SysWOW64' for 64bit OS versions (standard under Windows Server 2003).
 If this file is not found, the process monitor will output an error to the log file (logs/machine-agent.log) .
 
+**Note** : By default, a Machine agent or a AppServer agent can send a fixed number of metrics to the controller. To change this limit, please follow the instructions mentioned [here](http://docs.appdynamics.com/display/PRO14S/Metrics+Limits).
+For eg.  
+```    
+    java -Dappdynamics.agent.maxMetrics=2500 -jar machineagent.jar
+```
 
 ##Custom Dashboard
-
 ![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/95i5C555106398901A2/image-size/original?v=mpbl-1&px=-1)
 
 ##Metric Browser
-
 ![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/93iED3BE531B3AE0FFC/image-size/original?v=mpbl-1&px=-1)
 
 ![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/97iCA9AA07958232EAD/image-size/original?v=mpbl-1&px=-1)
 
 
-
 ##Contributing
-
 Always feel free to fork and contribute any changes directly here on GitHub.
 
 ##Community

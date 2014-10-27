@@ -1,0 +1,20 @@
+# No of times the commands are executed to fetch metrics in 1 min
+fetchesPerInterval: 2
+
+# comma-separated names of processes you want to exclude out of the reported metrics.
+#Example Linux  : java,bash,sshd
+#Example Windows: java.exe,chrome.exe
+excludeProcesses: [ ]
+
+# comma-separated Process IDs (pids) to be excluded out of the reported metrics.
+# Example: 2,343,1235,34
+excludePIDs: [ ]
+
+# Processes with an aggregated absolute memory consumption of LESS than this number
+# in Megabytes will be filtered out of the reported metrics. Default value is 100 [MB]
+memoryThreshold: 100
+
+# this is the path to the file .monitored-processes
+monitoredProcessFilePath: "monitors/ProcessMonitor/.monitored-processes"
+
+metricPrefix: "Custom Metrics|"
