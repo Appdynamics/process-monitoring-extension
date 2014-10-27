@@ -29,6 +29,7 @@ import com.appdynamics.extensions.process.processexception.ProcessMonitorExcepti
 
 public class LinuxParser extends Parser {
 
+	private static final String MEMORY_COMMAND = "cat /proc/meminfo";
 	private int posPID = -1, posCPU = -1, posMem = -1; // used for parsing
 	private static final Logger logger = Logger.getLogger("com.singularity.extensions.LinuxParser");
 
@@ -42,45 +43,55 @@ public class LinuxParser extends Parser {
 	public void retrieveMemoryMetrics() throws ProcessMonitorException {
 		Runtime rt = Runtime.getRuntime();
 		Process p = null;
-		String cmd = "cat /proc/meminfo";
+		BufferedReader input = null;
+		BufferedReader error = null;
 		try {
+			p = rt.exec(MEMORY_COMMAND);
+			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			String line;
-			p = rt.exec(cmd);
-			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			parseErrorsIfAny(error);
 			if ((line = input.readLine()) != null) {
 				String[] words = line.split("\\s+");
 				setTotalMemSizeMB(Integer.parseInt(words[1]) / 1024);
 			}
-			closeBufferedReader(input);
 		} catch (IOException e) {
-			logger.error("Unable to read output from cat /proc/meminfo command", e);
+			logger.error("Error in executing the command " + MEMORY_COMMAND, e);
+			throw new ProcessMonitorException("Error in executing the command " + MEMORY_COMMAND, e);
 		} catch (NumberFormatException e) {
 			logger.error("Unable to retrieve total physical memory size (not a number) ", e);
+			throw new ProcessMonitorException("Unable to retrieve total physical memory size (not a number) ", e);
 		} finally {
-			cleanUpProcess(p, cmd);
+			closeBufferedReader(input);
+			closeBufferedReader(error);
+			cleanUpProcess(p, MEMORY_COMMAND);
 		}
 	}
 
 	public String getNameOfProcess(int pid) {
-		BufferedReader input = null;
 		Runtime rt = Runtime.getRuntime();
-		Process allProcs = null;
+		Process p = null;
 		String cmd = "cat /proc/" + pid + "/status";
+		BufferedReader input = null;
+		BufferedReader error = null;
 		try {
+			p = rt.exec(cmd);
+			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			String line;
-			allProcs = rt.exec(cmd);
-			input = new BufferedReader(new InputStreamReader(allProcs.getInputStream()));
+			parseErrorsIfAny(error);
 			if ((line = input.readLine()) != null) {
 				String[] words = line.split("\\s+");
 				return words[1];
 			}
 		} catch (IOException e) {
-			logger.error("IOException: ", e);
+			logger.error("Error in executing the command " + cmd, e);
 		} catch (Exception e) {
 			logger.error(e);
 		} finally {
 			closeBufferedReader(input);
-			cleanUpProcess(allProcs, cmd);
+			closeBufferedReader(error);
+			cleanUpProcess(p, cmd);
 		}
 		return null;
 	}
@@ -92,26 +103,28 @@ public class LinuxParser extends Parser {
 	 * @throws ProcessMonitorException
 	 */
 	public void parseProcesses() throws NumberFormatException, ProcessMonitorException {
-		BufferedReader input = null;
-		Process allProcs = null;
+		Runtime rt = Runtime.getRuntime();
+		Process p = null;
 		String cmd = "ps aux";
+		BufferedReader input = null;
+		BufferedReader error = null;
 		try {
-			String processLine;
-			allProcs = Runtime.getRuntime().exec(cmd);
-			input = new BufferedReader(new InputStreamReader(allProcs.getInputStream()));
-
+			p = rt.exec(cmd);
+			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			String line;
+			parseErrorsIfAny(error);
 			// there seems to be a single process, probably ps aux itself,
 			// for which information can't be retrieved after it is terminated.
 			// this is used for logging errors on retrieving single process
 			// information
 			boolean hasReadOwn = false;
-
 			int i = 0;
-			while ((processLine = input.readLine()) != null) {
+			while ((line = input.readLine()) != null) {
 				if (i == 0) {
-					processHeader(processLine);
+					processHeader(line);
 				} else {
-					String[] words = processLine.split("\\s+");
+					String[] words = line.split("\\s+");
 					// retrieve single process information
 					int pid = Integer.parseInt(words[posPID]);
 
@@ -138,8 +151,8 @@ public class LinuxParser extends Parser {
 							}
 						}
 					} else {
-						if (hasReadOwn) { // see description for hasReadOwn
-											// above
+						// see description for hasReadOwn above
+						if (hasReadOwn) {
 							logger.warn("Could not retrieve the name of Process with pid " + pid);
 						}
 						hasReadOwn = true;
@@ -148,14 +161,15 @@ public class LinuxParser extends Parser {
 				i++;
 			}
 		} catch (IOException e) {
-			logger.error("Unable to read output from ps aux command", e);
-			throw new ProcessMonitorException("Unable to read output from ps aux command", e);
+			logger.error("Error in executing the command " + cmd, e);
+			throw new ProcessMonitorException("Error in executing the command " + cmd, e);
 		} catch (Exception e) {
 			logger.error("Exception: ", e);
 			throw new ProcessMonitorException("Exception: ", e);
 		} finally {
 			closeBufferedReader(input);
-			cleanUpProcess(allProcs, cmd);
+			closeBufferedReader(error);
+			cleanUpProcess(p, cmd);
 		}
 	}
 

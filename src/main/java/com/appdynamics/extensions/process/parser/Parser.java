@@ -133,6 +133,23 @@ public abstract class Parser {
 			logger.debug("New Process added to the list of metrics to be permanently" + "reported, even if falling back below threshold: " + name);
 		}
 	}
+	
+	protected void parseErrorsIfAny(BufferedReader error) throws ProcessMonitorException {
+		String line;
+		StringBuilder sb = new StringBuilder();
+		// read any errors from the attempted command
+		try {
+		    while ((line = error.readLine()) != null) {
+		    	sb.append(line).append("\n");
+		    }
+		} catch (IOException e) {
+		    logger.error("Error in accessing the error stream " + e);
+		}
+		if(sb.length() != 0) {
+			logger.error(sb.toString());
+		    throw new ProcessMonitorException(sb.toString());
+		}
+	}
 
 	protected void cleanUpProcess(Process p, String cmd) {
 		try {
@@ -142,7 +159,7 @@ public abstract class Parser {
 			}
 			p.destroy();
 		} catch (InterruptedException e) {
-			logger.error("Execution of command got interrupted " + e);
+			logger.error("Execution of command " + cmd + " got interrupted ", e);
 		}
 	}
 
@@ -178,35 +195,38 @@ public abstract class Parser {
 			}
 			p.destroy();
 		} catch (IOException e) {
-			logger.error("Error in executing the command " + e);
-            throw new ProcessMonitorException("Execution failed with message "+ e.getMessage(), e);
+			logger.error("Error in executing the command " + command, e);
+            throw new ProcessMonitorException("Error in executing the command " + command, e);
 		} catch (InterruptedException e) {
-			logger.error("Execution of command got interrupted " + e);
-            throw new ProcessMonitorException("Execution of command got interrupted  "+ e.getMessage(), e);
+			logger.error("Execution of command " + command + " got interrupted ", e);
+            throw new ProcessMonitorException("Execution of command " + command + " got interrupted ", e);
 		}
 	}
 
-	private void process(Process p) {
+	private void process(Process p) throws ProcessMonitorException {
 		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		
-		logger.debug("Output from the command:\n");
         String s;
+        StringBuilder sb = new StringBuilder();
+        // read any errors from the attempted command
+        try {
+            while ((s = stdError.readLine()) != null) {
+            	sb.append(s).append("\n");
+            }
+        } catch (IOException e) {
+            logger.error("Error in accessing the error stream " + e);
+        }
+        if(sb.length() != 0) {
+        	logger.error(sb.toString());
+            throw new ProcessMonitorException(sb.toString());
+        }
         try {
             if ((s = stdInput.readLine()) != null) {
                 //System.out.println(s);
             }
         } catch (IOException e) {
             logger.error("Error in accessing the stdInput stream " + e);
-        }
-        // read any errors from the attempted command
-        logger.info("Error stream from the command:\n");
-        try {
-            while ((s = stdError.readLine()) != null) {
-            	logger.info(s);
-            }
-        } catch (IOException e) {
-            logger.error("Error in accessing the error stream " + e);
         }
 		closeBufferedReader(stdInput);
 		closeBufferedReader(stdError);

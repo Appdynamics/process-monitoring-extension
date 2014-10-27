@@ -52,13 +52,17 @@ public class WindowsParser extends Parser {
 
 	@Override
 	public void retrieveMemoryMetrics() throws ProcessMonitorException {
-		BufferedReader input = null;
+		Runtime rt = Runtime.getRuntime();
 		Process p = null;
 		String cmd = "wmic OS get TotalVisibleMemorySize";
+		BufferedReader input = null;
+		BufferedReader error = null;
 		try {
-			String line;
-			p = Runtime.getRuntime().exec(cmd);
+			p = rt.exec(cmd);
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			String line;
+			parseErrorsIfAny(error);
 			// skipping first lines
 			input.readLine();
 			input.readLine();
@@ -71,11 +75,9 @@ public class WindowsParser extends Parser {
 		} catch (NumberFormatException e) {
 			logger.error("Unable to retrieve total physical memory size (not a number) ", e);
 			throw new ProcessMonitorException("Unable to retrieve total physical memory size (not a number) ", e);
-		} catch (Exception e) {
-			logger.error(e);
-			throw new ProcessMonitorException(e);
 		} finally {
 			closeBufferedReader(input);
+			closeBufferedReader(error);
 			cleanUpProcess(p, cmd);
 		}
 	}
@@ -87,20 +89,23 @@ public class WindowsParser extends Parser {
 	 */
 	@Override
 	public void parseProcesses() throws ProcessMonitorException {
-		BufferedReader input = null;
+		Runtime rt = Runtime.getRuntime();
 		Process p = null;
 		String cmd = "tasklist /fo csv";
+		BufferedReader input = null;
+		BufferedReader error = null;
 		try {
-			String processLine;
-			p = Runtime.getRuntime().exec(cmd);
+			p = rt.exec(cmd);
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
+			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			String line;
+			parseErrorsIfAny(error);
 			int i = 0;
-			while ((processLine = input.readLine()) != null) {
+			while ((line = input.readLine()) != null) {
 				if (i == 0) {
-					processHeader(processLine);
+					processHeader(line);
 				} else {
-					String[] words = processLine.split("\",\"");
+					String[] words = line.split("\",\"");
 					words[0] = words[0].replaceAll("\"", "");
 					words[words.length - 1] = words[words.length - 1].replaceAll("\"", "");
 
@@ -136,6 +141,7 @@ public class WindowsParser extends Parser {
 			throw new ProcessMonitorException("Exception: " + e);
 		} finally {
 			closeBufferedReader(input);
+			closeBufferedReader(error);
 			cleanUpProcess(p, cmd);
 		}
 	}
@@ -163,23 +169,21 @@ public class WindowsParser extends Parser {
 	 * @throws ProcessMonitorException
 	 */
 	private void calcCPUTime() throws ProcessMonitorException {
-		BufferedReader input = null;
+		Runtime rt = Runtime.getRuntime();
 		Process p = null;
 		String cmd = "wmic process get name,usermodetime,kernelmodetime /format:csv";
+		BufferedReader input = null;
+		BufferedReader error = null;
 		try {
+			p = rt.exec(cmd);
+			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			String cpudata;
 			int cpuPosName = -1, cpuPosUserModeTime = -1, cpuPosKernelModeTime = -1;
-			p = Runtime.getRuntime().exec(cmd);
-			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-			// skipping first lines
-			if (input.readLine().toLowerCase().contains("invalid xsl format")) {
-				logger.error("csv.xls not found. Cannot process information for CPU usage (value 0 will be repored)"
-						+ "Make sure csv.xsl is in C:\\Windows\\System32 or C:\\Windows\\SysWOW64 respectively.");
-				return;
-			}
-			if (input.readLine().toLowerCase().contains("invalid xsl format")) {
-				logger.error("csv.xls not found. Cannot process information for CPU usage (value 0 will be repored)"
+			try {
+				parseErrorsIfAny(error);
+			} catch (ProcessMonitorException e) {
+				logger.warn("csv.xls not found. Cannot process information for CPU usage (value 0 will be repored)"
 						+ "Make sure csv.xsl is in C:\\Windows\\System32 or C:\\Windows\\SysWOW64 respectively.");
 				return;
 			}
@@ -213,7 +217,7 @@ public class WindowsParser extends Parser {
 				// retrieve single process information
 				String procName = words[cpuPosName];
 				// divide by 10000 to convert to milliseconds
-				long userModeTime = Long.parseLong(words[cpuPosUserModeTime]) / 10000; 
+				long userModeTime = Long.parseLong(words[cpuPosUserModeTime]) / 10000;
 				long kernelModeTime = Long.parseLong(words[cpuPosKernelModeTime]) / 10000;
 
 				// update hashmaps used for CPU load calculations
@@ -225,8 +229,6 @@ public class WindowsParser extends Parser {
 					}
 				}
 			}
-			input.close();
-
 			// update CPU data in processes hash-map
 			for (String key : newDeltaCPUTime.keySet()) {
 				if (oldDeltaCPUTime.containsKey(key)) {
@@ -249,6 +251,7 @@ public class WindowsParser extends Parser {
 			throw new ProcessMonitorException("Exception: ", e);
 		} finally {
 			closeBufferedReader(input);
+			closeBufferedReader(error);
 			cleanUpProcess(p, cmd);
 		}
 	}
