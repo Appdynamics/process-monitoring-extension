@@ -58,7 +58,6 @@ public class WindowsParser extends Parser {
 		BufferedReader input = null;
 		try {
 			p = rt.exec(cmd);
-			//handleErrorsIfAny(p.getErrorStream());
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 			// skipping first lines
@@ -92,7 +91,6 @@ public class WindowsParser extends Parser {
 		BufferedReader input = null;
 		try {
 			p = rt.exec(cmd);
-			//handleErrorsIfAny(p.getErrorStream());
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			processHeader(input.readLine());
 			String line;
@@ -164,19 +162,18 @@ public class WindowsParser extends Parser {
 		BufferedReader input = null;
 		try {
 			p = rt.exec(cmd);
-			/*try {
-				handleErrorsIfAny(p.getErrorStream());
-			} catch (ProcessMonitorException e) {
-				logger.warn("csv.xls not found. Cannot process information for CPU usage (value 0 will be repored)"
-						+ "Make sure csv.xsl is in C:\\Windows\\System32 or C:\\Windows\\SysWOW64 respectively.");
-				return;
-			}*/
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			if(input.readLine().toLowerCase().contains("invalid xsl format")){
-				logger.error("csv.xls not found. Cannot process information for CPU usage (value 0 will be repored)" +
-						"Make sure csv.xsl is in C:\\Windows\\System32 or C:\\Windows\\SysWOW64 respectively.");
-				return;
+			if(input.readLine() == null) {
+				closeBufferedReader(input);
+				input = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+				String errorString = input.readLine();
+				if(errorString.toLowerCase().contains("invalid xsl format")){
+					logger.warn(errorString + " csv.xls not found. Cannot process information for CPU usage (value 0 will be repored)" +
+							"Make sure csv.xsl is in C:\\Windows\\System32 or C:\\Windows\\SysWOW64 respectively.");
+					return;
+				}
 			}
+			
 			String cpudata;
 			int cpuPosName = -1, cpuPosUserModeTime = -1, cpuPosKernelModeTime = -1;
 			String header = input.readLine();

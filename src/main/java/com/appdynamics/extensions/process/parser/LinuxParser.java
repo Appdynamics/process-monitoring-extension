@@ -24,7 +24,6 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 
 import com.appdynamics.extensions.process.config.Configuration;
-import com.appdynamics.extensions.process.parser.Parser.ErrorHandler;
 import com.appdynamics.extensions.process.processdata.ProcessData;
 import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 
@@ -47,8 +46,6 @@ public class LinuxParser extends Parser {
 		BufferedReader input = null;
 		try {
 			p = rt.exec(MEMORY_COMMAND);
-			//handleErrorsIfAny(p.getErrorStream());
-			
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 			if ((line = input.readLine()) != null) {
@@ -74,7 +71,6 @@ public class LinuxParser extends Parser {
 		BufferedReader input = null;
 		try {
 			p = rt.exec(cmd);
-			//handleErrorsIfAny(p.getErrorStream());
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 			if ((line = input.readLine()) != null) {
@@ -105,7 +101,6 @@ public class LinuxParser extends Parser {
 		BufferedReader input = null;
 		try {
 			p = rt.exec(cmd);
-			//handleErrorsIfAny(p.getErrorStream());
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 			// there seems to be a single process, probably ps aux itself,

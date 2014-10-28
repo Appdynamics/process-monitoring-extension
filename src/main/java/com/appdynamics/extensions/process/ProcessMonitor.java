@@ -17,7 +17,6 @@ package com.appdynamics.extensions.process;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -116,7 +115,7 @@ public class ProcessMonitor extends AManagedMonitor {
 		String exclProcs = "";
 		String exclPIDs = "";
 		logger.info("Detected total RAM size: " + parser.getTotalMemSizeMB() + " MB");
-		logger.info("Memory Threshold:        " + parser.getMemoryThreshold() + " MB");
+		logger.debug("Memory Threshold:        " + parser.getMemoryThreshold() + " MB");
 		for (String pr : config.getExcludeProcesses()) {
 			exclProcs = exclProcs.concat(pr + ", ");
 		}
@@ -124,10 +123,10 @@ public class ProcessMonitor extends AManagedMonitor {
 			exclPIDs = exclPIDs.concat(pid + ", ");
 		}
 		if (!"".equals(exclProcs)) {
-			logger.info("Ignoring processes:      " + exclProcs.substring(0, exclProcs.length() - 2));
+			logger.debug("Ignoring processes:      " + exclProcs.substring(0, exclProcs.length() - 2));
 		}
 		if (!"".equals(exclPIDs)) {
-			logger.info("Ignoring pids:           " + exclPIDs.substring(0, exclPIDs.length() - 2));
+			logger.debug("Ignoring pids:           " + exclPIDs.substring(0, exclPIDs.length() - 2));
 		}
 	}
 
@@ -225,13 +224,5 @@ public class ProcessMonitor extends AManagedMonitor {
 
 	private static String getImplementationVersion() {
 		return ProcessMonitor.class.getPackage().getImplementationTitle();
-	}
-
-	public static void main(String[] args) throws TaskExecutionException {
-		Map<String, String> taskArgs = new HashMap<String, String>();
-		taskArgs.put("config-file",
-				"/home/balakrishnav/AppDynamics/ExtensionsProject/process-monitoring-extension/src/main/resources/conf/config.yml");
-		ProcessMonitor monitor = new ProcessMonitor();
-		monitor.execute(taskArgs, null);
 	}
 }
