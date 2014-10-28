@@ -12,6 +12,9 @@ The Processes extension retrieves the following metrics of each process:
 -   Memory utilization in %
 -   Number of running instances. (If there are, for example, 3 Java processes running, this monitor will report them individually)
 
+**Note**: If you are running Windows,  make sure that the file 'csv.xsl' is in 'C:\Windows\System32' for 32bit or 'C:\Windows\SysWOW64' for 64bit OS versions (standard under Windows Server 2003).
+If this file is not found, the process monitor will output an error to the log file (logs/machine-agent.log) .
+
 
 ##Installation
 1. Run 'mvn clean install' from the process-monitoring-extension directory and find the ProcessMonitor.zip in the "target" folder.
@@ -64,9 +67,6 @@ Note : Please make sure to not use tab (\t) while editing yaml files. You may wa
      </task-arguments>
     ```
 
-
-**Note**: If you are running Windows,  make sure that the file 'csv.xsl' is in 'C:\Windows\System32' for 32bit or 'C:\Windows\SysWOW64' for 64bit OS versions (standard under Windows Server 2003).
-If this file is not found, the process monitor will output an error to the log file (logs/machine-agent.log) .
 
 **Note** : By default, a Machine agent or a AppServer agent can send a fixed number of metrics to the controller. To change this limit, please follow the instructions mentioned [here](http://docs.appdynamics.com/display/PRO14S/Metrics+Limits).
 For eg.  
