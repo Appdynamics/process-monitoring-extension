@@ -24,6 +24,7 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 
 import com.appdynamics.extensions.process.config.Configuration;
+import com.appdynamics.extensions.process.parser.Parser.ErrorHandler;
 import com.appdynamics.extensions.process.processdata.ProcessData;
 import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 
@@ -44,13 +45,12 @@ public class LinuxParser extends Parser {
 		Runtime rt = Runtime.getRuntime();
 		Process p = null;
 		BufferedReader input = null;
-		BufferedReader error = null;
 		try {
 			p = rt.exec(MEMORY_COMMAND);
+			//handleErrorsIfAny(p.getErrorStream());
+			
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			String line;
-			parseErrorsIfAny(error);
 			if ((line = input.readLine()) != null) {
 				String[] words = line.split("\\s+");
 				setTotalMemSizeMB(Integer.parseInt(words[1]) / 1024);
@@ -63,7 +63,6 @@ public class LinuxParser extends Parser {
 			throw new ProcessMonitorException("Unable to retrieve total physical memory size (not a number) ", e);
 		} finally {
 			closeBufferedReader(input);
-			closeBufferedReader(error);
 			cleanUpProcess(p, MEMORY_COMMAND);
 		}
 	}
@@ -73,13 +72,11 @@ public class LinuxParser extends Parser {
 		Process p = null;
 		String cmd = "cat /proc/" + pid + "/status";
 		BufferedReader input = null;
-		BufferedReader error = null;
 		try {
 			p = rt.exec(cmd);
+			//handleErrorsIfAny(p.getErrorStream());
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			String line;
-			parseErrorsIfAny(error);
 			if ((line = input.readLine()) != null) {
 				String[] words = line.split("\\s+");
 				return words[1];
@@ -90,7 +87,6 @@ public class LinuxParser extends Parser {
 			logger.error(e);
 		} finally {
 			closeBufferedReader(input);
-			closeBufferedReader(error);
 			cleanUpProcess(p, cmd);
 		}
 		return null;
@@ -107,13 +103,11 @@ public class LinuxParser extends Parser {
 		Process p = null;
 		String cmd = "ps aux";
 		BufferedReader input = null;
-		BufferedReader error = null;
 		try {
 			p = rt.exec(cmd);
+			//handleErrorsIfAny(p.getErrorStream());
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			String line;
-			parseErrorsIfAny(error);
 			// there seems to be a single process, probably ps aux itself,
 			// for which information can't be retrieved after it is terminated.
 			// this is used for logging errors on retrieving single process
@@ -168,7 +162,6 @@ public class LinuxParser extends Parser {
 			throw new ProcessMonitorException("Exception: ", e);
 		} finally {
 			closeBufferedReader(input);
-			closeBufferedReader(error);
 			cleanUpProcess(p, cmd);
 		}
 	}

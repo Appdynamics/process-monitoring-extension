@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -133,31 +134,65 @@ public abstract class Parser {
 			logger.debug("New Process added to the list of metrics to be permanently" + "reported, even if falling back below threshold: " + name);
 		}
 	}
-	
+
+	protected class ErrorHandler extends Thread {
+		InputStream is;
+		StringBuilder sb = new StringBuilder();
+		BufferedReader br = null;
+
+		public ErrorHandler(InputStream is) {
+			this.is = is;
+		}
+
+		public void run() {
+			br = new BufferedReader(new InputStreamReader(is));
+			String line = null;
+			try {
+				while ((line = br.readLine()) != null) {
+					sb.append(line).append("\n");
+				}
+			} catch (IOException e) {
+				logger.error("Error in accessing the error stream " + e);
+			}
+		}
+	}
+
+	protected void handleErrorsIfAny(InputStream is) throws ProcessMonitorException {
+		ErrorHandler error = new ErrorHandler(is);
+		error.start();
+		StringBuilder sb = error.sb;
+		if (sb.length() != 0) {
+			logger.error(sb.toString());
+			throw new ProcessMonitorException(sb.toString());
+		}
+	}
+
 	protected void parseErrorsIfAny(BufferedReader error) throws ProcessMonitorException {
 		String line;
 		StringBuilder sb = new StringBuilder();
 		// read any errors from the attempted command
 		try {
-		    while ((line = error.readLine()) != null) {
-		    	sb.append(line).append("\n");
-		    }
+			while ((line = error.readLine()) != null) {
+				sb.append(line).append("\n");
+			}
 		} catch (IOException e) {
-		    logger.error("Error in accessing the error stream " + e);
+			logger.error("Error in accessing the error stream " + e);
 		}
-		if(sb.length() != 0) {
+		if (sb.length() != 0) {
 			logger.error(sb.toString());
-		    throw new ProcessMonitorException(sb.toString());
+			throw new ProcessMonitorException(sb.toString());
 		}
 	}
 
 	protected void cleanUpProcess(Process p, String cmd) {
 		try {
-			int exitValue = p.waitFor();
-			if(exitValue != 0) {
-				logger.error("Unable to terminate the command " + cmd + " normally. ExitValue = " + exitValue);
+			if (p != null) {
+				int exitValue = p.waitFor();
+				if (exitValue != 0) {
+					logger.warn("Unable to terminate the command " + cmd + " normally. ExitValue = " + exitValue);
+				}
+				p.destroy();
 			}
-			p.destroy();
 		} catch (InterruptedException e) {
 			logger.error("Execution of command " + cmd + " got interrupted ", e);
 		}
@@ -182,7 +217,7 @@ public abstract class Parser {
 			}
 		}
 	}
-	
+
 	public void executeCommand(String command) throws ProcessMonitorException {
 		Runtime rt = Runtime.getRuntime();
 		Process p = null;
@@ -190,44 +225,44 @@ public abstract class Parser {
 			p = rt.exec(command);
 			process(p);
 			int exitValue = p.waitFor();
-			if(exitValue != 0) {
+			if (exitValue != 0) {
 				logger.error("Unable to terminate the command normally. ExitValue = " + exitValue);
 			}
 			p.destroy();
 		} catch (IOException e) {
 			logger.error("Error in executing the command " + command, e);
-            throw new ProcessMonitorException("Error in executing the command " + command, e);
+			throw new ProcessMonitorException("Error in executing the command " + command, e);
 		} catch (InterruptedException e) {
 			logger.error("Execution of command " + command + " got interrupted ", e);
-            throw new ProcessMonitorException("Execution of command " + command + " got interrupted ", e);
+			throw new ProcessMonitorException("Execution of command " + command + " got interrupted ", e);
 		}
 	}
 
 	private void process(Process p) throws ProcessMonitorException {
 		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-		
-        String s;
-        StringBuilder sb = new StringBuilder();
-        // read any errors from the attempted command
-        try {
-            while ((s = stdError.readLine()) != null) {
-            	sb.append(s).append("\n");
-            }
-        } catch (IOException e) {
-            logger.error("Error in accessing the error stream " + e);
-        }
-        if(sb.length() != 0) {
-        	logger.error(sb.toString());
-            throw new ProcessMonitorException(sb.toString());
-        }
-        try {
-            if ((s = stdInput.readLine()) != null) {
-                //System.out.println(s);
-            }
-        } catch (IOException e) {
-            logger.error("Error in accessing the stdInput stream " + e);
-        }
+
+		String s;
+		StringBuilder sb = new StringBuilder();
+		// read any errors from the attempted command
+		try {
+			while ((s = stdError.readLine()) != null) {
+				sb.append(s).append("\n");
+			}
+		} catch (IOException e) {
+			logger.error("Error in accessing the error stream " + e);
+		}
+		if (sb.length() != 0) {
+			logger.error(sb.toString());
+			throw new ProcessMonitorException(sb.toString());
+		}
+		try {
+			if ((s = stdInput.readLine()) != null) {
+				// System.out.println(s);
+			}
+		} catch (IOException e) {
+			logger.error("Error in accessing the stdInput stream " + e);
+		}
 		closeBufferedReader(stdInput);
 		closeBufferedReader(stdError);
 	}

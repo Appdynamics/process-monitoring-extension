@@ -56,13 +56,11 @@ public class WindowsParser extends Parser {
 		Process p = null;
 		String cmd = "wmic OS get TotalVisibleMemorySize";
 		BufferedReader input = null;
-		BufferedReader error = null;
 		try {
 			p = rt.exec(cmd);
+			//handleErrorsIfAny(p.getErrorStream());
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			String line;
-			parseErrorsIfAny(error);
 			// skipping first lines
 			input.readLine();
 			input.readLine();
@@ -77,7 +75,6 @@ public class WindowsParser extends Parser {
 			throw new ProcessMonitorException("Unable to retrieve total physical memory size (not a number) ", e);
 		} finally {
 			closeBufferedReader(input);
-			closeBufferedReader(error);
 			cleanUpProcess(p, cmd);
 		}
 	}
@@ -93,44 +90,37 @@ public class WindowsParser extends Parser {
 		Process p = null;
 		String cmd = "tasklist /fo csv";
 		BufferedReader input = null;
-		BufferedReader error = null;
 		try {
 			p = rt.exec(cmd);
+			//handleErrorsIfAny(p.getErrorStream());
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			processHeader(input.readLine());
 			String line;
-			parseErrorsIfAny(error);
-			int i = 0;
 			while ((line = input.readLine()) != null) {
-				if (i == 0) {
-					processHeader(line);
-				} else {
-					String[] words = line.split("\",\"");
-					words[0] = words[0].replaceAll("\"", "");
-					words[words.length - 1] = words[words.length - 1].replaceAll("\"", "");
-
-					// retrieve single process information
-					int pid = Integer.parseInt(words[posPID]);
-					String procName = words[posName];
-
-					float memPercent = (Float.parseFloat(words[posMem].replaceAll("\\D*", "")) / 1024) / getTotalMemSizeMB() * 100;
-
-					if (procName != null) {
-						// check if user wants to exclude this process
-						if (!config.getExcludeProcesses().contains(procName) && !config.getExcludePIDs().contains(pid)) {
-							// update the processes Map
-							if (processes.containsKey(procName)) {
-								ProcessData procData = processes.get(procName);
-								procData.numOfInstances++;
-								procData.memPercent += memPercent;
-							} else {
-								processes.put(procName, new ProcessData(procName, 0, memPercent));
-							}
+				String[] words = line.split("\",\"");
+				words[0] = words[0].replaceAll("\"", "");
+				words[words.length - 1] = words[words.length - 1].replaceAll("\"", "");
+	
+				// retrieve single process information
+				int pid = Integer.parseInt(words[posPID]);
+				String procName = words[posName];
+	
+				float memPercent = (Float.parseFloat(words[posMem].replaceAll("\\D*", "")) / 1024) / getTotalMemSizeMB() * 100;
+	
+				if (procName != null) {
+					// check if user wants to exclude this process
+					if (!config.getExcludeProcesses().contains(procName) && !config.getExcludePIDs().contains(pid)) {
+						// update the processes Map
+						if (processes.containsKey(procName)) {
+							ProcessData procData = processes.get(procName);
+							procData.numOfInstances++;
+							procData.memPercent += memPercent;
+						} else {
+							processes.put(procName, new ProcessData(procName, 0, memPercent));
 						}
-
 					}
+	
 				}
-				i++;
 			}
 			calcCPUTime();
 		} catch (IOException e) {
@@ -141,7 +131,6 @@ public class WindowsParser extends Parser {
 			throw new ProcessMonitorException("Exception: " + e);
 		} finally {
 			closeBufferedReader(input);
-			closeBufferedReader(error);
 			cleanUpProcess(p, cmd);
 		}
 	}
@@ -173,21 +162,23 @@ public class WindowsParser extends Parser {
 		Process p = null;
 		String cmd = "wmic process get name,usermodetime,kernelmodetime /format:csv";
 		BufferedReader input = null;
-		BufferedReader error = null;
 		try {
 			p = rt.exec(cmd);
-			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			String cpudata;
-			int cpuPosName = -1, cpuPosUserModeTime = -1, cpuPosKernelModeTime = -1;
-			try {
-				parseErrorsIfAny(error);
+			/*try {
+				handleErrorsIfAny(p.getErrorStream());
 			} catch (ProcessMonitorException e) {
 				logger.warn("csv.xls not found. Cannot process information for CPU usage (value 0 will be repored)"
 						+ "Make sure csv.xsl is in C:\\Windows\\System32 or C:\\Windows\\SysWOW64 respectively.");
 				return;
+			}*/
+			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			if(input.readLine().toLowerCase().contains("invalid xsl format")){
+				logger.error("csv.xls not found. Cannot process information for CPU usage (value 0 will be repored)" +
+						"Make sure csv.xsl is in C:\\Windows\\System32 or C:\\Windows\\SysWOW64 respectively.");
+				return;
 			}
-
+			String cpudata;
+			int cpuPosName = -1, cpuPosUserModeTime = -1, cpuPosKernelModeTime = -1;
 			String header = input.readLine();
 			if (header != null) {
 				String[] words = header.trim().split(",");
@@ -251,7 +242,6 @@ public class WindowsParser extends Parser {
 			throw new ProcessMonitorException("Exception: ", e);
 		} finally {
 			closeBufferedReader(input);
-			closeBufferedReader(error);
 			cleanUpProcess(p, cmd);
 		}
 	}
