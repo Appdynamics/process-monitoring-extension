@@ -158,7 +158,8 @@ public class WindowsParser extends Parser {
 	private void calcCPUTime() throws ProcessMonitorException {
 		Runtime rt = Runtime.getRuntime();
 		Process p = null;
-		String cmd = "wmic process get name,usermodetime,kernelmodetime /format:csv";
+		
+		String cmd = getCommand();
 		BufferedReader input = null;
 		try {
 			p = rt.exec(cmd);
@@ -168,8 +169,16 @@ public class WindowsParser extends Parser {
 				input = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 				String errorString = input.readLine();
 				if(errorString.toLowerCase().contains("invalid xsl format")){
-					logger.warn(errorString + " csv.xls not found. Cannot process information for CPU usage (value 0 will be repored)" +
-							"Make sure csv.xsl is in C:\\Windows\\System32 or C:\\Windows\\SysWOW64 respectively.");
+					StringBuilder msg = new StringBuilder(errorString).append(" ");
+					
+					if (Configuration.DEFAULT_CSV_FILE_PATH.equals(config.getCsvFilePath())) {
+						msg.append("csv.xls not found in C:\\Windows\\System32 or C:\\Windows\\SysWOW64 respectively.");
+					} else {
+						msg.append(config.getCsvFilePath()).append(" not found.");
+					}
+					
+					msg.append(" Cannot process information for CPU usage (value 0 will be reported).");
+					logger.warn(msg.toString());
 					return;
 				}
 			}
@@ -177,7 +186,21 @@ public class WindowsParser extends Parser {
 			String cpudata;
 			int cpuPosName = -1, cpuPosUserModeTime = -1, cpuPosKernelModeTime = -1;
 			String header = input.readLine();
+			
+			// sometimes the first line is empty, so need to cater for this
+			while (header != null && header.trim().equals("")) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("header is empty, checking the next line...");
+				}
+				
+				header = input.readLine();
+			}
+			
 			if (header != null) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("header found!");
+				}
+				
 				String[] words = header.trim().split(",");
 				for (int i = 0; i < words.length; i++) {
 					if (words[i].toLowerCase().equals("name")) {
@@ -192,8 +215,9 @@ public class WindowsParser extends Parser {
 
 			if (cpuPosName == -1 || cpuPosUserModeTime == -1 || cpuPosKernelModeTime == -1) {
 				input.close();
-				throw new ProcessMonitorException("Could not find correct header information of 'wmic process get name,"
-						+ "usermodetime,kernelmodetime /format:csv'. Terminating Process Monitor");
+				throw new ProcessMonitorException(
+						String.format("Could not find correct header information of '%s'. Terminating Process Monitor",
+								cmd));
 			}
 
 			while ((cpudata = input.readLine()) != null) {
@@ -241,5 +265,17 @@ public class WindowsParser extends Parser {
 			closeBufferedReader(input);
 			cleanUpProcess(p, cmd);
 		}
+	}
+	
+	private String getCommand() {
+		StringBuilder cmdBuilder = new StringBuilder("wmic process get name,usermodetime,kernelmodetime /format:");
+		
+		if (Configuration.DEFAULT_CSV_FILE_PATH.equals(config.getCsvFilePath())) {
+			cmdBuilder.append(config.getCsvFilePath());
+		} else {
+			cmdBuilder.append("\"").append(config.getCsvFilePath()).append("\"");
+		}
+		
+		return cmdBuilder.toString();
 	}
 }

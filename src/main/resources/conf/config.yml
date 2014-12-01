@@ -14,6 +14,10 @@ excludePIDs: [ ]
 # in Megabytes will be filtered out of the reported metrics. Default value is 100 [MB]
 memoryThreshold: 100
 
+# csv.xsl file path - leave null for default location, 
+# i.e. C:/Windows/SysWOW64/csv.xsl (for 64bit) or C:/Windows/System32/csv.xsl (32 bit)
+csvFilePath: ""
+
 # this is the path to the file .monitored-processes
 monitoredProcessFilePath: "monitors/ProcessMonitor/.monitored-processes"
 
