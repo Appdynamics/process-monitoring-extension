@@ -109,6 +109,8 @@ public class WindowsParser extends Parser {
 					// check if user wants to exclude this process
 					if (!config.getExcludeProcesses().contains(procName) && !config.getExcludePIDs().contains(pid)) {
 						// update the processes Map
+						StringBuilder sb = new StringBuilder(procName);
+						procName = sb.append("|PID|").append(pid).toString();
 						if (processes.containsKey(procName)) {
 							ProcessData procData = processes.get(procName);
 							procData.numOfInstances++;
