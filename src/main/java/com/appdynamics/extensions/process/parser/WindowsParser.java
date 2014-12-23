@@ -113,7 +113,7 @@ public class WindowsParser extends Parser {
 						procName = sb.append("|PID|").append(pid).toString();
 						if (processes.containsKey(procName)) {
 							ProcessData procData = processes.get(procName);
-							procData.numOfInstances++;
+							//procData.numOfInstances++;
 							procData.memPercent += memPercent;
 						} else {
 							processes.put(procName, new ProcessData(procName, 0, memPercent));
@@ -186,7 +186,7 @@ public class WindowsParser extends Parser {
 			}
 			
 			String cpudata;
-			int cpuPosName = -1, cpuPosUserModeTime = -1, cpuPosKernelModeTime = -1;
+			int cpuPosName = -1, cpuPosUserModeTime = -1, cpuPosKernelModeTime = -1, cpuPosProcessId = -1;
 			String header = input.readLine();
 			
 			// sometimes the first line is empty, so need to cater for this
@@ -211,11 +211,13 @@ public class WindowsParser extends Parser {
 						cpuPosUserModeTime = i;
 					} else if (words[i].toLowerCase().equals("kernelmodetime")) {
 						cpuPosKernelModeTime = i;
+					} else if (words[i].toLowerCase().equals("processid")) {
+						cpuPosProcessId = i;
 					}
 				}
 			}
 
-			if (cpuPosName == -1 || cpuPosUserModeTime == -1 || cpuPosKernelModeTime == -1) {
+			if (cpuPosName == -1 || cpuPosUserModeTime == -1 || cpuPosKernelModeTime == -1 || cpuPosProcessId == -1) {
 				input.close();
 				throw new ProcessMonitorException(
 						String.format("Could not find correct header information of '%s'. Terminating Process Monitor",
@@ -224,7 +226,7 @@ public class WindowsParser extends Parser {
 
 			while ((cpudata = input.readLine()) != null) {
 				String[] words = cpudata.trim().split(",");
-				if (words.length < 4) {
+				if (words.length < 5) {
 					continue;
 				}
 
@@ -233,6 +235,9 @@ public class WindowsParser extends Parser {
 				// divide by 10000 to convert to milliseconds
 				long userModeTime = Long.parseLong(words[cpuPosUserModeTime]) / 10000;
 				long kernelModeTime = Long.parseLong(words[cpuPosKernelModeTime]) / 10000;
+				int pid = Integer.parseInt(words[cpuPosProcessId]);
+				StringBuilder sb = new StringBuilder(procName);
+				procName = sb.append("|PID|").append(pid).toString();
 
 				// update hashmaps used for CPU load calculations
 				if (processes.containsKey(procName)) {
@@ -270,7 +275,7 @@ public class WindowsParser extends Parser {
 	}
 	
 	private String getCommand() {
-		StringBuilder cmdBuilder = new StringBuilder("wmic process get name,usermodetime,kernelmodetime /format:");
+		StringBuilder cmdBuilder = new StringBuilder("wmic process get name,processid,usermodetime,kernelmodetime /format:");
 		
 		if (Configuration.DEFAULT_CSV_FILE_PATH.equals(config.getCsvFilePath())) {
 			cmdBuilder.append(config.getCsvFilePath());

@@ -146,14 +146,14 @@ public class ProcessMonitor extends AManagedMonitor {
 				int cpuPercent = (int) (procData.CPUPercent / fetchesPerInterval);
 				int memPercent = (int) (procData.memPercent / fetchesPerInterval);
 				int memAbsolute = (int) (Math.round(absoluteMem));
-				int numOfInst = procData.numOfInstances / fetchesPerInterval;
+				//int numOfInst = procData.numOfInstances / fetchesPerInterval;
 
 				StringBuilder metricPath = new StringBuilder(config.getMetricPrefix()).append(parser.processGroupName).append(METRIC_SEPARATOR);
 				
 				printMetric(metricPath.toString() + procData.name + "|CPU Utilization in Percent", cpuPercent);
 				printMetric(metricPath.toString() + procData.name + "|Memory Utilization in Percent", memPercent);
 				printMetric(metricPath.toString() + procData.name + "|Memory Utilization Absolute (MB)", memAbsolute); 
-				printMetric(metricPath.toString() + procData.name + "|Number of running instances", numOfInst);
+				//printMetric(metricPath.toString() + procData.name + "|Number of running instances", numOfInst);
 			}
 		}
 		logger.debug("Writing monitored processes out to file");

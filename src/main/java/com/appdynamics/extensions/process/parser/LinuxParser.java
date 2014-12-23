@@ -132,7 +132,7 @@ public class LinuxParser extends Parser {
 							// update the processes Map
 							if (processes.containsKey(procName)) {
 								ProcessData procData = processes.get(procName);
-								procData.numOfInstances++;
+								//procData.numOfInstances++;
 								procData.CPUPercent += cpu;
 								procData.memPercent += mem;
 							} else {

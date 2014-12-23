@@ -19,13 +19,13 @@ package com.appdynamics.extensions.process.processdata;
 
 public class ProcessData {
 	public String name;
-	public int numOfInstances;
+	//public int numOfInstances;
 	public float memPercent;
 	public float CPUPercent;
 	
 	public ProcessData(String name, float CPUPercent, float memPercent){
 		this.name = name;
-		this.numOfInstances = 1;
+		//this.numOfInstances = 1;
 		this.memPercent = memPercent;
 		this.CPUPercent = CPUPercent;	
 	}
