@@ -1,5 +1,5 @@
 
-# Option to view process metrics in MetricBrowser.
+# Option to view process metrics in MetricBrowser per PID OR as aggregated over all the processes with same name.
 # If false, all the processes with same name are grouped and collective metrics are reported to AppDynamics Metric Browser.
 # If true, each process with PID can be viewed but since PID changes with process restart, this might not be the best option.
 displayByPid: false
