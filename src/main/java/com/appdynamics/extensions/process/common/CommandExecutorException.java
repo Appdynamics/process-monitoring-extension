@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 AppDynamics
+ * Copyright 2015 AppDynamics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.appdynamics.extensions.process.common;
 
 
-package com.appdynamics.extensions.process.processexception;
+public class CommandExecutorException extends Exception {
 
-public class ProcessMonitorException extends Exception {
-
-    private static final long serialVersionUID = 8069820319694849033L;
-
-    public ProcessMonitorException(String message) {
+    public CommandExecutorException(String message) {
         super(message);
     }
 
-    public ProcessMonitorException(String message, Throwable cause) {
+    public CommandExecutorException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ProcessMonitorException(Throwable cause) {
+    public CommandExecutorException(Throwable cause) {
         super(cause);
     }
 }

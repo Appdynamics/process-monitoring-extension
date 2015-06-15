@@ -1,5 +1,8 @@
-# No of times the commands are executed to fetch metrics in 1 min
-fetchesPerInterval: 2
+
+# Option to view process metrics in MetricBrowser.
+# If false, all the processes with same name are grouped and collective metrics are reported to AppDynamics Metric Browser.
+# If true, each process with PID can be viewed but since PID changes with process restart, this might not be the best option.
+displayByPid: false
 
 # comma-separated names of processes you want to exclude out of the reported metrics.
 #Example Linux  : java,bash,sshd
@@ -14,8 +17,10 @@ excludePIDs: [ ]
 # in Megabytes will be filtered out of the reported metrics. Default value is 100 [MB]
 memoryThreshold: 100
 
+# ONLY for OS - WINDOWS
 # csv.xsl file path - leave null for default location, 
-# i.e. C:/Windows/SysWOW64/csv.xsl (for 64bit) or C:/Windows/System32/csv.xsl (32 bit)
+# i.e. C:/Windows/SysWOW64/csv.xsl OR C:\\Windows\\SysWOW64\\webem\\en-US\\csv.xsl (for 64bit)
+# OR C:/Windows/System32/csv.xsl (32 bit)
 csvFilePath: ""
 
 # this is the path to the file .monitored-processes

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 AppDynamics
+ * Copyright 2015 AppDynamics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.appdynamics.extensions.process.parser;
+
+import com.appdynamics.extensions.process.config.Configuration;
+import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 
 
-package com.appdynamics.extensions.process.processexception;
+public class AIXParser extends Parser {
 
-public class ProcessMonitorException extends Exception {
-
-    private static final long serialVersionUID = 8069820319694849033L;
-
-    public ProcessMonitorException(String message) {
-        super(message);
+    public AIXParser(Configuration config) {
+        super(config);
     }
 
-    public ProcessMonitorException(String message, Throwable cause) {
-        super(message, cause);
-    }
 
-    public ProcessMonitorException(Throwable cause) {
-        super(cause);
+    @Override
+    public void parseProcesses() throws ProcessMonitorException {
+
     }
 }
