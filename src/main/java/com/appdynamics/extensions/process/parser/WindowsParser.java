@@ -57,12 +57,9 @@ public class WindowsParser extends Parser {
         BufferedReader input = null;
         try {
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            // skipping first lines
-            input.readLine();
-            input.readLine();
-            // setting the total RAM size
-            line = input.readLine();
+            // skipping two lines
+            skipParsingLines(input, 2);
+            String line = line = input.readLine();
             setTotalMemSizeMB(toBigDecimal(line.trim()).divide(new BigDecimal(1024)));
         } catch (IOException e) {
             logger.error("Error in parsing the output of command " + cmd, e);
@@ -102,23 +99,22 @@ public class WindowsParser extends Parser {
                 String processName = words[posName];
 
                 if (processName != null) {
-                    String procName = "";
                     StringBuilder sb = new StringBuilder(processName);
                     if (config.isDisplayByPid()) {
-                        procName = sb.append(METRIC_SEPARATOR).append(pid).toString();
+                        processName = sb.append(METRIC_SEPARATOR).append(pid).toString();
                     } else {
-                        procName = sb.toString();
+                        processName = sb.toString();
                     }
                     // check if user wants to exclude this process
-                    if (!config.getExcludeProcesses().contains(procName) && !config.getExcludePIDs().contains(pid)) {
+                    if (!config.getExcludeProcesses().contains(processName) && !config.getExcludePIDs().contains(pid)) {
                         // update the processes Map
-                        if (processes.containsKey(procName)) {
-                            ProcessData procData = processes.get(procName);
+                        if (processes.containsKey(processName)) {
+                            ProcessData procData = processes.get(processName);
                             procData.numOfInstances++;
-                            procData.memPercent.add(memPercent);
-                            procData.absoluteMem.add(absoluteMem);
+                            procData.memPercent = procData.memPercent.add(memPercent);
+                            procData.absoluteMem = procData.absoluteMem.add(absoluteMem);
                         } else {
-                            processes.put(procName, new ProcessData(procName, BigDecimal.ZERO, memPercent, absoluteMem));
+                            processes.put(processName, new ProcessData(processName, BigDecimal.ZERO, memPercent, absoluteMem));
                         }
                     }
 
@@ -258,7 +254,7 @@ public class WindowsParser extends Parser {
                     float time = reportIntervalSecs * 1000;
                     ProcessData procData = processes.get(key);
                     if (procData != null) {
-                        procData.CPUPercent.add((new BigDecimal(delta).divide(new BigDecimal(time))).multiply(new BigDecimal(100)));
+                        procData.CPUPercent = procData.CPUPercent.add((new BigDecimal(delta).divide(new BigDecimal(time))).multiply(new BigDecimal(100)));
                     }
                 }
             }

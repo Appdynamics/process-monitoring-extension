@@ -29,4 +29,8 @@ public class ProcessCommands {
 
     // Solaris
     public static final String SOLARIS_PROCESS_LIST_COMMAND = "top -b";
+
+    // AIX
+    public static final String AIX_MEMORY_COMMAND = "getconf REAL_MEMORY";
+    public static final String AIX_PROCESS_LIST_COMMAND = "ps -eo pid,pcpu,pmem,command";
 }

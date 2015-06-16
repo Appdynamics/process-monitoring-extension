@@ -195,5 +195,6 @@ public class ProcessMonitor extends AManagedMonitor {
         taskArgs.put("config-file", "/home/balakrishnav/AppDynamics/ExtensionsProject/process-monitoring-extension/src/main/resources/conf/config.yml");
         ProcessMonitor monitor = new ProcessMonitor();
         monitor.execute(taskArgs, null);
+
     }
 }

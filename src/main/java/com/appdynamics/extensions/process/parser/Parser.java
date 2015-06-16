@@ -19,6 +19,7 @@ package com.appdynamics.extensions.process.parser;
 import com.appdynamics.extensions.process.ProcessMonitor;
 import com.appdynamics.extensions.process.common.CommandExecutor;
 import com.appdynamics.extensions.process.common.CommandExecutorException;
+import com.appdynamics.extensions.process.common.CommandHeaderInfo;
 import com.appdynamics.extensions.process.config.Configuration;
 import com.appdynamics.extensions.process.processdata.ProcessData;
 import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
@@ -117,6 +118,32 @@ public abstract class Parser {
         }
     }
 
+    protected void populateProcessData(String processName, int pid, BigDecimal cpuUtilizationInPercent, BigDecimal memUtilizationInPercent, BigDecimal absoluteMemUsed) {
+        if (processName != null) {
+            StringBuilder sb = new StringBuilder(processName);
+            if (config.isDisplayByPid()) {
+                processName = sb.append(METRIC_SEPARATOR).append(pid).toString();
+            } else {
+                processName = sb.toString();
+            }
+            // check if user wants to exclude this process
+            if (!config.getExcludeProcesses().contains(processName) && !config.getExcludePIDs().contains(pid)) {
+                // update the processes Map
+                if (processes.containsKey(processName)) {
+                    ProcessData procData = processes.get(processName);
+                    procData.numOfInstances++;
+                    procData.CPUPercent = procData.CPUPercent.add(cpuUtilizationInPercent);
+                    procData.memPercent = procData.memPercent.add(memUtilizationInPercent);
+                    procData.absoluteMem = procData.absoluteMem.add(absoluteMemUsed);
+                } else {
+                    processes.put(processName, new ProcessData(processName, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMemUsed));
+                }
+            }
+        } else {
+            logger.warn("Could not retrieve the name of Process with pid " + pid);
+        }
+    }
+
     public Map<String, ProcessData> getProcesses() {
         return processes;
     }
@@ -144,6 +171,14 @@ public abstract class Parser {
     public void addIncludeProcesses(String name) {
         if (this.includeProcesses.add(name)) {
             logger.debug("New Process added to the list of metrics to be permanently" + "reported, even if falling back below threshold: " + name);
+        }
+    }
+
+    protected void skipParsingLines(BufferedReader input, int count) throws IOException {
+        if (input != null) {
+            for (int i = 0; i < count; i++) {
+                input.readLine();
+            }
         }
     }
 
@@ -180,5 +215,9 @@ public abstract class Parser {
                 logger.error("Exception while closing the writer: ", e);
             }
         }
+    }
+
+    protected CommandHeaderInfo processHeaderLine(String headerLine, String... headerStrings) throws ProcessMonitorException {
+        return null;
     }
 }

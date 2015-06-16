@@ -3,7 +3,7 @@
 This extension works only with the standalone machine agent.
 
 ##Use Case
-The AppDynamics Process extension observes active processes on a Linux or Windows machine and displays them in the AppDynamics Metric Browser.
+The AppDynamics Process extension observes active processes on a Linux OR Windows OR Solaris OR AIX machine and displays them in the AppDynamics Metric Browser.
 
 The Processes extension retrieves the following metrics for each process/process group:
 

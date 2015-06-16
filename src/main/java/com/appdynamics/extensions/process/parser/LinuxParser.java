@@ -106,39 +106,16 @@ public class LinuxParser extends Parser {
                     processHeader(line);
                 } else {
                     String[] words = line.split("\\s+");
-                    // retrieve single process information
+
                     int pid = Integer.parseInt(words[posPID]);
 
-                    BigDecimal cpu = toBigDecimal(words[posCPU]);
-                    BigDecimal mem = toBigDecimal(words[posMem]);
-                    BigDecimal absoluteMem = (mem.divide(new BigDecimal(100)).multiply(getTotalMemSizeMB()));
+                    BigDecimal cpuUtilizationInPercent = toBigDecimal(words[posCPU]);
+                    BigDecimal memUtilizationInPercent = toBigDecimal(words[posMem]);
+                    BigDecimal absoluteMem = (memUtilizationInPercent.divide(new BigDecimal(100)).multiply(getTotalMemSizeMB()));
 
                     String processName = getNameOfProcess(pid);
 
-                    if (processName != null) {
-                        String procName = "";
-                        StringBuilder sb = new StringBuilder(processName);
-                        if (config.isDisplayByPid()) {
-                            procName = sb.append(METRIC_SEPARATOR).append(pid).toString();
-                        } else {
-                            procName = sb.toString();
-                        }
-                        // check if user wants to exclude this process
-                        if (!config.getExcludeProcesses().contains(procName) && !config.getExcludePIDs().contains(pid)) {
-                            // update the processes Map
-                            if (processes.containsKey(procName)) {
-                                ProcessData procData = processes.get(procName);
-                                procData.numOfInstances++;
-                                procData.CPUPercent.add(cpu);
-                                procData.memPercent.add(mem);
-                                procData.absoluteMem.add(absoluteMem);
-                            } else {
-                                processes.put(procName, new ProcessData(procName, cpu, mem, absoluteMem));
-                            }
-                        }
-                    } else {
-                        logger.warn("Could not retrieve the name of Process with pid " + pid);
-                    }
+                    populateProcessData(processName, pid, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMem);
                 }
                 i++;
             }

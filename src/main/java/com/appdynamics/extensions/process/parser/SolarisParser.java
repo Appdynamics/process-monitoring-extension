@@ -54,59 +54,23 @@ public class SolarisParser extends Parser {
         try {
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
-
-            for (int i = 0; i < 4; i++) {
-                input.readLine();
-            }
+            skipParsingLines(input, 4);
             processMemoryLine(input.readLine());
-            input.readLine();
+            skipParsingLines(input, 1);
             processHeader(input.readLine());
-            //logger.info("posPID: " + posPID);
+
             while (!Strings.isNullOrEmpty(input.readLine())) {
                 line = input.readLine();
                 String[] words = line.trim().split("\\s+");
-                //logger.info(words[posPID]);
-                //logger.info(line);
-                // retrieve single process information
                 int pid = Integer.parseInt(words[posPID].trim());
-
                 String processName = words[posProcName].trim();
 
-                BigDecimal cpu = toBigDecimal(words[posCPU].split("%")[0].trim());
-                String memString = words[posMem].trim();
-                BigDecimal mem = BigDecimal.ZERO;
-                if (memString.endsWith("M")) {
-                    mem = toBigDecimal(memString.split("M")[0].trim());
-                } else if (memString.endsWith("K")) {
-                    mem = toBigDecimal(memString.split("K")[0].trim()).divide(new BigDecimal(1024));
-                }
-                BigDecimal memPercent = (mem.divide(getTotalMemSizeMB(), BigDecimal.ROUND_HALF_UP)).multiply(new BigDecimal(100));
+                BigDecimal cpuUtilizationInPercent = toBigDecimal(words[posCPU].split("%")[0].trim());
+                BigDecimal absoluteMemUsed = parseMemoryString(words[posMem].trim());
 
-                if (processName != null) {
-                    String procName = "";
-                    StringBuilder sb = new StringBuilder(processName);
-                    if (config.isDisplayByPid()) {
-                        procName = sb.append(METRIC_SEPARATOR).append(pid).toString();
-                    } else {
-                        procName = sb.toString();
-                    }
-                    // check if user wants to exclude this process
-                    if (!config.getExcludeProcesses().contains(procName) && !config.getExcludePIDs().contains(pid)) {
-                        // update the processes Map
-                        if (processes.containsKey(procName)) {
-                            //logger.info("Process Name" + procName);
-                            ProcessData procData = processes.get(procName);
-                            procData.numOfInstances++;
-                            procData.CPUPercent.add(cpu);
-                            procData.memPercent.add(memPercent);
-                            procData.absoluteMem.add(mem);
-                        } else {
-                            processes.put(procName, new ProcessData(procName, cpu, memPercent, mem));
-                        }
-                    }
-                } else {
-                    logger.warn("Could not retrieve the name of Process with pid " + pid);
-                }
+                BigDecimal memUtilizationInPercent = (absoluteMemUsed.divide(getTotalMemSizeMB(), BigDecimal.ROUND_HALF_UP)).multiply(new BigDecimal(100));
+
+                populateProcessData(processName, pid, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMemUsed);
             }
         } catch (IOException e) {
             logger.error("Error in parsing the output of command " + cmd, e);
@@ -120,11 +84,20 @@ public class SolarisParser extends Parser {
         }
     }
 
+    private BigDecimal parseMemoryString(String memString) {
+        BigDecimal mem = null;
+        if (memString.endsWith("M")) {
+            mem = toBigDecimal(memString.split("M")[0].trim());
+        } else if (memString.endsWith("K")) {
+            mem = toBigDecimal(memString.split("K")[0].trim()).divide(new BigDecimal(1024));
+        }
+        return mem;
+    }
+
     private void processMemoryLine(String line) throws ProcessMonitorException {
         String memoryToken = line.split(",")[0].trim().split(":")[1].trim().split("\\s+")[0].trim();
         if (memoryToken.endsWith("M")) {
             String memoryString = memoryToken.split("M")[0].trim();
-            logger.info("Memory of Solaris: " + memoryString);
             setTotalMemSizeMB(new BigDecimal(unLocalizeStrValue(memoryString)));
         } else {
             logger.error("Couldn't parse " + line + " for memory retrieval");
