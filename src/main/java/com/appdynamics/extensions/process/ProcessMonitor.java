@@ -89,7 +89,7 @@ public class ProcessMonitor extends AManagedMonitor {
         } else if (os.contains("aix")) {
             parser = new AIXParser(config);
             logger.debug("OS System detected: IBM AIX");
-        } else if (os.contains("hp ux")) {
+        } else if (os.contains("hp-ux")) {
             parser = new HPUXParser(config);
             logger.debug("OS System detected: HP-UX");
         } else {
@@ -162,7 +162,6 @@ public class ProcessMonitor extends AManagedMonitor {
                 logger.debug(metricName + " = " + metricValue);
             }
         }
-        //System.out.println(metricName + " " + metricValue);
     }
 
     private String convertBigDecimalToString(BigDecimal value) {
@@ -188,13 +187,5 @@ public class ProcessMonitor extends AManagedMonitor {
 
     private static String getImplementationVersion() {
         return ProcessMonitor.class.getPackage().getImplementationTitle();
-    }
-
-    public static void main(String[] args) throws TaskExecutionException {
-        Map<String, String> taskArgs = Maps.newHashMap();
-        taskArgs.put("config-file", "/home/balakrishnav/AppDynamics/ExtensionsProject/process-monitoring-extension/src/main/resources/conf/config.yml");
-        ProcessMonitor monitor = new ProcessMonitor();
-        monitor.execute(taskArgs, null);
-
     }
 }

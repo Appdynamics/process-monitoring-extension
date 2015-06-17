@@ -3,15 +3,17 @@
 This extension works only with the standalone machine agent.
 
 ##Use Case
-The AppDynamics Process extension observes active processes on a Linux OR Windows OR Solaris OR AIX machine and displays them in the AppDynamics Metric Browser.
+The AppDynamics Process Extension observes active processes on a Linux/Windows/Solaris/AIX machine and displays them in the AppDynamics Metric Browser.
 
-The Processes extension retrieves the following metrics for each process/process group:
+The Processes extension retrieves the following metrics for each process/processes group:
 
 -   CPU utilization in %
 -   Memory utilization in MB
 -   Memory utilization in %
 
-NOTE: If there are multiple processes with the same name (i.e. 3 "java.exe" processes), there is an option in config.yml to report the aggregate metrics for all the processes with same name OR as individually with their PID. If reported as a process group, there is an additional metric (Number of running instances) reported.
+There are two ways of reporting these metrics to controller by changing the flag `displayByPid` in config.yml
+1. If false, the aggregate metrics (sum) are reported. For eg. If there are multiple processes with the same name (i.e. 3 "java.exe" processes), the aggregate metrics with process group name are reported with an additional metric (Number of running instances).
+2. If true, each individual process metrics are reported under PID.
 
 **Note**: If you are running Windows,  make sure that the file 'csv.xsl' is in 'C:\Windows\System32' for 32bit or 'C:\Windows\SysWOW64' or 'C:\\Windows\\SysWOW64\\webem\\en-US\\csv.xsl' for 64bit OS versions (standard under Windows Server 2003).
 If this file is not found, the process monitor will output an error to the log file (logs/machine-agent.log) .

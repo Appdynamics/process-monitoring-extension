@@ -53,14 +53,12 @@ public class SolarisParser extends Parser {
         BufferedReader input = null;
         try {
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
             skipParsingLines(input, 4);
             processMemoryLine(input.readLine());
             skipParsingLines(input, 1);
             processHeader(input.readLine());
-
-            while (!Strings.isNullOrEmpty(input.readLine())) {
-                line = input.readLine();
+            String line;
+            while (!Strings.isNullOrEmpty(line = input.readLine())) {
                 String[] words = line.trim().split("\\s+");
                 int pid = Integer.parseInt(words[posPID].trim());
                 String processName = words[posProcName].trim();

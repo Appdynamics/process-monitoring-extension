@@ -48,8 +48,8 @@ public class LinuxParser extends Parser {
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
             if ((line = input.readLine()) != null) {
-                String[] words = line.split("\\s+");
-                setTotalMemSizeMB(toBigDecimal(words[1]).divide(new BigDecimal(1024)));
+                String[] words = line.trim().split("\\s+");
+                setTotalMemSizeMB(toBigDecimal(words[1].trim()).divide(new BigDecimal(1024)));
             }
         } catch (IOException e) {
             logger.error("Error in parsing the output of command " + ProcessCommands.LINUX_MEMORY_COMMAND, e);
@@ -71,7 +71,7 @@ public class LinuxParser extends Parser {
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
             if ((line = input.readLine()) != null) {
-                String[] words = line.split("\\s+");
+                String[] words = line.trim().split("\\s+");
                 return words[1];
             }
         } catch (IOException e) {
@@ -107,7 +107,7 @@ public class LinuxParser extends Parser {
                 } else {
                     String[] words = line.split("\\s+");
 
-                    int pid = Integer.parseInt(words[posPID]);
+                    int pid = Integer.parseInt(words[posPID].trim());
 
                     BigDecimal cpuUtilizationInPercent = toBigDecimal(words[posCPU]);
                     BigDecimal memUtilizationInPercent = toBigDecimal(words[posMem]);
