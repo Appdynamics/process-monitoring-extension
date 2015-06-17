@@ -12,6 +12,7 @@ The Processes extension retrieves the following metrics for each process/process
 -   Memory utilization in %
 
 There are two ways of reporting these metrics to controller by changing the flag `displayByPid` in config.yml
+
 1. If false, the aggregate metrics (sum) are reported. For eg. If there are multiple processes with the same name (i.e. 3 "java.exe" processes), the aggregate metrics with process group name are reported with an additional metric (Number of running instances).
 2. If true, each individual process metrics are reported under PID.
 
