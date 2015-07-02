@@ -21,7 +21,7 @@ If this file is not found, the process monitor will output an error to the log f
 
 
 ##Installation
-1. Run 'mvn clean install' from the process-monitoring-extension directory and find the ProcessMonitor.zip in the "target" folder.
+1. To build from source, clone this repository and run 'mvn clean install'. This will produce a ProcessMonitor-VERSION.zip in the target directory. Alternatively, download the latest release archive from [Github](https://github.com/Appdynamics/process-monitoring-extension/releases/latest).
 2. Unzip as "ProcessMonitor" and copy the "ProcessMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
 3. Configure the extension by referring to the below section.
 4. Restart the Machine Agent.
