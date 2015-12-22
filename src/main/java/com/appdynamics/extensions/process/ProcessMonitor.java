@@ -47,14 +47,12 @@ public class ProcessMonitor extends AManagedMonitor {
     public static final String METRIC_SEPARATOR = "|";
 
     public ProcessMonitor() {
-        String msg = "Using Monitor Version [" + getImplementationVersion() + "]";
-        logger.info(msg);
-        System.out.println(msg);
+        System.out.println(logVersion());
     }
 
     public TaskOutput execute(Map<String, String> taskArguments, TaskExecutionContext taskContext) throws TaskExecutionException {
         if (taskArguments != null) {
-            logger.info("Starting the Process Monitoring task.");
+            logger.info(logVersion());
             String configFilename = getConfigFilename(taskArguments.get(CONFIG_ARG));
             try {
                 Configuration config = YmlReader.readFromFile(configFilename, Configuration.class);
@@ -186,5 +184,10 @@ public class ProcessMonitor extends AManagedMonitor {
 
     private static String getImplementationVersion() {
         return ProcessMonitor.class.getPackage().getImplementationTitle();
+    }
+
+    private String logVersion() {
+        String msg = "Using Monitor Version [" + getImplementationVersion() + "]";
+        return msg;
     }
 }
