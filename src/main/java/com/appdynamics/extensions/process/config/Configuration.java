@@ -24,7 +24,7 @@ public class Configuration {
 
     private boolean displayByPid;
     private Set<String> excludeProcesses = new HashSet<String>();
-    private Set<Integer> excludePIDs = new HashSet<Integer>();
+    private Set<String> includeProcesses = new HashSet<String>();
     private int memoryThreshold;
     private String csvFilePath;
     private String monitoredProcessFilePath;
@@ -46,12 +46,12 @@ public class Configuration {
         this.excludeProcesses = excludeProcesses;
     }
 
-    public Set<Integer> getExcludePIDs() {
-        return excludePIDs;
+    public Set<String> getIncludeProcesses() {
+        return includeProcesses;
     }
 
-    public void setExcludePIDs(Set<Integer> excludePIDs) {
-        this.excludePIDs = excludePIDs;
+    public void setIncludeProcesses(Set<String> includeProcesses) {
+        this.includeProcesses = includeProcesses;
     }
 
     public int getMemoryThreshold() {

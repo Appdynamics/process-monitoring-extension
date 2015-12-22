@@ -16,11 +16,13 @@
 
 package com.appdynamics.extensions.process.parser;
 
+import com.appdynamics.extensions.process.common.CmdOutHeaderConstants;
 import com.appdynamics.extensions.process.common.CommandExecutorException;
 import com.appdynamics.extensions.process.common.ProcessCommands;
 import com.appdynamics.extensions.process.config.Configuration;
 import com.appdynamics.extensions.process.processdata.ProcessData;
 import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
+import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -34,7 +36,6 @@ import java.util.Map;
 public class WindowsParser extends Parser {
 
     private static final Logger logger = Logger.getLogger(WindowsParser.class);
-    private int posName = -1, posPID = -1, posMem = -1;
     private int reportIntervalSecs = 60;
 
     // for keeping track of the CPU load
@@ -56,10 +57,11 @@ public class WindowsParser extends Parser {
         Process p = commandExecutor.execute(cmd);
         BufferedReader input = null;
         try {
+            closeOutputStream(p);
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
             // skipping two lines
             skipParsingLines(input, 2);
-            String line = line = input.readLine();
+            String line = input.readLine();
             setTotalMemSizeMB(toBigDecimal(line.trim()).divide(new BigDecimal(1024)));
         } catch (IOException e) {
             logger.error("Error in parsing the output of command " + cmd, e);
@@ -67,6 +69,8 @@ public class WindowsParser extends Parser {
         } catch (NumberFormatException e) {
             logger.error("Unable to retrieve total physical memory size (not a number) ", e);
             throw new ProcessMonitorException("Unable to retrieve total physical memory size (not a number) ", e);
+        } catch(Exception e) {
+            logger.error(e);
         } finally {
             closeBufferedReader(input);
             cleanUpProcess(p, cmd);
@@ -85,29 +89,29 @@ public class WindowsParser extends Parser {
         Process p = commandExecutor.execute(cmd);
         BufferedReader input = null;
         try {
+            closeOutputStream(p);
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            processHeader(input.readLine());
+            String [] headerArray = {CmdOutHeaderConstants.WIN_PROC_NAME, CmdOutHeaderConstants.WIN_PID, CmdOutHeaderConstants.WIN_MEM};
+            String headerLine = input.readLine().replaceAll("\"", "").trim();
+            Map<String, Integer> headerPositions = processHeaderLine(cmd, headerLine, headerArray, ",");
             String line;
             while ((line = input.readLine()) != null) {
                 String[] words = line.split("\",\"");
                 words[0] = words[0].replaceAll("\"", "");
                 words[words.length - 1] = words[words.length - 1].replaceAll("\"", "");
 
-                BigDecimal absoluteMem = toBigDecimal(words[posMem].replaceAll("\\D*", "")).divide(new BigDecimal(1024));
-                BigDecimal memPercent = (absoluteMem.divide(getTotalMemSizeMB(), BigDecimal.ROUND_HALF_UP)).multiply(new BigDecimal(100));
-                int pid = Integer.parseInt(words[posPID]);
-                String processName = words[posName];
-
+                String processName = words[headerPositions.get(CmdOutHeaderConstants.WIN_PROC_NAME)];
                 if (processName != null) {
-                    StringBuilder sb = new StringBuilder(processName);
-                    if (config.isDisplayByPid()) {
-                        processName = sb.append(METRIC_SEPARATOR).append(pid).toString();
-                    } else {
-                        processName = sb.toString();
-                    }
-                    // check if user wants to exclude this process
-                    if (!config.getExcludeProcesses().contains(processName) && !config.getExcludePIDs().contains(pid)) {
-                        // update the processes Map
+                    if(checkFromConfigIfProcessNeedsToBeReported(processName)) {
+                        BigDecimal absoluteMem = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.WIN_MEM)].replaceAll("\\D*", "")).divide(new BigDecimal(1024));
+                        BigDecimal memPercent = (absoluteMem.divide(getTotalMemSizeMB(), BigDecimal.ROUND_HALF_UP)).multiply(new BigDecimal(100));
+                        int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.WIN_PID)]);
+                        StringBuilder sb = new StringBuilder(processName);
+                        if (config.isDisplayByPid()) {
+                            processName = sb.append(METRIC_SEPARATOR).append(pid).toString();
+                        } else {
+                            processName = sb.toString();
+                        }
                         if (processes.containsKey(processName)) {
                             ProcessData procData = processes.get(processName);
                             procData.numOfInstances++;
@@ -117,7 +121,6 @@ public class WindowsParser extends Parser {
                             processes.put(processName, new ProcessData(processName, BigDecimal.ZERO, memPercent, absoluteMem));
                         }
                     }
-
                 }
             }
             calcCPUTime();
@@ -130,22 +133,6 @@ public class WindowsParser extends Parser {
         } finally {
             closeBufferedReader(input);
             cleanUpProcess(p, cmd);
-        }
-    }
-
-    private void processHeader(String processLine) throws ProcessMonitorException {
-        String[] words = processLine.replaceAll("\"", "").trim().split(",");
-        for (int i = 0; i < words.length; i++) {
-            if (words[i].equals("Image Name")) {
-                posName = i;
-            } else if (words[i].equals("PID")) {
-                posPID = i;
-            } else if (words[i].equals("Mem Usage")) {
-                posMem = i;
-            }
-        }
-        if (posName == -1 || posPID == -1 || posMem == -1) {
-            throw new ProcessMonitorException("Could not find correct header information of 'tasklist -fo csv'. Terminating Process Monitor");
         }
     }
 
@@ -163,6 +150,7 @@ public class WindowsParser extends Parser {
         BufferedReader input = null;
         try {
             p = rt.exec(cmd);
+            closeOutputStream(p);
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
             if (input.readLine() == null) {
                 closeBufferedReader(input);
@@ -184,7 +172,6 @@ public class WindowsParser extends Parser {
             }
 
             String cpudata;
-            int cpuPosName = -1, cpuPosUserModeTime = -1, cpuPosKernelModeTime = -1, cpuPosProcessId = -1;
             String header = input.readLine();
 
             // sometimes the first line is empty, so need to cater for this
@@ -192,34 +179,16 @@ public class WindowsParser extends Parser {
                 if (logger.isDebugEnabled()) {
                     logger.debug("header is empty, checking the next line...");
                 }
-
                 header = input.readLine();
             }
 
+            Map<String, Integer> headerPositions = Maps.newHashMap();
             if (header != null) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("header found!");
                 }
-
-                String[] words = header.trim().split(",");
-                for (int i = 0; i < words.length; i++) {
-                    if (words[i].toLowerCase().equals("name")) {
-                        cpuPosName = i;
-                    } else if (words[i].toLowerCase().equals("usermodetime")) {
-                        cpuPosUserModeTime = i;
-                    } else if (words[i].toLowerCase().equals("kernelmodetime")) {
-                        cpuPosKernelModeTime = i;
-                    } else if (words[i].toLowerCase().equals("processid")) {
-                        cpuPosProcessId = i;
-                    }
-                }
-            }
-
-            if (cpuPosName == -1 || cpuPosUserModeTime == -1 || cpuPosKernelModeTime == -1 || cpuPosProcessId == -1) {
-                input.close();
-                throw new ProcessMonitorException(
-                        String.format("Could not find correct header information of '%s'. Terminating Process Monitor",
-                                cmd));
+                String [] headerArray = {CmdOutHeaderConstants.WIN_CPU_PROC_NAME, CmdOutHeaderConstants.WIN_USER_MODETIME, CmdOutHeaderConstants.WIN_KERNEL_MODETIME, CmdOutHeaderConstants.WIN_CPU_PROC_ID};
+                headerPositions = processHeaderLine(cmd, header.trim(), headerArray, ",");
             }
 
             while ((cpudata = input.readLine()) != null) {
@@ -227,15 +196,19 @@ public class WindowsParser extends Parser {
                 if (words.length < 5) {
                     continue;
                 }
-
                 // retrieve single process information
-                String procName = words[cpuPosName];
+                String procName = words[headerPositions.get(CmdOutHeaderConstants.WIN_CPU_PROC_NAME)];
                 // divide by 10000 to convert to milliseconds
-                long userModeTime = Long.parseLong(words[cpuPosUserModeTime]) / 10000;
-                long kernelModeTime = Long.parseLong(words[cpuPosKernelModeTime]) / 10000;
-                int pid = Integer.parseInt(words[cpuPosProcessId]);
+                long userModeTime = Long.parseLong(words[headerPositions.get(CmdOutHeaderConstants.WIN_USER_MODETIME)]) / 10000;
+                long kernelModeTime = Long.parseLong(words[headerPositions.get(CmdOutHeaderConstants.WIN_KERNEL_MODETIME)]) / 10000;
+                int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.WIN_CPU_PROC_ID)]);
+
                 StringBuilder sb = new StringBuilder(procName);
-                procName = sb.append("|PID|").append(pid).toString();
+                if (config.isDisplayByPid()) {
+                    procName = sb.append(METRIC_SEPARATOR).append(pid).toString();
+                } else {
+                    procName = sb.toString();
+                }
 
                 // update hashmaps used for CPU load calculations
                 if (processes.containsKey(procName)) {
@@ -269,6 +242,16 @@ public class WindowsParser extends Parser {
         } finally {
             closeBufferedReader(input);
             cleanUpProcess(p, cmd);
+        }
+    }
+
+    private void closeOutputStream(Process p) {
+        // hack to work in win 2003, wmic hangs everytime
+        // fetching and closing the output stream before reading the input stream
+        try {
+            p.getOutputStream().close();
+        } catch (IOException e) {
+            logger.info("Exception while closing the output stream: ", e);
         }
     }
 

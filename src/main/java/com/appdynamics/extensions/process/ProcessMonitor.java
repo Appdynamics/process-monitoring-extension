@@ -27,7 +27,6 @@ import com.appdynamics.extensions.process.processdata.ProcessData;
 import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
 import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
@@ -101,20 +100,20 @@ public class ProcessMonitor extends AManagedMonitor {
 
     private void logConfigInfo(Configuration config) {
         String exclProcs = "";
-        String exclPIDs = "";
+        String includeProcs = "";
         logger.debug("Display by PID " + config.isDisplayByPid());
         logger.debug("Memory Threshold:        " + config.getMemoryThreshold() + " MB");
         for (String pr : config.getExcludeProcesses()) {
             exclProcs = exclProcs.concat(pr + ", ");
         }
-        for (int pid : config.getExcludePIDs()) {
-            exclPIDs = exclPIDs.concat(pid + ", ");
+        for (String process : config.getIncludeProcesses()) {
+            includeProcs = includeProcs.concat(process + ", ");
         }
         if (!"".equals(exclProcs)) {
             logger.debug("Ignoring processes: " + exclProcs.substring(0, exclProcs.length() - 2));
         }
-        if (!"".equals(exclPIDs)) {
-            logger.debug("Ignoring pids: " + exclPIDs.substring(0, exclPIDs.length() - 2));
+        if (!"".equals(includeProcs)) {
+            logger.debug("Ignoring pids: " + includeProcs.substring(0, includeProcs.length() - 2));
         }
     }
 

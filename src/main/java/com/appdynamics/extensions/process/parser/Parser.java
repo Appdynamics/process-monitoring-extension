@@ -19,10 +19,11 @@ package com.appdynamics.extensions.process.parser;
 import com.appdynamics.extensions.process.ProcessMonitor;
 import com.appdynamics.extensions.process.common.CommandExecutor;
 import com.appdynamics.extensions.process.common.CommandExecutorException;
-import com.appdynamics.extensions.process.common.CommandHeaderInfo;
 import com.appdynamics.extensions.process.config.Configuration;
 import com.appdynamics.extensions.process.processdata.ProcessData;
 import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -32,8 +33,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,7 +83,7 @@ public abstract class Parser {
     }
 
     public static BigDecimal toBigDecimal(String valueStr) {
-        if (valueStr != null && !valueStr.trim().isEmpty()) {
+        if (!Strings.isNullOrEmpty(valueStr.trim())) {
             try {
                 return new BigDecimal(valueStr.trim());
             } catch (NumberFormatException e) {
@@ -120,16 +123,16 @@ public abstract class Parser {
     }
 
     protected void populateProcessData(String processName, int pid, BigDecimal cpuUtilizationInPercent, BigDecimal memUtilizationInPercent, BigDecimal absoluteMemUsed) {
+        // check if user wants to exclude this process
         if (processName != null) {
-            StringBuilder sb = new StringBuilder(processName);
-            if (config.isDisplayByPid()) {
-                processName = sb.append(METRIC_SEPARATOR).append(pid).toString();
-            } else {
-                processName = sb.toString();
-            }
-            // check if user wants to exclude this process
-            if (!config.getExcludeProcesses().contains(processName) && !config.getExcludePIDs().contains(pid)) {
+            if(checkFromConfigIfProcessNeedsToBeReported(processName)) {
                 // update the processes Map
+                StringBuilder sb = new StringBuilder(processName);
+                if (config.isDisplayByPid()) {
+                    processName = sb.append(METRIC_SEPARATOR).append(pid).toString();
+                } else {
+                    processName = sb.toString();
+                }
                 if (processes.containsKey(processName)) {
                     ProcessData procData = processes.get(processName);
                     procData.numOfInstances++;
@@ -143,6 +146,19 @@ public abstract class Parser {
         } else {
             logger.warn("Could not retrieve the name of Process with pid " + pid);
         }
+    }
+
+    public boolean checkFromConfigIfProcessNeedsToBeReported(String processName) {
+        boolean processNeedsToBeReported = false;
+        Set<String> includeProcessesSet = config.getIncludeProcesses();
+        if(includeProcessesSet.isEmpty()) {
+            if (!config.getExcludeProcesses().contains(processName)) {
+                processNeedsToBeReported = true;
+            }
+        } else {
+            processNeedsToBeReported = includeProcessesSet.contains(processName) ? true : false;
+        }
+        return processNeedsToBeReported;
     }
 
     public Map<String, ProcessData> getProcesses() {
@@ -218,7 +234,17 @@ public abstract class Parser {
         }
     }
 
-    protected CommandHeaderInfo processHeaderLine(String headerLine, String... headerStrings) throws ProcessMonitorException {
-        return null;
+    protected Map<String, Integer> processHeaderLine(String command, String headerLine, String [] headerStrings, String delimiter) throws ProcessMonitorException {
+        List<String> headersList = Arrays.asList(headerLine.trim().split(delimiter));
+        Map<String, Integer> headerInfo = Maps.newHashMap();
+        for(String headerString : headerStrings) {
+            if(headersList.contains(headerString)) {
+                headerInfo.put(headerString, headersList.indexOf(headerString));
+            } else {
+                logger.error("Could not find correct header information for " + headerString + " while executing command " + command);
+                throw new ProcessMonitorException("Could not find correct header information for " + headerString + " while executing command " + command);
+            }
+        }
+        return headerInfo;
     }
 }

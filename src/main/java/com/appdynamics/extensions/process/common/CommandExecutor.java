@@ -18,6 +18,7 @@ package com.appdynamics.extensions.process.common;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public class CommandExecutor {
@@ -25,9 +26,21 @@ public class CommandExecutor {
 
     public Process execute(String command) throws CommandExecutorException {
         Runtime rt = Runtime.getRuntime();
-        Process p = null;
+        Process p;
         try {
             p = rt.exec(command);
+        } catch (IOException e) {
+            logger.error("Error in executing the command " + e);
+            throw new CommandExecutorException("Execution failed with message " + e.getMessage(), e);
+        }
+        return p;
+    }
+
+    public Process execute(String command, List<String> env) throws CommandExecutorException {
+        Runtime rt = Runtime.getRuntime();
+        Process p;
+        try {
+            p = rt.exec(command, env.toArray(new String[1]));
         } catch (IOException e) {
             logger.error("Error in executing the command " + e);
             throw new CommandExecutorException("Execution failed with message " + e.getMessage(), e);

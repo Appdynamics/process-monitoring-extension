@@ -15,6 +15,7 @@
  */
 package com.appdynamics.extensions.process.parser;
 
+import com.appdynamics.extensions.process.common.CmdOutHeaderConstants;
 import com.appdynamics.extensions.process.common.CommandExecutorException;
 import com.appdynamics.extensions.process.common.ProcessCommands;
 import com.appdynamics.extensions.process.config.Configuration;
@@ -28,11 +29,11 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 
 public class AIXParser extends Parser {
     private static final Logger logger = Logger.getLogger(AIXParser.class);
-    private int posPID = -1, posCPU = -1, posMem = -1, posCommand = -1; // used for parsing
 
     public AIXParser(Configuration config) {
         super(config);
@@ -50,17 +51,20 @@ public class AIXParser extends Parser {
         Process p = commandExecutor.execute(processListCommand);
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
         try {
-            String line = input.readLine().trim();
-            processHeader(line);
+            String line = input.readLine();
+            String [] headerArray = {CmdOutHeaderConstants.AIX_PID, CmdOutHeaderConstants.AIX_CPU_PERCENT, CmdOutHeaderConstants.AIX_MEM_PERCENT, CmdOutHeaderConstants.AIX_PROC_NAME};
+            Map<String, Integer> headerPositions = processHeaderLine(processListCommand, line, headerArray, "\\s+");
             while ((line = input.readLine()) != null) {
                 String[] words = line.trim().split("\\s+");
-                int pid = Integer.parseInt(words[posPID].trim());
+                if(words.length == headerPositions.size()) {
+                    int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.AIX_PID)].trim());
 
-                BigDecimal cpuUtilizationInPercent = toBigDecimal(words[posCPU].trim());
-                BigDecimal memUtilizationInPercent = toBigDecimal(words[posMem].trim());
-                String processName = words[posCommand].trim();
-                BigDecimal absoluteMem = (memUtilizationInPercent.divide(new BigDecimal(100)).multiply(getTotalMemSizeMB()));
-                populateProcessData(processName, pid, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMem);
+                    BigDecimal cpuUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.AIX_CPU_PERCENT)].trim());
+                    BigDecimal memUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.AIX_MEM_PERCENT)].trim());
+                    String processName = words[headerPositions.get(CmdOutHeaderConstants.AIX_PROC_NAME)].trim();
+                    BigDecimal absoluteMem = (memUtilizationInPercent.divide(new BigDecimal(100)).multiply(getTotalMemSizeMB()));
+                    populateProcessData(processName, pid, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMem);
+                }
             }
         } catch (IOException e) {
             logger.error("Error in parsing the output of command " + processListCommand, e);
@@ -69,8 +73,6 @@ public class AIXParser extends Parser {
             closeBufferedReader(input);
             cleanUpProcess(p, processListCommand);
         }
-
-
     }
 
     private void fetchMemorySize() throws CommandExecutorException, ProcessMonitorException {
@@ -88,24 +90,6 @@ public class AIXParser extends Parser {
         } finally {
             closeBufferedReader(input);
             cleanUpProcess(p, cmd);
-        }
-    }
-
-    private void processHeader(String processLine) throws ProcessMonitorException {
-        String[] words = processLine.split("\\s+");
-        for (int i = 0; i < words.length; i++) {
-            if (words[i].equals("PID")) {
-                posPID = i;
-            } else if (words[i].equals("%CPU")) {
-                posCPU = i;
-            } else if (words[i].equals("%MEM")) {
-                posMem = i;
-            } else if (words[i].equals("COMMAND")) {
-                posCommand = i;
-            }
-        }
-        if (posMem == -1 || posCPU == -1 || posMem == -1 || posCommand == -1) {
-            throw new ProcessMonitorException("Can't find correct process stats from 'ps -eo pid,pcpu,pmem,command' command. Terminating Process Monitor");
         }
     }
 }

@@ -15,11 +15,13 @@
  */
 package com.appdynamics.extensions.process.parser;
 
+import com.appdynamics.extensions.process.common.CmdOutHeaderConstants;
 import com.appdynamics.extensions.process.common.CommandExecutorException;
 import com.appdynamics.extensions.process.common.ProcessCommands;
 import com.appdynamics.extensions.process.config.Configuration;
 import com.appdynamics.extensions.process.processdata.ProcessData;
 import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
+import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -28,10 +30,10 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class LinuxParser extends Parser {
 
-    private int posPID = -1, posCPU = -1, posMem = -1; // used for parsing
     private static final Logger logger = Logger.getLogger(LinuxParser.class);
 
     public LinuxParser(Configuration config) {
@@ -101,16 +103,18 @@ public class LinuxParser extends Parser {
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
             int i = 0;
+            Map<String, Integer> headerPositions = Maps.newHashMap();
             while ((line = input.readLine()) != null) {
                 if (i == 0) {
-                    processHeader(line);
+                    String [] headerArray = {CmdOutHeaderConstants.LINUX_PID, CmdOutHeaderConstants.LINUX_CPU_PERCENT, CmdOutHeaderConstants.LINUX_MEM_PERCENT};
+                    headerPositions = processHeaderLine(cmd, line, headerArray, "\\s+");
                 } else {
                     String[] words = line.split("\\s+");
 
-                    int pid = Integer.parseInt(words[posPID].trim());
+                    int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.LINUX_PID)].trim());
 
-                    BigDecimal cpuUtilizationInPercent = toBigDecimal(words[posCPU]);
-                    BigDecimal memUtilizationInPercent = toBigDecimal(words[posMem]);
+                    BigDecimal cpuUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.LINUX_CPU_PERCENT)]);
+                    BigDecimal memUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.LINUX_MEM_PERCENT)]);
                     BigDecimal absoluteMem = (memUtilizationInPercent.divide(new BigDecimal(100)).multiply(getTotalMemSizeMB()));
 
                     String processName = getNameOfProcess(pid);
@@ -128,22 +132,6 @@ public class LinuxParser extends Parser {
         } finally {
             closeBufferedReader(input);
             cleanUpProcess(p, cmd);
-        }
-    }
-
-    private void processHeader(String processLine) throws ProcessMonitorException {
-        String[] words = processLine.split("\\s+");
-        for (int i = 0; i < words.length; i++) {
-            if (words[i].equals("PID")) {
-                posPID = i;
-            } else if (words[i].equals("%CPU")) {
-                posCPU = i;
-            } else if (words[i].equals("%MEM")) {
-                posMem = i;
-            }
-        }
-        if (posMem == -1 || posCPU == -1 || posMem == -1) {
-            throw new ProcessMonitorException("Can't find correct process stats from 'ps aux' command. Terminating Process Monitor");
         }
     }
 }

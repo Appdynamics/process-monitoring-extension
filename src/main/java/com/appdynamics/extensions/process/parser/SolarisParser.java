@@ -15,6 +15,7 @@
  */
 package com.appdynamics.extensions.process.parser;
 
+import com.appdynamics.extensions.process.common.CmdOutHeaderConstants;
 import com.appdynamics.extensions.process.common.CommandExecutorException;
 import com.appdynamics.extensions.process.common.ProcessCommands;
 import com.appdynamics.extensions.process.config.Configuration;
@@ -32,10 +33,10 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 
 
 public class SolarisParser extends Parser {
-    private int posPID = -1, posCPU = -1, posMem = -1, posProcName = -1;// used for parsing
     private static final Logger logger = Logger.getLogger(SolarisParser.class);
 
     public SolarisParser(Configuration config) {
@@ -56,15 +57,17 @@ public class SolarisParser extends Parser {
             skipParsingLines(input, 4);
             processMemoryLine(input.readLine());
             skipParsingLines(input, 1);
-            processHeader(input.readLine());
+
+            String [] headerArray = {CmdOutHeaderConstants.SOLARIS_PID, CmdOutHeaderConstants.SOLARIS_CPU, CmdOutHeaderConstants.SOLARIS_MEM, CmdOutHeaderConstants.SOLARIS_PROC_NAME};
+            Map<String, Integer> headerPositions = processHeaderLine(cmd, input.readLine(), headerArray, "\\s+");
             String line;
             while (!Strings.isNullOrEmpty(line = input.readLine())) {
                 String[] words = line.trim().split("\\s+");
-                int pid = Integer.parseInt(words[posPID].trim());
-                String processName = words[posProcName].trim();
+                int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_PID)].trim());
+                String processName = words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_PROC_NAME)].trim();
 
-                BigDecimal cpuUtilizationInPercent = toBigDecimal(words[posCPU].split("%")[0].trim());
-                BigDecimal absoluteMemUsed = parseMemoryString(words[posMem].trim());
+                BigDecimal cpuUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_CPU)].split("%")[0].trim());
+                BigDecimal absoluteMemUsed = parseMemoryString(words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_MEM)].trim());
 
                 BigDecimal memUtilizationInPercent = (absoluteMemUsed.divide(getTotalMemSizeMB(), BigDecimal.ROUND_HALF_UP)).multiply(new BigDecimal(100));
 
@@ -111,23 +114,5 @@ public class SolarisParser extends Parser {
             logger.error("Exception while unlocalizing number string " + valueStr, e);
         }
         return null;
-    }
-
-    private void processHeader(String processLine) throws ProcessMonitorException {
-        String[] words = processLine.trim().split("\\s+");
-        for (int i = 0; i < words.length; i++) {
-            if (words[i].equals("PID")) {
-                posPID = i;
-            } else if (words[i].equals("CPU")) {
-                posCPU = i;
-            } else if (words[i].equals("SIZE")) {
-                posMem = i;
-            } else if (words[i].equals("COMMAND")) {
-                posProcName = i;
-            }
-        }
-        if (posPID == -1 || posCPU == -1 || posMem == -1 || posProcName == -1) {
-            throw new ProcessMonitorException("Can't find correct process stats from 'top' command. Terminating Process Monitor");
-        }
     }
 }

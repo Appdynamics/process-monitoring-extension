@@ -3,7 +3,7 @@
 This extension works only with the standalone machine agent.
 
 ##Use Case
-The AppDynamics Process Extension observes active processes on a Linux/Windows/Solaris/AIX machine and displays them in the AppDynamics Metric Browser.
+The AppDynamics Process Extension observes active processes on a Linux/Windows/Solaris/AIX/HP-UX machine and displays them in the AppDynamics Metric Browser.
 
 The Processes extension retrieves the following metrics for each process/processes group:
 
@@ -17,8 +17,7 @@ There are two ways of reporting these metrics to controller by changing the flag
 2. If true, each individual process metrics are reported under PID.
 
 **Note**: If you are running Windows,  make sure that the file 'csv.xsl' is in 'C:\Windows\System32' for 32bit or 'C:\Windows\SysWOW64' or 'C:\\Windows\\SysWOW64\\webem\\en-US\\csv.xsl' for 64bit OS versions (standard under Windows Server 2003).
-If this file is not found, the process monitor will output an error to the log file (logs/machine-agent.log) .
-
+If this file is not found, the process monitor will output an error to the log file (logs/machine-agent.log).
 
 ##Installation
 1. To build from source, clone this repository and run 'mvn clean install'. This will produce a ProcessMonitor-VERSION.zip in the target directory. Alternatively, download the latest release archive from [Github](https://github.com/Appdynamics/process-monitoring-extension/releases/latest).
@@ -36,19 +35,18 @@ Note : Please make sure to not use tab (\t) while editing yaml files. You may wa
 
    For eg.
    ```
-        # Option to view process metrics in MetricBrowser.
+        # Option to view process metrics in MetricBrowser per PID OR as aggregated over all the processes with same name.
         # If false, all the processes with same name are grouped and collective metrics are reported to AppDynamics Metric Browser.
         # If true, each process with PID can be viewed but since PID changes with process restart, this might not be the best option.
         displayByPid: false
 
-        # comma-separated names of processes you want to exclude out of the reported metrics.
-        #Example Linux  : java,bash,sshd
+        # comma-separated names of processes you want to include and exclude respectively in the reported metrics.
+        #Example Linux: java,bash,sshd
         #Example Windows: java.exe,chrome.exe
-        excludeProcesses: [ ]
+        # includeProcesses: If empty, all processes are monitored. If not empty, only those specified are monitored excluding others.
 
-        # comma-separated Process IDs (pids) to be excluded out of the reported metrics.
-        # Example: 2,343,1235,34
-        excludePIDs: [ ]
+        includeProcesses: []
+        excludeProcesses: []
 
         # Processes with an aggregated absolute memory consumption of LESS than this number
         # in Megabytes will be filtered out of the reported metrics. Default value is 100 [MB]
@@ -98,7 +96,7 @@ Always feel free to fork and contribute any changes directly here on GitHub.
 
 ##Community
 
-Find out more in the [AppSphere](http://appsphere.appdynamics.com/t5/Extensions/Process-Monitoring-Extension/idi-p/1069) community.
+Find out more in the [AppSphere](https://www.appdynamics.com/community/exchange/extension/process-monitoring-extension/) community.
 
 ##Support
 
