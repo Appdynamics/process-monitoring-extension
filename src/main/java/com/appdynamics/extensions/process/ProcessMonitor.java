@@ -121,9 +121,10 @@ public class ProcessMonitor extends AManagedMonitor {
 
         logger.debug("Reading in the set of monitored processes");
         parser.readProcsFromFile();
+        int memoryThreshold = config.getMemoryThreshold();
         for (ProcessData procData : parser.getProcesses().values()) {
 
-            if (procData.absoluteMem.doubleValue() >= parser.getMemoryThreshold() || parser.getIncludeProcesses().contains(procData.name)) {
+            if (procData.absoluteMem.doubleValue() >= memoryThreshold || parser.getIncludeProcesses().contains(procData.name)) {
 
                 parser.addIncludeProcesses(procData.name);
 

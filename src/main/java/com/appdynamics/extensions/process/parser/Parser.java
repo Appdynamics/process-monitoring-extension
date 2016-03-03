@@ -42,7 +42,6 @@ import java.util.Set;
 
 public abstract class Parser {
 
-    private final int DEFAULT_MEM_THRESHOLD = 100;
     public final BigDecimal BYTES_CONVERSION_FACTOR = new BigDecimal(1024);
     protected Set<String> includeProcesses = new HashSet<String>();
     protected Map<String, ProcessData> processes = new HashMap<String, ProcessData>();
@@ -111,14 +110,6 @@ public abstract class Parser {
             logger.error("Exception: ", e);
         } finally {
             closeBufferedWriter(wr);
-        }
-    }
-
-    public int getMemoryThreshold() {
-        if (config.getMemoryThreshold() == 0) {
-            return DEFAULT_MEM_THRESHOLD;
-        } else {
-            return config.getMemoryThreshold();
         }
     }
 
