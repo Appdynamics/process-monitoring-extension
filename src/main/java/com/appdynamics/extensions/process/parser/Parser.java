@@ -26,19 +26,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class Parser {
 
@@ -133,9 +123,8 @@ public abstract class Parser {
                 } else {
                     processes.put(processName, new ProcessData(processName, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMemUsed));
                 }
+                logger.debug("ProcessName:" + processName + " CPU%:" + cpuUtilizationInPercent + " Mem%:" + memUtilizationInPercent + "AbsMem:" + absoluteMemUsed);
             }
-        } else {
-            logger.warn("Could not retrieve the name of Process with pid " + pid);
         }
     }
 
@@ -143,14 +132,26 @@ public abstract class Parser {
         boolean processNeedsToBeReported = false;
         Set<String> includeProcessesSet = config.getIncludeProcesses();
         if(includeProcessesSet.isEmpty()) {
-            if (!config.getExcludeProcesses().contains(processName)) {
+            if (!isMatchProcessName(config.getExcludeProcesses(), processName)) {
                 processNeedsToBeReported = true;
             }
         } else {
-            processNeedsToBeReported = includeProcessesSet.contains(processName) ? true : false;
+            processNeedsToBeReported = isMatchProcessName(includeProcessesSet, processName) ? true : false;
         }
         return processNeedsToBeReported;
     }
+
+    public boolean isMatchProcessName(Set<String> processes, String processName) {
+
+        for (String regexProcess : processes) {
+            boolean matches = processName.matches(regexProcess);
+            if (matches) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public Map<String, ProcessData> getProcesses() {
         return processes;
@@ -196,7 +197,7 @@ public abstract class Parser {
             if (p != null) {
                 int exitValue = p.waitFor();
                 if (exitValue != 0) {
-                    logger.warn("Unable to terminate the command " + cmd + " normally. ExitValue = " + exitValue);
+                    logger.debug("Unable to terminate the command " + cmd + " normally. ExitValue = " + exitValue);
                 }
                 p.destroy();
             }

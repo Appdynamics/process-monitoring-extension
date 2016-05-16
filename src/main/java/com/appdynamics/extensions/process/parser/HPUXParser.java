@@ -30,12 +30,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 
 public class HPUXParser extends Parser {
@@ -65,16 +60,14 @@ public class HPUXParser extends Parser {
             String line;
             while ((line = input.readLine()) != null) {
                 String[] words = line.trim().split("\\s+");
-                int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.HPUX_PID)].trim());
-
-                String processName = deriveProcessNameFromCommand(words[headerPositions.get(CmdOutHeaderConstants.HPUX_COMMAND)].trim());
-
-                BigDecimal cpuUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.HPUX_CPU)].trim());
-
-                BigDecimal absoluteMemUsedInMB = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.HPUX_SIZE)].trim()).divide(BYTES_CONVERSION_FACTOR);
-                BigDecimal memUtilizationInPercent = (absoluteMemUsedInMB.divide(getTotalMemSizeMB(), BigDecimal.ROUND_HALF_UP)).multiply(new BigDecimal(100));
-
-                populateProcessData(processName, pid, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMemUsedInMB);
+                if(words.length == headerPositions.size()) {
+                    int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.HPUX_PID)].trim());
+                    String processName = deriveProcessNameFromCommand(words[headerPositions.get(CmdOutHeaderConstants.HPUX_COMMAND)].trim());
+                    BigDecimal cpuUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.HPUX_CPU)].trim());
+                    BigDecimal absoluteMemUsedInMB = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.HPUX_SIZE)].trim()).divide(BYTES_CONVERSION_FACTOR);
+                    BigDecimal memUtilizationInPercent = (absoluteMemUsedInMB.divide(getTotalMemSizeMB(), BigDecimal.ROUND_HALF_UP)).multiply(new BigDecimal(100));
+                    populateProcessData(processName, pid, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMemUsedInMB);
+                }
             }
         } catch (IOException e) {
             logger.error("Error in parsing the output of command " + cmd, e);

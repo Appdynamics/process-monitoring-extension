@@ -17,12 +17,7 @@ package com.appdynamics.extensions.process;
 
 import com.appdynamics.extensions.PathResolver;
 import com.appdynamics.extensions.process.config.Configuration;
-import com.appdynamics.extensions.process.parser.AIXParser;
-import com.appdynamics.extensions.process.parser.HPUXParser;
-import com.appdynamics.extensions.process.parser.LinuxParser;
-import com.appdynamics.extensions.process.parser.Parser;
-import com.appdynamics.extensions.process.parser.SolarisParser;
-import com.appdynamics.extensions.process.parser.WindowsParser;
+import com.appdynamics.extensions.process.parser.*;
 import com.appdynamics.extensions.process.processdata.ProcessData;
 import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 import com.appdynamics.extensions.yml.YmlReader;
@@ -108,10 +103,10 @@ public class ProcessMonitor extends AManagedMonitor {
             includeProcs = includeProcs.concat(process + ", ");
         }
         if (!"".equals(exclProcs)) {
-            logger.debug("Ignoring processes: " + exclProcs.substring(0, exclProcs.length() - 2));
+            logger.debug("Excluding processes: " + exclProcs.substring(0, exclProcs.length() - 2));
         }
         if (!"".equals(includeProcs)) {
-            logger.debug("Ignoring pids: " + includeProcs.substring(0, includeProcs.length() - 2));
+            logger.debug("Including processes: " + includeProcs.substring(0, includeProcs.length() - 2));
         }
     }
 
@@ -137,7 +132,6 @@ public class ProcessMonitor extends AManagedMonitor {
                 if (!config.isDisplayByPid()) {
                     printMetric(metricPath.toString() + "Number of running instances", procData.numOfInstances);
                 }
-
             }
         }
         logger.debug("Writing monitored processes out to file");

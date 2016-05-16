@@ -29,6 +29,7 @@ public class CommandExecutor {
         Process p;
         try {
             p = rt.exec(command);
+            logger.debug("Executed command " + command);
         } catch (IOException e) {
             logger.error("Error in executing the command " + e);
             throw new CommandExecutorException("Execution failed with message " + e.getMessage(), e);

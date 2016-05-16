@@ -63,15 +63,17 @@ public class SolarisParser extends Parser {
             String line;
             while (!Strings.isNullOrEmpty(line = input.readLine())) {
                 String[] words = line.trim().split("\\s+");
-                int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_PID)].trim());
-                String processName = words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_PROC_NAME)].trim();
+                if(words.length == headerPositions.size()) {
+                    int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_PID)].trim());
+                    String processName = words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_PROC_NAME)].trim();
 
-                BigDecimal cpuUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_CPU)].split("%")[0].trim());
-                BigDecimal absoluteMemUsed = parseMemoryString(words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_MEM)].trim());
+                    BigDecimal cpuUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_CPU)].split("%")[0].trim());
+                    BigDecimal absoluteMemUsed = parseMemoryString(words[headerPositions.get(CmdOutHeaderConstants.SOLARIS_MEM)].trim());
 
-                BigDecimal memUtilizationInPercent = (absoluteMemUsed.divide(getTotalMemSizeMB(), BigDecimal.ROUND_HALF_UP)).multiply(new BigDecimal(100));
+                    BigDecimal memUtilizationInPercent = (absoluteMemUsed.divide(getTotalMemSizeMB(), BigDecimal.ROUND_HALF_UP)).multiply(new BigDecimal(100));
 
-                populateProcessData(processName, pid, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMemUsed);
+                    populateProcessData(processName, pid, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMemUsed);
+                }
             }
         } catch (IOException e) {
             logger.error("Error in parsing the output of command " + cmd, e);

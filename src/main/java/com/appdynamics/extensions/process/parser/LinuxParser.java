@@ -51,7 +51,9 @@ public class LinuxParser extends Parser {
             String line;
             if ((line = input.readLine()) != null) {
                 String[] words = line.trim().split("\\s+");
-                setTotalMemSizeMB(toBigDecimal(words[1].trim()).divide(new BigDecimal(1024)));
+                BigDecimal memory = toBigDecimal(words[1].trim()).divide(new BigDecimal(1024));
+                setTotalMemSizeMB(memory);
+                logger.debug("Memory: " + memory);
             }
         } catch (IOException e) {
             logger.error("Error in parsing the output of command " + ProcessCommands.LINUX_MEMORY_COMMAND, e);
