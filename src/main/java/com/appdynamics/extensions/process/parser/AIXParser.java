@@ -55,6 +55,9 @@ public class AIXParser extends Parser {
             String [] headerArray = {CmdOutHeaderConstants.AIX_PID, CmdOutHeaderConstants.AIX_CPU_PERCENT, CmdOutHeaderConstants.AIX_MEM_PERCENT, CmdOutHeaderConstants.AIX_PROC_NAME};
             Map<String, Integer> headerPositions = processHeaderLine(processListCommand, line, headerArray, "\\s+");
             while ((line = input.readLine()) != null) {
+                //karl.wolf Fix to no consider defunct proccess
+            	if(line.contains("defunct"))
+            		continue;
                 String[] words = line.trim().split("\\s+");
                 if(words.length == headerPositions.size()) {
                     int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.AIX_PID)].trim());
