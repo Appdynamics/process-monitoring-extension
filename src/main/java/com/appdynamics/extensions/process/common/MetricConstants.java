@@ -13,23 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.appdynamics.extensions.process.common;
 
+public class MetricConstants {
 
-package com.appdynamics.extensions.process.processexception;
-
-public class ProcessMonitorException extends Exception {
-
-    private static final long serialVersionUID = 8069820319694849033L;
-
-    public ProcessMonitorException(String message) {
-        super(message);
-    }
-
-    public ProcessMonitorException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ProcessMonitorException(Throwable cause) {
-        super(cause);
-    }
+    public static final String NUMBER_OF_RUNNING_INSTANCES = "Number of running instances";
 }

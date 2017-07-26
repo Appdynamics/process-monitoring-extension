@@ -2,14 +2,14 @@
 processesToBeMonitored:
   - displayName: "docker"
     pattern: ".*docker.*"
-  - displayName: "bioset"
-    pattern: "\\[bioset\\]"
+  - displayName: "gnome"
+    pattern: "gnome.*"
   - displayName: "java"
-    pattern: "java.exe"
+    pattern: ".*java.*"
+  - displayName: "java1"
+    pattern: ".*java .*"
   - displayName: "hadoop"
     pattern: "hadoop"
-  - displayName: "machine agent"
-    pattern: "java -jar machine-agent.jar"
 
 
 # number of concurrent tasks

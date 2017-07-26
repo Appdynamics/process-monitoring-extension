@@ -1,0 +1,42 @@
+324,\SystemRoot\System32\smss.exe
+780,C:\Windows\system32\csrss.exe
+832,C:\Windows\system32\wininit.exe
+840,C:\Windows\system32\csrss.exe
+888,C:\Windows\system32\winlogon.exe
+940,C:\Windows\system32\services.exe
+948,C:\Windows\system32\lsass.exe
+980,C:\Windows\system32\lsm.exe
+1056,C:\Windows\system32\svchost.exe
+1188,C:\Windows\system32\svchost.exe
+1272,C:\Windows\System32\svchost.exe
+1332,C:\Windows\System32\svchost.exe
+1360,C:\Windows\system32\svchost.exe
+1416,C:\Windows\system32\svchost.exe
+1644,C:\Windows\system32\svchost.exe
+1808,C:\Windows\system32\svchost.exe
+1836,C:\Program Files\AVG\Antivirus\AVGSvc.exe
+1928,C:\Windows\system32\Dwm.exe
+1952,C:\Windows\Explorer.EXE
+2044,C:\Windows\System32\spoolsv.exe
+824,C:\Windows\system32\taskhost.exe
+1904,C:\ProgramData\DatacardService\HWDeviceService.exe
+700,C:\Program Files\Canon\IJPLM\IJPLMSVC.EXE
+1948,C:\ProgramData\DatacardService\DCSHelper.exe
+2068,C:\Windows\System32\snmp.exe
+2104,C:\Windows\system32\svchost.exe
+3840,C:\Program Files\AVG\Antivirus\AVGUI.exe
+2564,C:\Windows\system32\SearchIndexer.exe
+3028,C:\Windows\System32\WUDFHost.exe
+3476,C:\Program Files\AVG\Antivirus\aswidsagent.exe
+4008,C:\Windows\system32\svchost.exe
+5344,C:\Program Files\Windows Media Player\wmpnetwk.exe
+5636,C:\Windows\System32\svchost.exe
+2952,C:\Windows\system32\ctfmon.exe
+6060,C:\Windows\system32\cmd.exe
+1496,C:\Windows\system32\conhost.exe
+4512,C:\Program Files\AVG\Framework\Common\avgsvcx.exe
+5480,C:\Program Files\AVG\Framework\Common\avguix.exe
+1528,C:\Windows\system32\svchost.exe
+4520,C:\Windows\system32\wbem\wmiprvse.exe
+3300,C:\Windows\system32\taskeng.exe
+3296,C:\Windows\system32\java.exe

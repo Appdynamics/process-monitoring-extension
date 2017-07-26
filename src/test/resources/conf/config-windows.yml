@@ -1,11 +1,10 @@
-
 processesToBeMonitored:
-  - displayName: "supervisord"
-    pattern: "python .*supervisord -c .*supervisord.conf"
+  - displayName: "docker"
+    pattern: "docker-containerd .*"
+  - displayName: "svchost.exe"
+    pattern: ".*svchost.exe"
   - displayName: "java"
     pattern: ".*java.exe"
-  - displayName: "machine agent"
-    pattern: "java -jar machine-agent.jar"
 
 
 # number of concurrent tasks

@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 AppDynamics
+ * Copyright 2016 AppDynamics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.appdynamics.extensions.process.common;
+package com.appdynamics.extensions.process.data;
 
+import com.google.common.collect.Maps;
 
-public class CommandExecutorException extends Exception {
+import java.math.BigDecimal;
+import java.util.Map;
 
-    public CommandExecutorException(String message) {
-        super(message);
+public class ProcessData {
+
+    Map<String, BigDecimal> processMetrics;
+
+    public Map<String, BigDecimal> getProcessMetrics() {
+        if (processMetrics == null) {
+            processMetrics = Maps.newHashMap();
+        }
+        return processMetrics;
     }
 
-    public CommandExecutorException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public CommandExecutorException(Throwable cause) {
-        super(cause);
+    public void setProcessMetrics(Map<String, BigDecimal> processMetrics) {
+        this.processMetrics = processMetrics;
     }
 }

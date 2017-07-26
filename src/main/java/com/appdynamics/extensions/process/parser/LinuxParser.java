@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 AppDynamics
+ * Copyright 2016 AppDynamics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,125 +15,58 @@
  */
 package com.appdynamics.extensions.process.parser;
 
-import com.appdynamics.extensions.process.common.CmdOutHeaderConstants;
-import com.appdynamics.extensions.process.common.CommandExecutorException;
-import com.appdynamics.extensions.process.common.ProcessCommands;
-import com.appdynamics.extensions.process.config.Configuration;
-import com.appdynamics.extensions.process.processdata.ProcessData;
-import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
+import com.appdynamics.extensions.process.common.*;
+import com.appdynamics.extensions.process.data.ProcessData;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
-public class LinuxParser extends Parser {
+public class LinuxParser implements Parser {
 
-    private static final Logger logger = Logger.getLogger(LinuxParser.class);
+    public static final Logger logger = Logger.getLogger(LinuxParser.class);
 
-    public LinuxParser(Configuration config) {
-        super(config);
-        processGroupName = "Linux Processes";
-        processes = new HashMap<String, ProcessData>();
-        includeProcesses = new HashSet<String>();
-    }
-
-    public void retrieveMemoryMetrics() throws ProcessMonitorException, CommandExecutorException {
-        Process p = commandExecutor.execute(ProcessCommands.LINUX_MEMORY_COMMAND);
-        BufferedReader input = null;
-        try {
-            input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            if ((line = input.readLine()) != null) {
-                String[] words = line.trim().split("\\s+");
-                BigDecimal memory = toBigDecimal(words[1].trim()).divide(new BigDecimal(1024));
-                setTotalMemSizeMB(memory);
-                logger.debug("Memory: " + memory);
-            }
-        } catch (IOException e) {
-            logger.error("Error in parsing the output of command " + ProcessCommands.LINUX_MEMORY_COMMAND, e);
-            throw new ProcessMonitorException("Error in parsing the output of command " + ProcessCommands.LINUX_MEMORY_COMMAND, e);
-        } catch (NumberFormatException e) {
-            logger.error("Unable to retrieve total physical memory size (not a number) ", e);
-            throw new ProcessMonitorException("Unable to retrieve total physical memory size (not a number) ", e);
-        } finally {
-            closeBufferedReader(input);
-            cleanUpProcess(p, ProcessCommands.LINUX_MEMORY_COMMAND);
-        }
-    }
-
-    public String getNameOfProcess(int pid) throws CommandExecutorException {
-        String cmd = String.format(ProcessCommands.LINUX_PROCESS_NAME_COMMAD, pid);
-        Process p = commandExecutor.execute(cmd);
-        BufferedReader input = null;
-        try {
-            input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            if ((line = input.readLine()) != null) {
-                String[] words = line.trim().split("\\s+");
-                return words[1];
-            }
-        } catch (IOException e) {
-            logger.error("Error in parsing the output of command " + cmd, e);
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
-            closeBufferedReader(input);
-            cleanUpProcess(p, cmd);
-        }
-        return null;
-    }
-
-    /**
-     * Parsing the 'ps aux' command and gathering process information data.
-     *
-     * @throws NumberFormatException
-     * @throws ProcessMonitorException
-     */
-    public void parseProcesses() throws NumberFormatException, ProcessMonitorException, CommandExecutorException {
-        this.retrieveMemoryMetrics();
-
+    public Map<String, ProcessData> parseProcesses(Map<String, ?> config) {
+        List<Map> processesToBeMonitored = (List) config.get("processesToBeMonitored");
         String cmd = ProcessCommands.LINUX_PROCESS_LIST_COMMAND;
-        Process p = commandExecutor.execute(cmd);
-        BufferedReader input = null;
-        try {
-            input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            int i = 0;
-            Map<String, Integer> headerPositions = Maps.newHashMap();
-            while ((line = input.readLine()) != null) {
-                if (i == 0) {
-                    String [] headerArray = {CmdOutHeaderConstants.LINUX_PID, CmdOutHeaderConstants.LINUX_CPU_PERCENT, CmdOutHeaderConstants.LINUX_MEM_PERCENT};
-                    headerPositions = processHeaderLine(cmd, line, headerArray, "\\s+");
-                } else {
-                    String[] words = line.split("\\s+");
+        List<String> processListOutput = CommandExecutor.execute(cmd);
+        Map<String, ProcessData> processMetrics = parseProcesses(cmd, processListOutput, processesToBeMonitored);
+        return processMetrics;
 
-                    int pid = Integer.parseInt(words[headerPositions.get(CmdOutHeaderConstants.LINUX_PID)].trim());
+    }
 
-                    BigDecimal cpuUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.LINUX_CPU_PERCENT)]);
-                    BigDecimal memUtilizationInPercent = toBigDecimal(words[headerPositions.get(CmdOutHeaderConstants.LINUX_MEM_PERCENT)]);
-                    BigDecimal absoluteMem = (memUtilizationInPercent.divide(new BigDecimal(100)).multiply(getTotalMemSizeMB()));
+    private Map<String, ProcessData> parseProcesses(String cmd, List<String> processListOutput, List<Map> processesToBeMonitored) {
+        Map<String, ProcessData> processesData = Maps.newHashMap();
+        if (processListOutput != null && !processListOutput.isEmpty()) {
+            String [] headerArray = {CmdOutHeaderConstants.LINUX_CPU_PERCENT, CmdOutHeaderConstants.LINUX_MEM_PERCENT, CmdOutHeaderConstants.COMMAND};
+            Map<String, Integer> headerPositions = ProcessUtil.processHeaderLine(cmd, processListOutput.get(0), headerArray, "\\s+");
 
-                    String processName = getNameOfProcess(pid);
+            ListMultimap<String, String> filteredProcessLines = ProcessUtil.filterProcessesToBeMonitoredFromCompleteList(processListOutput, processesToBeMonitored, headerPositions.get(CmdOutHeaderConstants.COMMAND), "\\s+", 3);
 
-                    populateProcessData(processName, pid, cpuUtilizationInPercent, memUtilizationInPercent, absoluteMem);
-                }
-                i++;
-            }
-        } catch (IOException e) {
-            logger.error("Error in parsing the output of command " + cmd, e);
-            throw new ProcessMonitorException("Error in parsing the output of command " + cmd, e);
-        } catch (Exception e) {
-            logger.error("Exception: ", e);
-            throw new ProcessMonitorException("Exception: ", e);
-        } finally {
-            closeBufferedReader(input);
-            cleanUpProcess(p, cmd);
+            populateProcessesData(processesToBeMonitored, processesData, filteredProcessLines);
+        } else {
+            logger.warn("Output from command " + cmd + " is null or empty " + processListOutput);
         }
+        return processesData;
+    }
+
+    // specific to parser to which data to populate
+    private void populateProcessesData(List<Map> processesToBeMonitored, Map<String, ProcessData> processesData, ListMultimap<String, String> filteredProcessLines) {
+        for (Map processToBeMonitored : processesToBeMonitored) {
+            ProcessData processData = new ProcessData();
+            Map<String, BigDecimal> processMetrics = Maps.newHashMap();
+            String displayName = (String) processToBeMonitored.get("displayName");
+            List<String> processLines = filteredProcessLines.get(displayName);
+            processMetrics.put(MetricConstants.NUMBER_OF_RUNNING_INSTANCES, new BigDecimal(processLines.size()));
+            processData.setProcessMetrics(processMetrics);
+            processesData.put(displayName, processData);
+        }
+    }
+
+    public String getProcessGroupName() {
+        return "Linux Processes";
     }
 }

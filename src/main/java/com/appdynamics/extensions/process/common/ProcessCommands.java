@@ -20,7 +20,7 @@ public class ProcessCommands {
     //Linux
     public static final String LINUX_MEMORY_COMMAND = "cat /proc/meminfo";
     public static final String LINUX_PROCESS_NAME_COMMAD = "cat /proc/%s/status";
-    public static final String LINUX_PROCESS_LIST_COMMAND = "ps aux";
+    public static final String LINUX_PROCESS_LIST_COMMAND = "ps -eo pcpu:5,pmem:5,command";
 
     // Windows
     public static final String WINDOWS_MEMORY_COMMAND = "wmic OS get TotalVisibleMemorySize";

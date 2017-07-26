@@ -1,12 +1,25 @@
+/**
+ * Copyright 2016 AppDynamics
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.appdynamics.extensions.process.common;
 
-/**
- * Created by balakrishnav on 31/7/15.
- */
 public class CmdOutHeaderConstants {
     public static final String LINUX_PID = "PID";
     public static final String LINUX_CPU_PERCENT = "%CPU";
     public static final String LINUX_MEM_PERCENT = "%MEM";
+    public static final String COMMAND = "COMMAND";
 
     public static final String SOLARIS_PID = "PID";
     public static final String SOLARIS_CPU = "CPU";

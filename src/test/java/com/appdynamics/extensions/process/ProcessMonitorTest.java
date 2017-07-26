@@ -1,24 +1,35 @@
 package com.appdynamics.extensions.process;
 
-import com.google.common.collect.Maps;
+import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
-import java.util.Map;
+import java.util.HashMap;
 
-/**
- * Created by balakrishnav on 22/12/15.
- */
 public class ProcessMonitorTest {
 
-    public static final String CONFIG_ARG = "config-file";
+    private ProcessMonitor classUnderTest;
 
-    @Test
-    public void testProcessMonitor() throws TaskExecutionException {
-        Map<String, String> taskArgs = Maps.newHashMap();
-        taskArgs.put(CONFIG_ARG, "src/test/resources/conf/config.yml");
+    @Before
+    public void setup() {
+        classUnderTest = Mockito.spy(new ProcessMonitor());
+    }
 
-        ProcessMonitor monitor = new ProcessMonitor();
-        monitor.execute(taskArgs, null);
+    @Test(expected=TaskExecutionException.class)
+    public void testWithNoArgs() throws TaskExecutionException {
+        classUnderTest.execute(null, null);
+    }
+
+    @Test(expected=TaskExecutionException.class)
+    public void testWithEmptyArgs() throws TaskExecutionException {
+        classUnderTest.execute(new HashMap<String, String>(), null);
+    }
+
+    @Test(expected=ProcessMonitorException.class)
+    public void testWithMacOS() throws ProcessMonitorException {
+        Mockito.when(classUnderTest.getOSFromSystemProperty()).thenReturn("mac");
+        classUnderTest.determineOS();
     }
 }
