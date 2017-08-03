@@ -1,15 +1,21 @@
 
-processesToBeMonitored:
+instances:
   - displayName: "docker"
-    pattern: ".*docker.*"
+    regex: ".*docker.*"
   - displayName: "gnome"
-    pattern: "gnome.*"
+    regex: "gnome.*"
   - displayName: "java"
-    pattern: ".*java.*"
+    regex: ".*java.*"
   - displayName: "java1"
-    pattern: ".*java .*"
+    regex: ".*java .*"
   - displayName: "hadoop"
-    pattern: "hadoop"
+    regex: "hadoop"
+
+
+
+commands:
+  -linuxProcess: "ps -eo pid,command"
+  -solarisProcess: "top -b"
 
 
 # number of concurrent tasks

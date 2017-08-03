@@ -15,17 +15,19 @@
  */
 package com.appdynamics.extensions.process.parser;
 
-import com.appdynamics.extensions.process.common.MetricConstants;
+import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.common.ProcessUtil;
+import com.appdynamics.extensions.process.configuration.ConfigProcessor;
+import com.appdynamics.extensions.process.configuration.Instance;
 import com.appdynamics.extensions.process.data.ProcessData;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarPermissionDeniedException;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,25 +37,13 @@ public class WindowsParser implements Parser {
     public static final Logger logger = Logger.getLogger(WindowsParser.class);
 
     public Map<String, ProcessData> parseProcesses(Map<String, ?> config) {
-        List<Map> processesToBeMonitored = (List) config.get("processesToBeMonitored");
+        List<Instance> instances = new ConfigProcessor().processConfig(config);
+        // all process lines
         List<String> processListOutput = fetchProcessListFromSigar();
-        ListMultimap<String, String> filteredProcessLines = ProcessUtil.filterProcessesToBeMonitoredFromCompleteList(processListOutput, processesToBeMonitored, 1, ",", 0);
-
-        Map<String, ProcessData> processesData = populateProcessesData(processesToBeMonitored, filteredProcessLines);
-        return processesData;
-    }
-
-    private Map<String, ProcessData> populateProcessesData(List<Map> processesToBeMonitored, ListMultimap<String, String> filteredProcessLines) {
-        Map<String, ProcessData> processesData = Maps.newHashMap();
-        for (Map processToBeMonitored : processesToBeMonitored) {
-            ProcessData processData = new ProcessData();
-            Map<String, BigDecimal> processMetrics = Maps.newHashMap();
-            String displayName = (String) processToBeMonitored.get("displayName");
-            List<String> processLines = filteredProcessLines.get(displayName);
-            processMetrics.put(MetricConstants.NUMBER_OF_RUNNING_INSTANCES, new BigDecimal(processLines.size()));
-            processData.setProcessMetrics(processMetrics);
-            processesData.put(displayName, processData);
-        }
+        // filter process lines based on configuration
+        ListMultimap<String, String> filteredProcessLines = ProcessUtil.filterProcessLinesFromCompleteList(processListOutput, instances, buildHeaderInfo());
+        // process the filtered lines and retrieve the data
+        Map<String, ProcessData> processesData = ProcessUtil.populateProcessesData(instances, filteredProcessLines);
         return processesData;
     }
 
@@ -64,13 +54,12 @@ public class WindowsParser implements Parser {
             long [] pids = sigar.getProcList();
             for (long pid : pids) {
                 String line = "";
-                if (pid == 4)
-                    continue;
                 try {
                     String processName = sigar.getProcExe(pid).getName();
-                    line = pid + "," + processName;
+                    String processArgs = Joiner.on(" ").join(sigar.getProcArgs(pid));
+                    line = pid + " " + processName + " " + processArgs;
                 } catch (SigarPermissionDeniedException e) {
-                    logger.warn("Unable to retrieve process name for pid " + pid + " " + e.getMessage());
+                    logger.trace("Unable to retrieve process name for pid " + pid + " " + e.getMessage());
                 }
                 processLines.add(line);
             }
@@ -78,6 +67,14 @@ public class WindowsParser implements Parser {
             logger.warn(e.getMessage());
         }
         return processLines;
+    }
+
+    private List<String> buildHeaderInfo() {
+        List<String> headerInfo = Lists.newArrayList();
+        headerInfo.add(MonitorConstants.PID);
+        headerInfo.add(MonitorConstants.COMMAND);
+
+        return headerInfo;
     }
 
     public String getProcessGroupName() {

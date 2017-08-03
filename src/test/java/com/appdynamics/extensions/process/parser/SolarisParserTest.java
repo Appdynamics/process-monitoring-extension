@@ -1,8 +1,9 @@
 package com.appdynamics.extensions.process.parser;
 
 import com.appdynamics.extensions.process.common.CommandExecutor;
-import com.appdynamics.extensions.process.common.MetricConstants;
-import com.appdynamics.extensions.process.common.ProcessCommands;
+import com.appdynamics.extensions.process.common.MonitorConstants;
+import com.appdynamics.extensions.process.configuration.ConfigProcessor;
+import com.appdynamics.extensions.process.configuration.Instance;
 import com.appdynamics.extensions.process.data.ProcessData;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.base.Charsets;
@@ -41,22 +42,23 @@ public class SolarisParserTest {
     @Test
     public void testParseProcesses() {
         Map<String, ?> configArgs = YmlReader.readFromFile(new File("src/test/resources/conf/config-solaris.yml"));
-        PowerMockito.when(CommandExecutor.execute(ProcessCommands.SOLARIS_PROCESS_LIST_COMMAND)).thenReturn(processList);
+        List<Instance> instances = new ConfigProcessor().processConfig(configArgs);
+        PowerMockito.when(CommandExecutor.execute(MonitorConstants.SOLARIS_PROCESS_LIST_COMMAND)).thenReturn(processList);
         Map<String, ProcessData> processDataMap = parser.parseProcesses(configArgs);
 
         Map<String, BigDecimal> dockerProcessData = processDataMap.get("docker").getProcessMetrics();
-        Assert.assertEquals(dockerProcessData.get(MetricConstants.NUMBER_OF_RUNNING_INSTANCES), new BigDecimal(0));
+        Assert.assertEquals(BigDecimal.ZERO, dockerProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, BigDecimal> gnomeProcessData = processDataMap.get("gnome").getProcessMetrics();
-        Assert.assertEquals(gnomeProcessData.get(MetricConstants.NUMBER_OF_RUNNING_INSTANCES), new BigDecimal(6));
+        Assert.assertEquals(BigDecimal.valueOf(6), gnomeProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, BigDecimal> javaProcessData = processDataMap.get("java").getProcessMetrics();
-        Assert.assertEquals(javaProcessData.get(MetricConstants.NUMBER_OF_RUNNING_INSTANCES), new BigDecimal(1));
+        Assert.assertEquals(BigDecimal.ONE, javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, BigDecimal> java1ProcessData = processDataMap.get("java1").getProcessMetrics();
-        Assert.assertEquals(java1ProcessData.get(MetricConstants.NUMBER_OF_RUNNING_INSTANCES), new BigDecimal(0));
+        Assert.assertEquals(BigDecimal.ZERO, java1ProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, BigDecimal> hadoopProcessData = processDataMap.get("hadoop").getProcessMetrics();
-        Assert.assertEquals(hadoopProcessData.get(MetricConstants.NUMBER_OF_RUNNING_INSTANCES), new BigDecimal(0));
+        Assert.assertEquals(BigDecimal.ZERO, hadoopProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
     }
 }

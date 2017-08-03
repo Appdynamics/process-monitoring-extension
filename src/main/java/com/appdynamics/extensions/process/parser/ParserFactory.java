@@ -36,6 +36,7 @@ public class ParserFactory {
         } else {
             logger.error("Error in initializing Parser for " + os);
             return null;
+            // null is handled in ProcessMonitor
         }
 
     }

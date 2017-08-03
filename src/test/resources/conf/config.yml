@@ -1,16 +1,21 @@
 
-processesToBeMonitored:
+instances:
   - displayName: "docker"
-    pattern: ".*docker.*"
+    regex: ".*docker.*"
   - displayName: "bioset"
-    pattern: "\\[bioset\\]"
+    regex: "\\[bioset\\]"
   - displayName: "java"
-    pattern: "java.exe"
+    regex: "java.exe"
   - displayName: "hadoop"
-    pattern: "hadoop"
+    regex: "hadoop"
   - displayName: "machine agent"
-    pattern: "java -jar machine-agent.jar"
+    regex: "java -jar machine-agent.jar"
 
+
+
+commands:
+  -linuxProcess: "ps -eo pid,command"
+  -solarisProcess: "top -b"
 
 # number of concurrent tasks
 numberOfThreads: 5

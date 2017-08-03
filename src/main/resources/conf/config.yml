@@ -1,15 +1,19 @@
+# displayName: required - Metrics to be reported under this name in Controller's Metric Browser
+# regex OR pid - process is fetched using this field
 
-processesToBeMonitored:
-  - displayName: "supervisord"
-    pattern: "python .*supervisord -c .*supervisord.conf"
-  - displayName: "java"
-    pattern: ".*java.exe"
+instances:
   - displayName: "machine agent"
-    pattern: "java -jar machine-agent.jar"
+    regex: ".* machineagent.jar"
 
+  - displayName: "ssh"
+    pid: 1056
+
+commands:
+  -linuxProcess: "ps -eo pid,command"
+  -solarisProcess: "top -b"
 
 # number of concurrent tasks
-numberOfThreads: 5
+numberOfThreads: 3
 
 
-metricPrefix: "Custom Metrics|Process Monitor|"
+metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"

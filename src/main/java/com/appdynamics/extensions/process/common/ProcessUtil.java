@@ -15,74 +15,62 @@
  */
 package com.appdynamics.extensions.process.common;
 
+import com.appdynamics.extensions.process.configuration.Instance;
+import com.appdynamics.extensions.process.data.ProcessData;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.Arrays;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class ProcessUtil {
 
     private static final Logger logger = Logger.getLogger(ProcessUtil.class);
 
-    public static Map<String, Integer> processHeaderLine(String command, String headerLine, String [] headerStrings, String delimiter) {
-        List<String> headersList = Arrays.asList(headerLine.trim().split(delimiter));
-        Map<String, Integer> headerInfo = Maps.newHashMap();
-        for(String headerString : headerStrings) {
-            if(headersList.contains(headerString)) {
-                Integer pos = headersList.indexOf(headerString);
-                headerInfo.put(headerString, pos);
-                logger.debug(headerString + " Position in header: " + pos);
-            } else {
-                logger.error("Could not find correct header information for " + headerString + " while executing command " + command);
-            }
-        }
-        return headerInfo;
-    }
-
-    public static Map isMatchProcessName(List<Map> processes, String processName) {
-        for (Map regexProcess : processes) {
-            String pattern = (String) regexProcess.get("pattern");
-            if(!Strings.isNullOrEmpty(pattern)) {
-                boolean matches = processName.matches(pattern);
-                if (matches) {
-                    logger.debug(processName + " matches with " + regexProcess.get("displayName"));
-                    return regexProcess;
-                }
-            }
-        }
-        return null;
-    }
-
-    public static ListMultimap<String, String> filterProcessesToBeMonitoredFromCompleteList(List<String> processOutputList, List<Map> processesToBeMonitored, Integer commandPos, String splitRegex, int splitLimit) {
+    public static ListMultimap<String, String> filterProcessLinesFromCompleteList(List<String> processOutputList, List<Instance> instances, List<String> headerColumns) {
         ListMultimap<String, String> filteredProcesses = ArrayListMultimap.create();
         for (String processLine : processOutputList) {
             if (!Strings.isNullOrEmpty(processLine)) {
-                String [] words = processLine.trim().split(splitRegex, splitLimit);
-                String command = words[commandPos].trim();
-                Map<String, String> processNeedsToBeReported = isMatchProcessName(processesToBeMonitored, command);
-                if (processNeedsToBeReported != null) {
-                    filteredProcesses.put(processNeedsToBeReported.get("displayName"), processLine);
+                // limit is to prevent command from splitting and maintain the size of the array
+                String [] processLineColumns = processLine.trim().split("\\s+", headerColumns.size());
+                for (Instance instance : instances) {
+                    String regex = instance.getRegex();
+                    String pidToMatch = String.valueOf(instance.getPid());
+                    String displayName = instance.getDisplayName();
+                    if (!Strings.isNullOrEmpty(regex)) {
+                        String commandPath = processLineColumns[headerColumns.indexOf(MonitorConstants.COMMAND)].trim();
+                        boolean matches = commandPath.matches(regex);
+                        if (matches) {
+                            filteredProcesses.put(displayName, processLine);
+                            logger.debug("Found match for regex " + regex + " in " + commandPath);
+                        }
+                    } else if (!Strings.isNullOrEmpty(pidToMatch)){
+                        String pid = processLineColumns[headerColumns.indexOf(MonitorConstants.PID)].trim();
+                        if (pidToMatch.equals(pid)) {
+                            filteredProcesses.put(displayName, processLine);
+                            logger.debug("Found matching pid for " + pid);
+                        }
+                    }
                 }
             }
         }
         return filteredProcesses;
     }
 
-    private static Integer unLocalizeStrValue(String valueStr) {
-        try {
-            Locale loc = Locale.getDefault();
-            return Integer.valueOf(NumberFormat.getInstance(loc).parse(valueStr).intValue());
-        } catch (ParseException e) {
-            logger.error("Exception while unlocalizing number string " + valueStr, e);
+    public static Map<String, ProcessData> populateProcessesData(List<Instance> instances, ListMultimap<String, String> filteredProcessLines) {
+        Map<String, ProcessData> processesData = Maps.newHashMap();
+        for (Instance instance : instances) {
+            ProcessData processData = new ProcessData();
+            Map<String, BigDecimal> processMetrics = Maps.newHashMap();
+            List<String> processLines = filteredProcessLines.get(instance.getDisplayName());
+            processMetrics.put(MonitorConstants.RUNNING_INSTANCES_COUNT, new BigDecimal(processLines.size()));
+            processData.setProcessMetrics(processMetrics);
+            processesData.put(instance.getDisplayName(), processData);
         }
-        return null;
+        return processesData;
     }
 }
