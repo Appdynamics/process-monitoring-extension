@@ -34,6 +34,14 @@
             <groupId>org.hyperic</groupId>
             <artifactId>sigar</artifactId>
             <version>1.6.3.82</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hyperic</groupId>
+            <artifactId>sigar-dist</artifactId>
+            <version>1.6.3.82</version>
+            <type>zip</type>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -106,6 +114,41 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includes>**/sigar-bin/lib/*</includes>
+                            <excludes>**/sigar-bin/lib/*jar</excludes>
+                            <includeGroupIds>org.hyperic</includeGroupIds>
+                            <includeArtifactIds>sigar-dist</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                    <systemProperties>
+                        <property>
+                            <name>java.library.path</name>
+                            <value>${project.build.directory}/hyperic-sigar-1.6.3/sigar-bin/lib</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
@@ -114,6 +157,7 @@
                         <filter>
                             <artifact>*:*</artifact>
                             <excludes>
+                                <exclude>hyperic-sigar-*/**</exclude>
                                 <exclude>META-INF/*.SF</exclude>
                                 <exclude>META-INF/*.DSA</exclude>
                                 <exclude>META-INF/*.RSA</exclude>
@@ -199,6 +243,10 @@
                 <enabled>false</enabled>
             </snapshots>
             <url>https://github.com/Appdynamics/maven-repo/raw/master/releases</url>
+        </repository>
+        <repository>
+            <id>jboss-3rd-party-releases</id>
+            <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/</url>
         </repository>
     </repositories>
     <scm>

@@ -38,8 +38,10 @@ public class ProcessMonitorTask implements Runnable {
     public void run() {
         Map<String, ?> config = monitorConfiguration.getConfigYml();
         Parser parser = ParserFactory.createParser(os);
+        if (parser != null) {
         Map<String, ProcessData> processDataMap = parser.parseProcesses(config);
         printMetrics(parser, processDataMap);
+        }
     }
 
     private void printMetrics(Parser parser, Map<String, ProcessData> processDataMap) {
