@@ -5,17 +5,15 @@ instances:
   - displayName: "bioset"
     regex: "\\[bioset\\]"
   - displayName: "java"
-    regex: "java.exe"
+    regex: ".*java .*"
   - displayName: "hadoop"
     regex: "hadoop"
-  - displayName: "machine agent"
-    regex: "java -jar machine-agent.jar"
-
 
 
 commands:
   -linuxProcess: "ps -eo pid,command"
   -solarisProcess: "top -b"
+
 
 # number of concurrent tasks
 numberOfThreads: 5

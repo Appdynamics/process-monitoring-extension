@@ -13,23 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.appdynamics.extensions.process.configuration;
 
+public class Instance {
+    private String displayName;
+    private String regex;
+    private Integer pid;
 
-package com.appdynamics.extensions.process.processexception;
-
-public class ProcessMonitorException extends Exception {
-
-    private static final long serialVersionUID = 8069820319694849033L;
-
-    public ProcessMonitorException(String message) {
-        super(message);
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public ProcessMonitorException(String message, Throwable cause) {
-        super(message, cause);
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
-    public ProcessMonitorException(Throwable cause) {
-        super(cause);
+    public String getRegex() {
+        return regex;
+    }
+
+    public void setRegex(String regex) {
+        this.regex = regex;
+    }
+
+    public Integer getPid() {
+        return pid;
+    }
+
+    public void setPid(Integer pid) {
+        this.pid = pid;
     }
 }

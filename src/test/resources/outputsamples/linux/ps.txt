@@ -1,0 +1,211 @@
+  PID %CPU %MEM COMMAND
+    1  0.0  0.0 /sbin/init splash
+    2  0.0  0.0 [kthreadd]
+    3  0.0  0.0 [ksoftirqd/0]
+    5  0.0  0.0 [kworker/0:0H]
+    7  0.0  0.0 [rcu_sched]
+    8  0.0  0.0 [rcu_bh]
+    9  0.0  0.0 [migration/0]
+   10  0.0  0.0 [watchdog/0]
+   11  0.0  0.0 [watchdog/1]
+   12  0.0  0.0 [migration/1]
+   13  0.0  0.0 [ksoftirqd/1]
+   15  0.0  0.0 [kworker/1:0H]
+   16  0.0  0.0 [watchdog/2]
+   17  0.0  0.0 [migration/2]
+   18  0.0  0.0 [ksoftirqd/2]
+   20  0.0  0.0 [kworker/2:0H]
+   21  0.0  0.0 [watchdog/3]
+   22  0.0  0.0 [migration/3]
+   23  0.0  0.0 [ksoftirqd/3]
+   25  0.0  0.0 [kworker/3:0H]
+   26  0.0  0.0 [kdevtmpfs]
+   27  0.0  0.0 [netns]
+   28  0.0  0.0 [perf]
+   29  0.0  0.0 [khungtaskd]
+   30  0.0  0.0 [writeback]
+   31  0.0  0.0 [ksmd]
+   32  0.0  0.0 [khugepaged]
+   33  0.0  0.0 [crypto]
+   34  0.0  0.0 [kintegrityd]
+   35  0.0  0.0 [bioset]
+   36  0.0  0.0 [kblockd]
+   37  0.0  0.0 [ata_sff]
+   38  0.0  0.0 [md]
+   39  0.0  0.0 [devfreq_wq]
+   46  0.0  0.0 [kswapd0]
+   47  0.0  0.0 [vmstat]
+   48  0.0  0.0 [fsnotify_mark]
+   49  0.0  0.0 [ecryptfs-kthrea]
+   65  0.0  0.0 [kthrotld]
+   66  0.0  0.0 [acpi_thermal_pm]
+   68  0.0  0.0 [bioset]
+   69  0.0  0.0 [bioset]
+   70  0.0  0.0 [bioset]
+   71  0.0  0.0 [bioset]
+   72  0.0  0.0 [bioset]
+   73  0.0  0.0 [bioset]
+   74  0.0  0.0 [bioset]
+   75  0.0  0.0 [bioset]
+   76  0.0  0.0 [bioset]
+   77  0.0  0.0 [bioset]
+   78  0.0  0.0 [bioset]
+   79  0.0  0.0 [bioset]
+   80  0.0  0.0 [bioset]
+   81  0.0  0.0 [bioset]
+   82  0.0  0.0 [bioset]
+   83  0.0  0.0 [bioset]
+   84  0.0  0.0 [bioset]
+   85  0.0  0.0 [bioset]
+   86  0.0  0.0 [bioset]
+   87  0.0  0.0 [bioset]
+   88  0.0  0.0 [bioset]
+   89  0.0  0.0 [bioset]
+   90  0.0  0.0 [bioset]
+   91  0.0  0.0 [bioset]
+   95  0.0  0.0 [ipv6_addrconf]
+  109  0.0  0.0 [deferwq]
+  110  0.0  0.0 [charger_manager]
+  148  0.0  0.0 [scsi_eh_0]
+  149  0.0  0.0 [scsi_tmf_0]
+  151  0.0  0.0 [kpsmoused]
+  157  0.0  0.0 [bioset]
+  160  0.0  0.0 [ttm_swap]
+  185  0.0  0.0 [kworker/2:1H]
+  186  0.0  0.0 [kworker/0:1H]
+  188  0.0  0.0 [jbd2/sda2-8]
+  189  0.0  0.0 [ext4-rsv-conver]
+  214  0.0  0.0 /lib/systemd/systemd-journald
+  219  0.0  0.0 [kauditd]
+  264  0.0  0.0 /lib/systemd/systemd-udevd
+  334  0.0  0.0 [irq/98-smo8800]
+  340  0.0  0.0 [cfg80211]
+  356  0.0  0.0 [irq/283-iwlwifi]
+  362  0.0  0.0 [kworker/u9:1]
+  414  0.0  0.0 [kvm-irqfd-clean]
+  566  0.0  0.0 [kmemstick]
+  568  0.0  0.0 [rtsx_usb_ms_1]
+  598  0.1  0.0 [irq/51-DLL06F2:]
+  642  0.0  0.0 [kworker/1:1H]
+  650  0.0  0.0 [jbd2/sda3-8]
+  651  0.0  0.0 [ext4-rsv-conver]
+  652  0.0  0.0 [kworker/3:1H]
+  718  0.0  0.0 /lib/systemd/systemd-timesyncd
+  864  0.0  0.0 /lib/systemd/systemd-logind
+  867  0.0  0.0 avahi-daemon: running [ubuntubvadavalasa.local]
+  868  0.0  0.0 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+  885  0.0  0.0 avahi-daemon: chroot helper
+  902  0.0  0.1 /usr/sbin/NetworkManager --no-daemon
+  903  0.0  0.0 /usr/sbin/ModemManager
+  908  0.0  0.0 /usr/sbin/cron -f
+  910  0.0  0.0 /usr/bin/whoopsie -f
+  924  0.0  0.0 /usr/lib/bluetooth/bluetoothd
+  932  0.0  0.0 /usr/lib/accountsservice/accounts-daemon
+  935  0.0  0.0 /usr/sbin/acpid
+  938  0.0  0.0 /usr/sbin/thermald --no-daemon --dbus-enable
+  948  0.0  0.0 /usr/sbin/cups-browsed
+  950  0.0  0.0 /usr/sbin/rsyslogd -n
+  953  0.0  0.1 /usr/lib/snapd/snapd
+ 1053  0.0  0.0 /usr/sbin/irqbalance --pid=/var/run/irqbalance.pid
+ 1072  0.0  0.0 /usr/sbin/lightdm
+ 1075  0.0  0.0 /usr/lib/policykit-1/polkitd --no-debug
+ 1092  0.0  0.0 /usr/lib/colord/colord
+ 1105  0.0  0.0 /usr/sbin/sshd -D
+ 1137  0.0  0.0 /sbin/wpa_supplicant -u -s -O /run/wpa_supplicant
+ 1256  0.0  0.0 /usr/lib/rtkit/rtkit-daemon
+ 1282  0.0  0.0 [krfcommd]
+ 1296  0.0  0.0 /usr/lib/upower/upowerd
+ 1319  0.1  0.2 /usr/bin/dockerd -H fd://
+ 1327  0.0  0.0 /sbin/agetty --noclear tty1 linux
+ 1342  0.1  0.0 docker-containerd -l unix:///var/run/docker/libcontainerd/docker-containerd.sock --metrics-interval=0 --start-timeout 2m --state-dir /
+ 1553  0.0  0.0 /lib/systemd/systemd --user
+ 1554  0.0  0.0 (sd-pam)
+ 1814  0.0  0.0 /usr/sbin/dnsmasq --no-resolv --keep-in-foreground --no-hosts --bind-interfaces --pid-file=/var/run/NetworkManager/dnsmasq.pid --liste
+ 2096  0.0  0.0 /usr/bin/pulseaudio --start --log-target=syslog
+ 2176  0.0  0.0 /usr/lib/udisks2/udisksd --no-debug
+ 2225  0.0  0.2 /usr/lib/x86_64-linux-gnu/fwupd/fwupd
+ 3604  0.0  0.0 [kworker/3:2]
+ 3806  0.0  0.0 [kworker/1:1]
+ 3815  0.0  0.0 [kworker/2:1]
+ 3909  0.1  0.2 /usr/lib/xorg/Xorg -core :0 -seat seat0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+ 3967  0.0  0.0 lightdm --session-child 12 19
+ 4129  0.0  0.0 [irq/282-mei_me]
+ 4130  0.0  0.0 [hci0]
+ 4131  0.0  0.0 [hci0]
+ 4132  0.0  0.0 [kworker/u9:2]
+ 4222  0.0  0.0 /usr/bin/gnome-keyring-daemon --daemonize --login
+ 4224  0.0  0.0 /sbin/upstart --user
+ 4303  0.0  0.0 upstart-udev-bridge --daemon --user
+ 4311  0.0  0.0 dbus-daemon --fork --session --address=unix:abstract=/tmp/dbus-itkEm6FOhT
+ 4323  0.0  0.0 /usr/lib/x86_64-linux-gnu/hud/window-stack-bridge
+ 4333  0.0  0.0 /sbin/dhclient -d -q -sf /usr/lib/NetworkManager/nm-dhcp-helper -pf /var/run/dhclient-wlp2s0.pid -lf /var/lib/NetworkManager/dhclient-
+ 4350  0.0  0.0 upstart-dbus-bridge --daemon --session --user --bus-name session
+ 4365  0.0  0.1 /usr/lib/x86_64-linux-gnu/bamf/bamfdaemon
+ 4373  0.0  0.0 upstart-file-bridge --daemon --user
+ 4380  0.0  0.0 upstart-dbus-bridge --daemon --system --user --bus-name system
+ 4381  0.0  0.0 gpg-agent --homedir /home/bvadavalasa/.gnupg --use-standard-socket --daemon
+ 4388  0.0  0.0 /usr/lib/gvfs/gvfsd
+ 4396  0.0  0.0 /usr/lib/gvfs/gvfsd-fuse /run/user/1000/gvfs -f -o big_writes
+ 4405  0.0  0.0 /usr/bin/ibus-daemon --daemonize --xim --address unix:tmpdir=/tmp/ibus
+ 4413  0.0  0.0 /usr/lib/ibus/ibus-dconf
+ 4414  0.0  0.1 /usr/lib/ibus/ibus-ui-gtk3
+ 4419  0.0  0.1 /usr/lib/ibus/ibus-x11 --kill-daemon
+ 4429  0.0  0.0 /usr/lib/ibus/ibus-engine-simple
+ 4567  0.0  0.2 /usr/lib/x86_64-linux-gnu/hud/hud-service
+ 4569  0.0  0.1 /usr/lib/unity-settings-daemon/unity-settings-daemon
+ 4575  0.0  0.0 /usr/lib/at-spi2-core/at-spi-bus-launcher --launch-immediately
+ 4576  0.0  0.1 /usr/lib/gnome-session/gnome-session-binary --session=ubuntu
+ 4593  0.0  0.2 /usr/lib/x86_64-linux-gnu/unity/unity-panel-service
+ 4595  0.0  0.0 /usr/bin/dbus-daemon --config-file=/etc/at-spi2/accessibility.conf --nofork --print-address 3
+ 4604  0.0  0.0 /usr/lib/dconf/dconf-service
+ 4614  0.0  0.0 /usr/lib/at-spi2-core/at-spi2-registryd --use-gnome-session
+ 4619  0.0  0.0 /usr/lib/x86_64-linux-gnu/indicator-messages/indicator-messages-service
+ 4620  0.0  0.0 /usr/lib/x86_64-linux-gnu/indicator-bluetooth/indicator-bluetooth-service
+ 4621  0.0  0.0 /usr/lib/x86_64-linux-gnu/indicator-power/indicator-power-service
+ 4622  0.0  0.1 /usr/lib/x86_64-linux-gnu/indicator-datetime/indicator-datetime-service
+ 4623  0.0  0.1 /usr/lib/x86_64-linux-gnu/indicator-keyboard/indicator-keyboard-service --use-gtk
+ 4625  0.0  0.0 /usr/lib/x86_64-linux-gnu/indicator-sound/indicator-sound-service
+ 4626  0.0  0.1 /usr/lib/x86_64-linux-gnu/indicator-printers/indicator-printers-service
+ 4627  0.0  0.0 /usr/lib/x86_64-linux-gnu/indicator-session/indicator-session-service
+ 4637  0.0  0.0 /usr/lib/x86_64-linux-gnu/indicator-application/indicator-application-service
+ 4678  0.0  0.1 /usr/lib/evolution/evolution-source-registry
+ 4700  0.0  0.3 /usr/lib/evolution/evolution-calendar-factory
+ 4715  0.7  0.6 compiz
+ 4738  0.0  0.3 /usr/lib/evolution/evolution-calendar-factory-subprocess --factory contacts --bus-name org.gnome.evolution.dataserver.Subprocess.Backe
+ 4741  0.0  0.1 /usr/lib/unity-settings-daemon/unity-fallback-mount-helper
+ 4742  0.0  0.3 nautilus -n
+ 4750  0.0  0.5 /usr/bin/gnome-software --gapplication-service
+ 4755  0.0  0.2 nm-applet
+ 4756  0.0  0.1 /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
+ 4758  0.0  0.0 /usr/lib/gvfs/gvfs-udisks2-volume-monitor
+ 4774  0.0  0.0 /usr/lib/gvfs/gvfs-gphoto2-volume-monitor
+ 4788  0.0  0.0 /usr/lib/gvfs/gvfs-afc-volume-monitor
+ 4797  0.0  0.1 /usr/lib/evolution/evolution-addressbook-factory
+ 4799  0.0  0.3 /usr/lib/evolution/evolution-calendar-factory-subprocess --factory local --bus-name org.gnome.evolution.dataserver.Subprocess.Backend.
+ 4806  0.0  0.0 /usr/lib/gvfs/gvfs-goa-volume-monitor
+ 4812  0.0  0.0 /usr/lib/gvfs/gvfs-mtp-volume-monitor
+ 4817  0.0  0.1 /usr/lib/evolution/evolution-addressbook-factory-subprocess --factory local --bus-name org.gnome.evolution.dataserver.Subprocess.Backe
+ 4844  0.0  0.0 /usr/lib/gvfs/gvfsd-trash --spawner :1.5 /org/gtk/gvfs/exec_spaw/0
+ 4863  0.0  0.0 /usr/lib/gvfs/gvfsd-metadata
+ 4901  0.0  0.2 /usr/lib/gnome-terminal/gnome-terminal-server
+ 4907  0.0  0.0 bash
+ 4923  0.0  0.1 zeitgeist-datahub
+ 4930  0.0  0.0 /bin/sh -c /usr/lib/x86_64-linux-gnu/zeitgeist/zeitgeist-maybe-vacuum; /usr/bin/zeitgeist-daemon
+ 4934  0.0  0.0 /usr/bin/zeitgeist-daemon
+ 4941  0.0  0.0 /usr/lib/x86_64-linux-gnu/zeitgeist-fts
+ 4992  0.0  0.1 update-notifier
+ 5027  0.0  0.0 /usr/lib/x86_64-linux-gnu/deja-dup/deja-dup-monitor
+ 5170  0.0  0.0 sshd: bvadavalasa [priv]
+ 5258  0.0  0.0 sshd: bvadavalasa@pts/4
+ 5259  0.0  0.0 -bash
+ 5317  0.0  0.1 /usr/lib/x86_64-linux-gnu/unity/unity-panel-service --lockscreen-mode
+ 5383  0.0  0.0 [kworker/u8:2]
+ 5389  0.0  0.0 [kworker/3:1]
+ 5755  0.0  0.0 [kworker/u8:0]
+ 5768  0.0  0.0 [kworker/2:2]
+ 5804  0.0  0.0 [kworker/0:1]
+ 5855  0.0  0.0 [kworker/u8:3]
+ 5871  0.0  0.0 [kworker/0:0]
+ 5874  0.0  0.0 [kworker/1:2]
+ 5886  0.0  0.0 [kworker/0:2]
+ 5889  0.0  0.0 [kworker/2:0]

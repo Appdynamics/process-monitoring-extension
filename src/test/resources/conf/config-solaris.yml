@@ -2,20 +2,21 @@
 instances:
   - displayName: "docker"
     regex: ".*docker.*"
-  - displayName: "bioset"
-    regex: "\\[bioset\\]"
+  - displayName: "gnome"
+    regex: "gnome.*"
   - displayName: "java"
-    regex: "java.exe"
+    regex: ".*java.*"
+  - displayName: "java1"
+    regex: ".*java .*"
   - displayName: "hadoop"
     regex: "hadoop"
-  - displayName: "machine agent"
-    regex: "java -jar machine-agent.jar"
 
 
 
 commands:
   -linuxProcess: "ps -eo pid,command"
   -solarisProcess: "top -b"
+
 
 # number of concurrent tasks
 numberOfThreads: 5

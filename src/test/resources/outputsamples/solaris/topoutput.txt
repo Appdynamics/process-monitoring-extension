@@ -1,0 +1,37 @@
+﻿load averages:  0.02,  0.02,  0.03;               up 0+-4:-51:-30      17:33:02
+105 processes: 104 sleeping, 1 on cpu
+CPU states: 96.0% idle,  0.0% user,  4.0% kernel,  0.0% iowait,  0.0% swap
+Kernel: 350 ctxsw, 33 trap, 469 intr, 917 syscall, 16 flt
+Memory: 2048M phys mem, 537M free mem, 4096M total swap, 4096M free swap
+
+   PID USERNAME NLWP PRI NICE  SIZE   RES STATE    TIME    CPU COMMAND
+  1261 admin      21  59    0  148M  116M sleep    0:16  0.55% java
+  1259 admin       3  59    0 6588K 2360K sleep    0:06  0.37% VBoxClient
+  1378 admin       1  59    0 3688K 2236K cpu      0:00  0.22% top
+  1299 admin       2  59    0  122M   18M sleep    0:04  0.15% gnome-terminal
+   902 admin       3  59    0   68M   54M sleep    0:06  0.07% Xorg
+  1302 admin       1  59    0 4516K 3196K sleep    0:00  0.04% bash
+   628 root        7  59    0   11M 2016K sleep    0:00  0.02% VBoxService
+  1278 admin       1  12   19   56M   35M sleep    0:00  0.01% updatemanagerno
+  1274 admin       1  59    0  130M   21M sleep    0:00  0.01% isapython2.7
+  1275 admin       1  59    0 7752K 5384K sleep    0:00  0.00% xscreensaver
+    15 root       23  59    0   22M   21M sleep    0:08  0.00% svc.configd
+    13 root       12  59    0   21M   20M sleep    0:02  0.00% svc.startd
+   537 root       33  59    0   16M 3852K sleep    0:01  0.00% nscd
+    71 daemon      3  60  -20   10M 1424K sleep    0:00  0.00% kcfd
+   163 root        5  60  -20 2760K 1352K sleep    0:00  0.00% zonestatd
+  1222 admin       2  59    0  129M   22M sleep    0:00  0.00% gnome-panel
+  1272 admin       1  59    0   32M   18M sleep    0:00  0.00% isapython2.7
+   774 root       33  59    0   97M   16M sleep    0:00  0.00% fmd
+  1294 admin       1  59    0   29M   15M sleep    0:00  0.00% notification-da
+  1227 admin       1  59    0  123M   15M sleep    0:00  0.00% wnck-applet
+  1235 admin       1  59    0   26M   14M sleep    0:00  0.00% clock-applet
+  1260 admin       1  59    0  122M   14M sleep    0:00  0.00% gnome-power-man
+  1230 admin       1  59    0  121M   14M sleep    0:00  0.00% trashapplet
+  1221 admin       1  59    0   24M   14M sleep    0:00  0.00% metacity
+  1215 admin       1  59    0  124M   13M sleep    0:00  0.00% gnome-settings-
+  1273 admin       2  59    0  122M   13M sleep    0:00  0.00% nwam-manager
+  1266 admin       1  59    0   88M   11M sleep    0:00  0.00% gnome-volume-co
+  1237 admin       1  59    0   20M 9180K sleep    0:00  0.00% notification-ar
+  1157 admin       2  59    0   15M 7212K sleep    0:00  0.00% gnome-session
+  1290 admin       5  59    0   14M 6212K sleep    0:00  0.00% rad

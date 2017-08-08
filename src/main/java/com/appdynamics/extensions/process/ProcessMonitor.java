@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 AppDynamics
+ * Copyright 2016 AppDynamics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,48 +15,51 @@
  */
 package com.appdynamics.extensions.process;
 
-import com.appdynamics.extensions.PathResolver;
-import com.appdynamics.extensions.process.config.Configuration;
-import com.appdynamics.extensions.process.parser.*;
-import com.appdynamics.extensions.process.processdata.ProcessData;
+import com.appdynamics.extensions.conf.MonitorConfiguration;
 import com.appdynamics.extensions.process.processexception.ProcessMonitorException;
-import com.appdynamics.extensions.yml.YmlReader;
-import com.google.common.base.Strings;
+import com.appdynamics.extensions.util.MetricWriteHelper;
+import com.appdynamics.extensions.util.MetricWriteHelperFactory;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
-import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.TaskOutput;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.math.BigDecimal;
 import java.util.Map;
 
 public class ProcessMonitor extends AManagedMonitor {
 
-    private Parser parser;
-
     private static final Logger logger = Logger.getLogger(ProcessMonitor.class);
-    public static final String CONFIG_ARG = "config-file";
-    public static final String METRIC_SEPARATOR = "|";
+
+    private static final String CONFIG_ARG = "config-file";
+    private static final String METRIC_PREFIX = "Custom Metrics|Process Monitor|";
+    private boolean initialized;
+    private MonitorConfiguration configuration;
+    private String os;
 
     public ProcessMonitor() {
         System.out.println(logVersion());
     }
 
-    public TaskOutput execute(Map<String, String> taskArguments, TaskExecutionContext taskContext) throws TaskExecutionException {
+    private void initialize(Map<String, String> argsMap) throws ProcessMonitorException {
+        determineOS();
+        MetricWriteHelper metricWriteHelper = MetricWriteHelperFactory.create(this);
+        MonitorConfiguration conf = new MonitorConfiguration(METRIC_PREFIX, new TaskRunnable(), metricWriteHelper);
+        conf.setConfigYml(argsMap.get(CONFIG_ARG));
+        conf.checkIfInitialized(MonitorConfiguration.ConfItem.METRIC_PREFIX, MonitorConfiguration.ConfItem.CONFIG_YML, MonitorConfiguration.ConfItem.METRIC_WRITE_HELPER, MonitorConfiguration.ConfItem.EXECUTOR_SERVICE);
+        this.configuration = conf;
+        initialized = true;
+    }
+
+    public TaskOutput execute(Map<String, String> taskArguments, TaskExecutionContext taskExecutionContext) throws TaskExecutionException {
+        logger.info(logVersion());
+        logger.debug("The task arguments in monitor.xml are " + taskArguments);
         if (taskArguments != null) {
-            logger.info(logVersion());
-            String configFilename = getConfigFilename(taskArguments.get(CONFIG_ARG));
             try {
-                Configuration config = YmlReader.readFromFile(configFilename, Configuration.class);
-                if (logger.isDebugEnabled()) {
-                    logConfigInfo(config);
+                if (!initialized) {
+                    initialize(taskArguments);
                 }
-                determineOS(config);
-                parser.parseProcesses();
-                printAllMetrics(config);
+                configuration.executeTask();
                 logger.info("Process monitoring task completed successfully.");
                 return new TaskOutput("Process monitoring task completed successfully.");
             } catch (Exception e) {
@@ -64,117 +67,27 @@ public class ProcessMonitor extends AManagedMonitor {
             }
         }
         throw new TaskExecutionException("Process Monitor completed with failures");
-
     }
 
-    private void determineOS(Configuration config) throws ProcessMonitorException {
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) {
-            parser = new WindowsParser(config);
-            logger.debug("OS System detected: Windows");
-        } else if (os.contains("linux")) {
-            parser = new LinuxParser(config);
-            logger.debug("OS System detected: Linux");
-        } else if (os.contains("sunos")) {
-            parser = new SolarisParser(config);
-            logger.debug("OS System detected: Solaris");
-        } else if (os.contains("aix")) {
-            parser = new AIXParser(config);
-            logger.debug("OS System detected: IBM AIX");
-        } else if (os.contains("hp-ux")) {
-            parser = new HPUXParser(config);
-            logger.debug("OS System detected: HP-UX");
-        } else {
+    private class TaskRunnable implements Runnable {
+
+        public void run() {
+            ProcessMonitorTask task = new ProcessMonitorTask(configuration, os);
+            configuration.getExecutorService().execute(task);
+        }
+    }
+
+    public void determineOS() throws ProcessMonitorException {
+        os = getOSFromSystemProperty();
+        if (!(os.contains("win") || os.contains("linux") || os.contains("sunos") || os.contains("aix") || os.contains("hp-ux"))) {
             logger.error("Your OS (" + os + ") is not supported. Quitting Process Monitor");
             throw new ProcessMonitorException("Your OS (" + os + ") is not supported. Quitting Process Monitor");
         }
-
+        logger.debug("OS of the System detected: " + os);
     }
 
-    private void logConfigInfo(Configuration config) {
-        String exclProcs = "";
-        String includeProcs = "";
-        logger.debug("Display by PID " + config.isDisplayByPid());
-        logger.debug("Memory Threshold:        " + config.getMemoryThreshold() + " MB");
-        for (String pr : config.getExcludeProcesses()) {
-            exclProcs = exclProcs.concat(pr + ", ");
-        }
-        for (String process : config.getIncludeProcesses()) {
-            includeProcs = includeProcs.concat(process + ", ");
-        }
-        if (!"".equals(exclProcs)) {
-            logger.debug("Excluding processes: " + exclProcs.substring(0, exclProcs.length() - 2));
-        }
-        if (!"".equals(includeProcs)) {
-            logger.debug("Including processes: " + includeProcs.substring(0, includeProcs.length() - 2));
-        }
-    }
-
-    private void printAllMetrics(Configuration config) {
-
-        logger.debug("This round of metric collection done. Starting to report metrics...");
-
-        logger.debug("Reading in the set of monitored processes");
-        parser.readProcsFromFile();
-        int memoryThreshold = config.getMemoryThreshold();
-        for (ProcessData procData : parser.getProcesses().values()) {
-
-            if (procData.absoluteMem.doubleValue() >= memoryThreshold || parser.getIncludeProcesses().contains(procData.name)) {
-
-                parser.addIncludeProcesses(procData.name);
-
-                StringBuilder metricPath = new StringBuilder(config.getMetricPrefix()).append(parser.processGroupName).append(METRIC_SEPARATOR);
-                metricPath.append(procData.name).append(METRIC_SEPARATOR);
-
-                printMetric(metricPath.toString() + "CPU Utilization in Percent", convertBigDecimalToString(procData.CPUPercent));
-                printMetric(metricPath.toString() + "Memory Utilization in Percent", convertBigDecimalToString(procData.memPercent));
-                printMetric(metricPath.toString() + "Memory Utilization Absolute (MB)", convertBigDecimalToString(procData.absoluteMem));
-                if (!config.isDisplayByPid()) {
-                    printMetric(metricPath.toString() + "Number of running instances", procData.numOfInstances);
-                }
-            }
-        }
-        logger.debug("Writing monitored processes out to file");
-        parser.writeProcsToFile();
-        logger.debug("Finished reporting metrics");
-    }
-
-    /**
-     * Returns the metric to the AppDynamics Controller.
-     *
-     * @param metricName  Name of the Metric
-     * @param metricValue Value of the Metric
-     */
-    public void printMetric(String metricName, Object metricValue) {
-        MetricWriter metricWriter = getMetricWriter(metricName, MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
-                MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE, MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
-        if (metricValue != null) {
-            metricWriter.printMetric(String.valueOf(metricValue));
-            if (logger.isDebugEnabled()) {
-                logger.debug(metricName + " = " + metricValue);
-            }
-        }
-    }
-
-    private String convertBigDecimalToString(BigDecimal value) {
-        return value.setScale(0, BigDecimal.ROUND_HALF_UP).toString();
-    }
-
-    public static String getConfigFilename(String filename) {
-        if (filename == null) {
-            return "";
-        }
-        // for absolute paths
-        if (new File(filename).exists()) {
-            return filename;
-        }
-        // for relative paths
-        File jarPath = PathResolver.resolveDirectory(AManagedMonitor.class);
-        String configFileName = "";
-        if (!Strings.isNullOrEmpty(filename)) {
-            configFileName = jarPath + File.separator + filename;
-        }
-        return configFileName;
+    public String getOSFromSystemProperty() {
+        return System.getProperty("os.name").toLowerCase();
     }
 
     private static String getImplementationVersion() {

@@ -1,0 +1,19 @@
+instances:
+  - displayName: "docker"
+    regex: "docker-containerd .*"
+  - displayName: "svchost"
+    regex: ".*svchost.exe.*"
+  - displayName: "svchostFiltered"
+    regex: ".*svchost.exe -k imgsvc.*"
+  - displayName: "java"
+    regex: ".*java.exe.*"
+  - displayName: "MachineAgent"
+    regex: ".*java.exe .* machineagent.jar"
+  - displayName: "Notepad"
+    pid: 5384
+
+# number of concurrent tasks
+numberOfThreads: 5
+
+
+metricPrefix: "Custom Metrics|Process Monitor|"

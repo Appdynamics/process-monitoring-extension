@@ -1,28 +1,19 @@
+# displayName: required - Metrics to be reported under this name in Controller's Metric Browser
+# regex OR pid - process is fetched using this field
 
-# Option to view process metrics in MetricBrowser per PID OR as aggregated over all the processes with same name.
-# If false, all the processes with same name are grouped and collective metrics are reported to AppDynamics Metric Browser.
-# If true, each process with PID can be viewed but since PID changes with process restart, this might not be the best option.
-displayByPid: false
+instances:
+  - displayName: "machine agent"
+    regex: ".* machineagent.jar"
 
-# comma-separated names of processes you want to include and exclude respectively in the reported metrics.
-#Example Linux: java,bash,sshd
-#Example Windows: java.exe,chrome.exe
-# includeProcesses: If empty, all processes are monitored. If not empty, only those specified are monitored excluding others.
+  - displayName: "ssh"
+    pid: 1056
 
-includeProcesses: []
-excludeProcesses: []
+commands:
+  -linuxProcess: "ps -eo pid,command"
+  -solarisProcess: "top -b"
 
-# Processes with an aggregated absolute memory consumption of LESS than this number
-# in Megabytes will be filtered out of the reported metrics. Default value is 100 [MB]
-memoryThreshold: 100
+# number of concurrent tasks
+numberOfThreads: 3
 
-# ONLY for OS - WINDOWS
-# csv.xsl file path - leave null for default location, 
-# i.e. C:/Windows/SysWOW64/csv.xsl OR C:\\Windows\\SysWOW64\\webem\\en-US\\csv.xsl (for 64bit)
-# OR C:/Windows/System32/csv.xsl (32 bit)
-csvFilePath: ""
 
-# this is the path to the file .monitored-processes
-monitoredProcessFilePath: "monitors/ProcessMonitor/.monitored-processes"
-
-metricPrefix: "Custom Metrics|"
+metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
