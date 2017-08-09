@@ -28,7 +28,7 @@ public class MonitorConstants {
     // Solaris
     public static final String SOLARIS_PROCESS_LIST_COMMAND = "top -b";
     // AIX
-    public static final String AIX_PROCESS_LIST_COMMAND = "ps -eo pid,pcpu,pmem,command";
+    public static final String AIX_PROCESS_LIST_COMMAND = "ps -eo pid,args";
     // HP-UX
     // For Memory machinfo | grep -i memory doesn't work on HP-UX 11.1x, so parsing top command
     public static final String HPUX_TOP_COMMAND = "top -d 1";

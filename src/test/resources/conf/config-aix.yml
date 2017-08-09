@@ -1,0 +1,20 @@
+
+instances:
+  - displayName: "java"
+    regex: ".*java.*"
+  - displayName: "ssh"
+    pid: 26017852
+  - displayName: "test"
+    pid: 260
+
+
+commands:
+  -linuxProcess: "ps -eo pid,command"
+  -solarisProcess: "top -b"
+  -aixProcess: "ps -eo pid,args"
+
+# number of concurrent tasks
+numberOfThreads: 5
+
+
+metricPrefix: "Custom Metrics|Process Monitor|"

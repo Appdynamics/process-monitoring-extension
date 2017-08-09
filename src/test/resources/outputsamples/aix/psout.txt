@@ -1,0 +1,282 @@
+     PID COMMAND
+       1 /etc/init
+ 1048752 /usr/sbin/syncd 60
+ 1114192 /usr/ccs/bin/shlap64
+ 1310932 /usr/lib/errdemon
+ 2031824 /usr/sbin/syslogd
+ 2162838 /usr/sbin/aso
+ 2359416 /usr/sbin/srcmstr
+ 2490598 /opt/freeware/cimom/pegasus/bin/cimssys cimsys
+ 2556040 /usr/sbin/cron
+ 2621510 /usr/sbin/qdaemon
+ 2752658 /usr/sbin/hostmibd
+ 2818188 /usr/sbin/portmap
+ 2883700 /usr/sbin/aixmibd
+ 2949214 /opt/freeware/cimom/pegasus/bin/cimssys platform_agent
+ 3014808 /usr/sbin/rpc.lockd -d 0
+ 3080288 /usr/sbin/inetd
+ 3145834 /usr/sbin/snmpd
+ 3211364 sendmail: accepting connections
+ 3276964 /usr/sbin/syslogd
+ 3342440 /usr/sbin/snmpmibd
+ 3408002 /usr/sbin/hrd
+ 3473518 /usr/sbin/biod 6
+ 3539170 /usr/sbin/uprintfd
+ 3604634 /usr/sbin/rpc.statd -d 0 -t 50
+ 3670136 /usr/sbin/qdaemon
+ 3735734 /opt/freeware/mysql/bin/mysqld --basedir=/opt/freeware/mysql --datadir=/opt/freeware/mysql/data --user=mysql --log-error=/opt/freeware/mys
+ 3866746 /usr/sbin/writesrv
+ 3997852 /bin/sh ./bin/mysqld_safe
+ 4063416 bin/nonstop_aix @/var/opt/tivoli/ep/runtime/nonstop/config/nonstop.properties
+ 4128808 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+ 4194368 /usr/sbin/rsct/bin/IBM.MgmtDomainRMd
+ 4259970 /usr/sbin/clcomd -d
+ 4325522 /usr/sbin/sshd
+ 4391072 /opt/freeware/sbin/httpd -k start
+ 4456476 sendmail: accepting connections
+ 4587752 /opt/freeware/bin/svnserve --daemon --pid-file=/var/run/svnserve.pid
+ 4653104 SCREEN
+ 4718742 /usr/sbin/rsct/bin/rmcd -a IBM.LPCommands -r
+ 4784294 /opt/freeware/sbin/httpd -k start
+ 4980860 /usr/sbin/writesrv
+ 5046450 /usr/bin/topasrec  -L -s 300 -R 1 -r 6 -o /var/perf/daily/ -ypersistent=1 -O type=bin -ystart_time=17:19:48,Nov05,2016
+ 5111970 /bin/ksh /var/opt/tivoli/ep/runtime/nonstop/bin/cas_src.sh
+ 5177502 /usr/lpp/diagnostics/bin/diagd
+ 5243044 /usr/sbin/getty /dev/console
+ 5308634 /opt/freeware/sbin/httpd -k start
+ 5374142 /usr/sbin/rsct/bin/IBM.DRMd
+ 5439734 SCREEN
+ 5505198 SCREEN
+ 5570770 /opt/polarhome/bin/perl /etc/opt/usermin-1.590/miniserv.pl /etc/opt/usermin/miniserv.conf
+ 5636268 /usr/sbin/inetd
+ 5701822 /usr/sbin/cron
+ 5767330 /opt/freeware/bin/bash
+ 5832830 /opt/freeware/bin/bash
+ 5898366 /usr/sbin/hrd
+ 5963968 /var/opt/tivoli/ep/_jvm/jre/bin/java -Xmx384m -Xminf0.01 -Xmaxf0.4 -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval
+ 6029362 /opt/freeware/bin/bash
+ 6095034 /usr/sbin/rsct/bin/IBM.ServiceRMd
+ 6226032 sshd: jericaix [priv]
+ 6291484 /etc/init
+ 6422706 /usr/sbin/portmap
+ 6488294 vi ll.c
+ 6553736 /usr/sbin/qdaemon
+ 6619380 /opt/freeware/bin/bash
+ 6684856 /usr/sbin/clcomd -d
+ 6750224 /usr/sbin/biod 6
+ 6815892 /usr/sbin/biod 6
+ 6881446 <defunct>
+ 6947028 /usr/sbin/rpc.lockd -d 0
+ 7012560 /opt/freeware/bin/bash
+ 7078084 /opt/freeware/bin/bash
+ 7143560 /usr/sbin/srcmstr
+ 7209140 /usr/sbin/hrd
+ 7274616 /opt/freeware/bin/bash
+ 7340230 /usr/lib/errdemon
+ 7471176 /usr/dt/bin/dtlogin -daemon
+ 7536856 /opt/freeware/bin/bash
+ 7602226 /usr/sbin/rpc.lockd -d 0
+ 7667758 /usr/sbin/sshd
+ 7733356 /usr/sbin/rpc.statd -d 0 -t 50
+ 7798856 sendmail: accepting connections
+ 7864320 SCREEN
+ 7929988 /opt/freeware/bin/bash
+ 7995632 sshd: jericaix@pts/1
+ 8061160 /usr/sbin/rsct/bin/rmcd -a IBM.LPCommands -r
+ 8126504 /usr/sbin/portmap
+ 8192046 SCREEN
+ 8257756 /opt/freeware/bin/bash
+ 8323256 /usr/sbin/writesrv
+ 8388656 /usr/sbin/clcomd -d
+ 8454284 /usr/sbin/rpc.statd -d 0 -t 50
+ 8519764 SCREEN
+ 8585406 -ksh
+ 8650786 bash
+ 8716456 /usr/lib/errdemon
+ 8781882 /usr/sbin/srcmstr
+ 8847550 /usr/sbin/rsct/bin/IBM.AuditRMd
+ 8912934 SCREEN
+ 8978494 /etc/init
+ 9043984 SCREEN
+ 9109562 SCREEN
+ 9175284 /usr/bin/bash
+ 9240582 /usr/sbin/inetd
+ 9306312 sudo su - sinapp
+ 9371764 SCREEN
+ 9437192 /usr/sbin/cron
+ 9502774 /opt/freeware/bin/bash
+ 9568362 SCREEN
+ 9633932 /usr/sbin/syslogd
+ 9699446 /opt/freeware/bin/bash
+ 9764964 /opt/freeware/bin/bash
+ 9830560 /opt/freeware/bin/bash
+ 9896136 SCREEN
+ 9961584 /usr/sbin/sshd
+10027240 /usr/bin/bash
+10092612 /usr/sbin/rsct/bin/rmcd -a IBM.LPCommands -r
+10158210 /opt/freeware/bin/bash
+10223742 /usr/bin/bash
+10289222 /usr/sbin/rsct/bin/IBM.AuditRMd
+10354704 /usr/sbin/rsct/bin/IBM.ERrmd
+10420324 SCREEN
+10485816 -ksh
+10551362 /usr/dt/bin/dtlogin -daemon
+10616982 /usr/bin/bash
+10682510 SCREEN
+10748008 /usr/bin/bash
+10813654 /usr/bin/bash
+10879134 /opt/freeware/bin/bash
+10944652 bash
+11010106 /usr/sbin/rsct/bin/IBM.HostRMd
+11075736 /opt/freeware/bin/bash
+11141204 rpc.ttdbserver 100083 1
+11206714 SCREEN
+11272332 SCREEN
+11337848 -ksh
+11403352 /opt/freeware/bin/bash
+11468950 /opt/freeware/bin/bash
+11534348 SCREEN
+11600066 SCREEN
+11665420 /usr/sbin/rsct/bin/IBM.ERrmd
+11731116 -ksh
+11796700 /usr/sbin/rsct/bin/IBM.AuditRMd
+11862246 SCREEN
+11927704 SCREEN
+11993102 /opt/freeware/bin/bash
+12058676 /usr/sbin/rsct/bin/rmcd -a IBM.LPCommands -r
+12124300 SCREEN -D -R 10420430.pts-22.aix7
+12189788 SCREEN
+12255252 /opt/freeware/bin/bash
+12321014 /opt/freeware/bin/bash
+12386368 /opt/freeware/bin/bash
+12452014 /opt/freeware/bin/bash
+12517446 /opt/freeware/bin/bash
+12582918 SCREEN
+12648580 /opt/freeware/bin/bash
+12714028 /opt/freeware/bin/bash
+12779570 SCREEN
+12845308 /usr/sbin/inetd
+12910682 /opt/freeware/bin/bash
+12976132 SCREEN
+13041898 SCREEN
+13107206 /opt/freeware/bin/bash
+13172878 /opt/freeware/bin/bash
+13238494 /opt/freeware/bin/bash
+13303904 /opt/freeware/bin/bash
+13369554 SCREEN
+13434906 SCREEN
+13500634 /opt/freeware/bin/bash
+13566102 SCREEN
+13631518 /usr/sbin/clcomd -d
+13697024 /opt/freeware/bin/bash
+13762808 vim cc.c
+13828240 /opt/freeware/bin/bash
+13893682 SCREEN
+13959398 SCREEN
+14024888 /opt/freeware/bin/bash
+14155840 SCREEN
+14221360 /opt/freeware/bin/bash
+14287024 /opt/freeware/bin/bash
+14352426 SCREEN
+14418114 SCREEN
+14483644 /opt/freeware/bin/bash
+14549050 SCREEN
+14614598 SCREEN
+14680104 SCREEN
+14745630 /opt/freeware/bin/bash
+14811372 /opt/freeware/bin/bash
+14876718 SCREEN
+14942242 SCREEN
+15007762 SCREEN
+15073292 SCREEN
+15139052 /opt/freeware/bin/bash
+15204358 /opt/freeware/bin/bash
+15270142 /opt/freeware/bin/bash
+15335522 SCREEN
+15401064 SCREEN
+15466724 /opt/freeware/bin/bash
+15532264 SCREEN
+15597712 SCREEN
+15663300 SCREEN
+15728680 SCREEN
+15794182 /opt/freeware/bin/bash
+15859914 SCREEN
+15925268 SCREEN
+15991020 /opt/freeware/bin/bash
+16056562 /opt/freeware/bin/bash
+16121856 /opt/freeware/bin/bash
+16187564 SCREEN
+16253172 SCREEN
+16318706 /opt/freeware/bin/bash
+16384246 /opt/freeware/bin/bash
+16449788 SCREEN
+16515074 /opt/freeware/bin/bash
+16580646 /opt/freeware/bin/bash
+16646162 /usr/java6/bin/java -Dsvnkit.http.sslProtocols=SSLv3 -jar slave.jar
+16711704 /opt/freeware/bin/bash
+16777360 /opt/freeware/bin/bash
+16842874 SCREEN
+16908348 SCREEN
+16974030 SCREEN
+17039444 SCREEN
+17105014 /usr/dt/bin/dtlogin -daemon
+17170448 SCREEN
+17235982 /opt/freeware/bin/bash
+17301504 /usr/sbin/srcmstr
+17367144 SCREEN
+17432646 /opt/freeware/bin/bash
+17498170 SCREEN
+17563900 sshd: massimo1@notty
+17694840 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+17760324 /opt/freeware/bin/bash
+17825882 /opt/freeware/bin/bash
+17891386 SCREEN
+17956900 /opt/freeware/bin/bash
+18022476 /opt/freeware/bin/bash
+18219056 SCREEN
+18284590 /opt/freeware/bin/bash
+18350114 /etc/init
+18415812 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+18481184 /usr/sbin/writesrv
+18546824 -bash
+18677830 /usr/sbin/qdaemon
+18743410 /usr/sbin/biod 6
+18874390 /usr/sbin/rpc.lockd -d 0
+19071136 /usr/sbin/hrd
+19202180 /usr/lib/errdemon
+19398898 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+19464226 /usr/sbin/portmap
+19529962 /usr/sbin/syslogd
+19595322 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+19726424 sshd: massimo1 [priv]
+19988694 /usr/sbin/cron
+20054060 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+20185166 /usr/sbin/rsct/bin/IBM.ERrmd
+20316300 sendmail: accepting connections
+20381898 /usr/sbin/clconfd
+20447278 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+20512858 /usr/sbin/rpc.statd -d 0 -t 50
+20578420 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+20643970 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+20775018 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+21168262 /opt/freeware/sbin/httpd -k start
+21233718 sshd: zenxyzzy@pts/9
+21496040 sshd: eao@pts/0
+21561532 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+21823656 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+22151340 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+22282442 ps -eo pid,args
+22413406 sshd: eao [priv]
+22741228 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+23003320 /opt/freeware/sbin/httpd -k start
+23134408 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+23331016 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+23396596 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+23724244 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+23920858 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+24051936 /opt/freeware/bin/bash -c env_parallel echo reading from process substitution :::: <(echo OK)
+24248436 imapd
+25690226 -bash
+25886878 /opt/freeware/sbin/httpd -k start
+26017852 sshd: zenxyzzy [priv]
+26083516 bash -c cd "/home/m/massimo1/private" && /usr/java6/bin/java -Dsvnkit.http.sslProtocols="SSLv3" -jar slave.jar

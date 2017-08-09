@@ -3,93 +3,69 @@
 This extension works only with the standalone machine agent.
 
 ##Use Case
-The AppDynamics Process Extension observes active processes on a Linux/Windows/Solaris/AIX/HP-UX machine and displays them in the AppDynamics Metric Browser.
+This version of AppDynamics Process Extension reports the availability of a process on a Linux/Windows/Solaris/AIX machine and displays it in the AppDynamics Metric Browser.
 
-The Processes extension retrieves the following metrics for each process/processes group:
+The metric "Number of running instances" reports the available process count and can be used to identify the state of a process (running / not running).
 
--   CPU utilization in %
--   Memory utilization in MB
--   Memory utilization in %
-
-There are two ways of reporting these metrics to controller by changing the flag `displayByPid` in config.yml
-
-1. If false, the aggregate metrics (sum) are reported. For eg. If there are multiple processes with the same name (i.e. 3 "java.exe" processes), the aggregate metrics with process group name are reported with an additional metric (Number of running instances).
-2. If true, each individual process metrics are reported under PID.
-
-**Note**: If you are running Windows,  make sure that the file 'csv.xsl' is in 'C:\Windows\System32' for 32bit or 'C:\Windows\SysWOW64' or 'C:\\Windows\\SysWOW64\\webem\\en-US\\csv.xsl' for 64bit OS versions (standard under Windows Server 2003).
-If this file is not found, the process monitor will output an error to the log file (logs/machine-agent.log).
+**Note**: If running on Windows, this extension has Sigar dependencies. Please make sure to copy sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll from MachineAgent\lib to MachineAgent\monitorLibs
 
 ##Installation
 1. To build from source, clone this repository and run 'mvn clean install'. This will produce a ProcessMonitor-VERSION.zip in the target directory. Alternatively, download the latest release archive from [Github](https://github.com/Appdynamics/process-monitoring-extension/releases/latest).
 2. Unzip as "ProcessMonitor" and copy the "ProcessMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
 3. Configure the extension by referring to the below section.
-4. Restart the Machine Agent.
+4. Restart the Machine Agent. Before restarting the Machine Agent, you could verify the extension output in workbench mode. Check in WorkBench section for details.
 
-In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Custom Metrics | \<Windows/Linux\> Processes
-or your specified path under Application Infrastructure Performance  | \<Tier\> |.
+In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Individual Nodes | Custom Metrics | \<OS\> Processes
 
-## Configuration ##
+## Configuration and Metric ##
 Note : Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/)
 
-1. Configure the extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/`.
+   Configure the extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/`.
 
    For eg.
    ```
-        # Option to view process metrics in MetricBrowser per PID OR as aggregated over all the processes with same name.
-        # If false, all the processes with same name are grouped and collective metrics are reported to AppDynamics Metric Browser.
-        # If true, each process with PID can be viewed but since PID changes with process restart, this might not be the best option.
-        displayByPid: false
-
-        # comma-separated names of processes you want to include and exclude respectively in the reported metrics.
-        #Example Linux: java,bash,sshd
-        #Example Windows: java.exe,chrome.exe
-        # includeProcesses: If empty, all processes are monitored. If not empty, only those specified are monitored excluding others.
-
-        includeProcesses: []
-        excludeProcesses: []
-
-        # Processes with an aggregated absolute memory consumption of LESS than this number
-        # in Megabytes will be filtered out of the reported metrics. Default value is 100 [MB]
-        memoryThreshold: 100
-
-        # ONLY for OS - WINDOWS
-        # csv.xsl file path - leave null for default location,
-        # i.e. C:/Windows/SysWOW64/csv.xsl OR C:\\Windows\\SysWOW64\\webem\\en-US\\csv.xsl (for 64bit)
-        # OR C:/Windows/System32/csv.xsl (32 bit)
-        csvFilePath: ""
-
-        # this is the path to the file .monitored-processes
-        monitoredProcessFilePath: "monitors/ProcessMonitor/.monitored-processes"
-
-        metricPrefix: "Custom Metrics|"
+    metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
+    # metricPrefix: Custom Metrics|Process Monitor
+    
+    # displayName: required - Metrics to be reported under this name in Controller's Metric Browser
+    # regex OR pid - process is fetched using this field
+    instances:
+      - displayName: "machine agent"
+        regex: ".* machineagent.jar"
+    
+      - displayName: "ssh"
+        pid: 1056
 
    ```
+   
+   instances: process instances that are to be monitored
+   
+   displayName: (mandatory) the name that is displayed on AppDynamics Metric Browser
+   
+   regex OR pid: pattern or pid of the process that is monitored
+   
+   When using regex, in order to monitor a particular process, please make sure that the pattern uniquely identifies the process of interest. 
+   
+   Metric Reported: Number of running instances (count of the matching processes defined by regex or pid)
 
-3. Configure the path to the config.yml file by editing the <task-arguments> in the monitor.xml file in the `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` directory. Below is the sample
+## WorkBench
+Workbench is a feature that lets you preview the metrics before registering it with the controller. This is useful if you want to fine tune the configurations. Workbench is embedded into the extension jar.
+To use the workbench
 
-     ```
-     <task-arguments>
-         <!-- config file-->
-         <argument name="config-file" is-required="true" default-value="monitors/ProcessMonitor/config.yml" />
-          ....
-     </task-arguments>
-    ```
+1. Deploy the extension and make all tne necessary configurations.
+2. Start the workbench with the command
+`java -jar /path/to/MachineAgent/monitors/ProcessMonitor/process-monitoring-extension.jar`
+This starts an http server at `http://host:9090/`. This can be accessed from the browser.
+3. If the server is not accessible from outside/browser, you can use the following end points to see the list of registered metrics and errors. #Get the stats `curl http://localhost:9090/api/stats` #Get the registered metrics `curl http://localhost:9090/api/metric-paths`
+4. You can make the changes to config.yml and validate it from the browser or the API
+5. Once the configuration is complete, you can kill the workbench and start the Machine Agent
 
 
-**Note** : By default, a Machine agent or a AppServer agent can send a fixed number of metrics to the controller. To change this limit, please follow the instructions mentioned [here](http://docs.appdynamics.com/display/PRO14S/Metrics+Limits).
-For eg.  
-```    
-    java -Dappdynamics.agent.maxMetrics=2500 -jar machineagent.jar
-```
-
-##Custom Dashboard
-![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/95i5C555106398901A2/image-size/original?v=mpbl-1&px=-1)
-
-##Metric Browser
-![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/93iED3BE531B3AE0FFC/image-size/original?v=mpbl-1&px=-1)
-
-![](http://appsphere.appdynamics.com/t5/image/serverpage/image-id/97iCA9AA07958232EAD/image-size/original?v=mpbl-1&px=-1)
-
+## Troubleshooting 
+1. Verify Machine Agent Data:Please start the Machine Agent without the extension and make sure that it reports data. Verify that the machine agent status is UP and it is reporting Machine Agent Availability Metric.
+2. Metric Limit: Please start the machine agent with the argument -Dappdynamics.agent.maxMetrics=2000, if there is a metric limit reached error in the logs [Ref](http://docs.appdynamics.com/display/PRO14S/Metrics+Limits).
+3. Collect Debug Logs: Edit the file, `<MachineAgent>/conf/logging/log4j.xml` and update the level of the appender "com.appdynamics" and "com.singularity" to debug.
+4. In windows, if there is a java.lang.NoClassDefFoundError: org/hyperic/sigar/SigarException in machine-agent.log, please copy sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll from MachineAgent_Home/lib to MachineAgent_Home/monitorsLibs.
 
 ##Contributing
 Always feel free to fork and contribute any changes directly here on GitHub.

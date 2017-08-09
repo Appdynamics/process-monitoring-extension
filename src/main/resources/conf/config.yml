@@ -1,6 +1,8 @@
+
+metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
+
 # displayName: required - Metrics to be reported under this name in Controller's Metric Browser
 # regex OR pid - process is fetched using this field
-
 instances:
   - displayName: "machine agent"
     regex: ".* machineagent.jar"
@@ -8,12 +10,13 @@ instances:
   - displayName: "ssh"
     pid: 1056
 
+
+
+# Not necessary to modify
 commands:
   -linuxProcess: "ps -eo pid,command"
   -solarisProcess: "top -b"
+  -aixProcess: "ps -eo pid,args"
 
 # number of concurrent tasks
 numberOfThreads: 3
-
-
-metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"

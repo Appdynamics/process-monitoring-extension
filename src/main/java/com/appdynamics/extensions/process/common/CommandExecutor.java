@@ -54,9 +54,7 @@ public class CommandExecutor {
             long endTime = System.currentTimeMillis() - startTime;
             logger.debug("Executing the command " + command + " ended. Time taken is " + endTime);
             List<String> commandOutput = responseParser.getData();
-            if (logger.isDebugEnabled()) {
-                logger.trace("Command Output: " + commandOutput);
-            }
+            logger.trace("Command Output: " + commandOutput);
             return commandOutput;
         } catch (Exception e) {
             logger.error("Error while executing the process " + command, e);
@@ -92,7 +90,7 @@ public class CommandExecutor {
                 } catch (IOException e) {
                 }
                 if (process != null) {
-                    logger.debug("Destroying the process " + command);
+                    logger.trace("Destroying the process " + command);
                     process.destroy();
                 }
             }
@@ -124,7 +122,7 @@ public class CommandExecutor {
                     logger.error("Process Error - " + temp);
                 }
             } catch (IOException e) {
-                logger.debug("Error while reading the contents of the the error stream", e);
+                logger.error("Error while reading the contents of the the error stream", e);
             } finally {
                 try {
                     reader.close();
