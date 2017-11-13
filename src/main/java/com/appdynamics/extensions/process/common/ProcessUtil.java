@@ -61,7 +61,7 @@ public class ProcessUtil {
         return filteredProcesses;
     }
 
-    public static Map<String, ProcessData> populateProcessesData(List<Instance> instances, ListMultimap<String, String> filteredProcessLines) {
+    public static Map<String, ProcessData> populateProcessesData(List<Instance> instances, BigDecimal memory, ListMultimap<String, String> filteredProcessLines) {
         Map<String, ProcessData> processesData = Maps.newHashMap();
         for (Instance instance : instances) {
             ProcessData processData = new ProcessData();
@@ -72,5 +72,16 @@ public class ProcessUtil {
             processesData.put(instance.getDisplayName(), processData);
         }
         return processesData;
+    }
+
+    public static BigDecimal toBigDecimal(String valueStr) {
+        if (!Strings.isNullOrEmpty(valueStr.trim())) {
+            try {
+                return new BigDecimal(valueStr.trim());
+            } catch (NumberFormatException e) {
+                logger.warn("Cannot convert the value " + valueStr + " to string ");
+            }
+        }
+        return null;
     }
 }

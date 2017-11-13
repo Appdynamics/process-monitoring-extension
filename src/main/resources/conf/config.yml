@@ -13,10 +13,16 @@ instances:
 
 
 # Not necessary to modify
-commands:
-  -linuxProcess: "ps -eo pid,command"
-  -solarisProcess: "top -b"
-  -aixProcess: "ps -eo pid,args"
+linuxCommands:
+  process: "ps -eo pid,%cpu,%mem,command"
+  memory: "cat /proc/meminfo"
+
+solarisCommands:
+  process: "top -b"
+
+aixCommands:
+  process: "ps -eo pid,pcpu,pmem,command"
+  memory: "getconf REAL_MEMORY"
 
 # number of concurrent tasks
 numberOfThreads: 3

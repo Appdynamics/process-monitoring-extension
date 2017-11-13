@@ -28,6 +28,7 @@ import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarPermissionDeniedException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,8 @@ public class WindowsParser implements Parser {
         // filter process lines based on configuration
         ListMultimap<String, String> filteredProcessLines = ProcessUtil.filterProcessLinesFromCompleteList(processListOutput, instances, buildHeaderInfo());
         // process the filtered lines and retrieve the data
-        Map<String, ProcessData> processesData = ProcessUtil.populateProcessesData(instances, filteredProcessLines);
+        //TODO
+        Map<String, ProcessData> processesData = ProcessUtil.populateProcessesData(instances, BigDecimal.ZERO, filteredProcessLines);
         return processesData;
     }
 

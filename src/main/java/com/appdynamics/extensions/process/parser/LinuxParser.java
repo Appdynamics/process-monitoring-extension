@@ -26,6 +26,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,35 +37,87 @@ public class LinuxParser implements Parser {
 
     public Map<String, ProcessData> parseProcesses(Map<String, ?> config) {
         List<Instance> instances = new ConfigProcessor().processConfig(config);
-        String cmd = getCommand(config);
-        List<String> processListOutput = CommandExecutor.execute(cmd);
-        Map<String, ProcessData> processMetrics = parseProcesses(cmd, processListOutput, instances);
+        Map<String, String> commands = getCommands(config);
+        List<String> memoryOutput = CommandExecutor.execute(getMemoryCommand(commands));
+        List<String> processListOutput = CommandExecutor.execute(getProcessListCommand(commands));
+        Map<String, ProcessData> processMetrics = parseProcesses(getProcessListCommand(commands), getTotalMemory(memoryOutput), processListOutput, instances);
         return processMetrics;
 
     }
 
-    private String getCommand(Map<String, ?> config) {
-        Map<String, String> commands = (Map) config.get("commands");
+    private Map<String, String> getCommands(Map<String, ?> config) {
+        return  (Map) config.get("linuxCommands");
+    }
+
+    private String getProcessListCommand(Map<String, String> commands) {
         String cmd;
-        if (commands != null && !Strings.isNullOrEmpty(commands.get("linuxProcess"))) {
-            cmd = commands.get("linuxProcess");
+        if (commands != null && !Strings.isNullOrEmpty(commands.get("process"))) {
+            cmd = commands.get("process");
         } else {
             cmd = MonitorConstants.LINUX_PROCESS_LIST_COMMAND;
         }
         return cmd;
     }
 
-    private Map<String, ProcessData> parseProcesses(String cmd, List<String> processListOutput, List<Instance> instances) {
+    private String getMemoryCommand(Map<String, String> commands) {
+        String cmd;
+        if (commands != null && !Strings.isNullOrEmpty(commands.get("memory"))) {
+            cmd = commands.get("memory");
+        } else {
+            cmd = MonitorConstants.LINUX_MEMORY_COMMAND;
+        }
+        return cmd;
+    }
+
+    private BigDecimal getTotalMemory(List<String> memoryOutput) {
+        BigDecimal memory = null;
+        try {
+            if (memoryOutput != null) {
+                String memoryLine = memoryOutput.get(0);
+                String[] words = memoryLine.trim().split("\\s+");
+                memory = ProcessUtil.toBigDecimal(words[1].trim()).divide(new BigDecimal(1024));
+                logger.debug("Memory: " + memory);
+            }
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return memory;
+    }
+
+    private Map<String, ProcessData> parseProcesses(String cmd, BigDecimal memory, List<String> processListOutput, List<Instance> instances) {
         Map<String, ProcessData> processesData = Maps.newHashMap();
         if (processListOutput != null && !processListOutput.isEmpty()) {
             List<String> headerColumns = Arrays.asList(processListOutput.get(0).trim().split("\\s+"));
 
             ListMultimap<String, String> filteredProcessLines = ProcessUtil.filterProcessLinesFromCompleteList(processListOutput, instances, headerColumns);
 
-            processesData = ProcessUtil.populateProcessesData(instances, filteredProcessLines);
+            processesData = populateProcessesData(instances, memory, filteredProcessLines, headerColumns);
 
         } else {
             logger.warn("Output from command " + cmd + " is null or empty " + processListOutput);
+        }
+        return processesData;
+    }
+
+    public static Map<String, ProcessData> populateProcessesData(List<Instance> instances, BigDecimal memory, ListMultimap<String, String> filteredProcessLines, List<String> headerColumns) {
+        Map<String, ProcessData> processesData = Maps.newHashMap();
+        for (Instance instance : instances) {
+            ProcessData processData = new ProcessData();
+            Map<String, BigDecimal> processMetrics = Maps.newHashMap();
+            List<String> processLines = filteredProcessLines.get(instance.getDisplayName());
+            if (processLines.size() == 1) {
+                String [] processLineColumns = processLines.get(0).trim().split("\\s+");
+                BigDecimal cpuPercent = ProcessUtil.toBigDecimal(processLineColumns[headerColumns.indexOf(MonitorConstants.LINUX_CPU_PERCENT)]);
+                BigDecimal memPercent = ProcessUtil.toBigDecimal(processLineColumns[headerColumns.indexOf(MonitorConstants.LINUX_MEM_PERCENT)]);
+                BigDecimal absoluteMemUsed = memPercent.divide(new BigDecimal(100)).multiply(memory);
+
+                processMetrics.put("CPU Utilization %", cpuPercent);
+                processMetrics.put("Memory Utilization %", memPercent);
+                processMetrics.put("Memory Utilization (MB)", absoluteMemUsed);
+            }
+            processMetrics.put(MonitorConstants.RUNNING_INSTANCES_COUNT, new BigDecimal(processLines.size()));
+            processData.setProcessMetrics(processMetrics);
+            processesData.put(instance.getDisplayName(), processData);
         }
         return processesData;
     }

@@ -24,16 +24,41 @@ public class MonitorConstants {
 
     // Commands
     //Linux
-    public static final String LINUX_PROCESS_LIST_COMMAND = "ps -eo pid,command";
+    public static final String LINUX_PROCESS_LIST_COMMAND = "ps -eo pid,%cpu,%mem,command";
+    public static final String LINUX_MEMORY_COMMAND = "cat /proc/meminfo";
+
+    public static final String LINUX_PID = "PID";
+    public static final String LINUX_CPU_PERCENT = "%CPU";
+    public static final String LINUX_MEM_PERCENT = "%MEM";
+
+
     // Solaris
     public static final String SOLARIS_PROCESS_LIST_COMMAND = "top -b";
+
+    public static final String SOLARIS_PID = "PID";
+    public static final String SOLARIS_CPU = "CPU";
+    public static final String SOLARIS_MEM = "SIZE";
+    public static final String SOLARIS_PROC_NAME = "COMMAND";
     // AIX
-    public static final String AIX_PROCESS_LIST_COMMAND = "ps -eo pid,args";
+    public static final String AIX_PROCESS_LIST_COMMAND = "ps -eo pid,pcpu,pmem,command";
+    public static final String AIX_MEMORY_COMMAND = "getconf REAL_MEMORY";
+
+    public static final String AIX_PID = "PID";
+    public static final String AIX_CPU_PERCENT = "%CPU";
+    public static final String AIX_MEM_PERCENT = "%MEM";
+    public static final String AIX_PROC_NAME = "COMMAND";
+
+
     // HP-UX
     // For Memory machinfo | grep -i memory doesn't work on HP-UX 11.1x, so parsing top command
     public static final String HPUX_TOP_COMMAND = "top -d 1";
     // UNIX95= ps -eo pid,pcpu,vsz,args
     public static final String HPUX_PROCESS_COMMAND = "ps -eo pid,pcpu,vsz,args";
+
+    public static final String HPUX_PID = "PID";
+    public static final String HPUX_SIZE = "VSZ";
+    public static final String HPUX_CPU = "%CPU";
+    public static final String HPUX_COMMAND = "COMMAND";
 
 
     // Metric Constants
