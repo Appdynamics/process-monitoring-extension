@@ -83,7 +83,7 @@ public class AIXParser implements Parser {
         return processesData;
     }
 
-    public static Map<String, ProcessData> populateProcessesData(List<Instance> instances, BigDecimal memory, ListMultimap<String, String> filteredProcessLines, List<String> headerColumns) {
+    public Map<String, ProcessData> populateProcessesData(List<Instance> instances, BigDecimal memory, ListMultimap<String, String> filteredProcessLines, List<String> headerColumns) {
         Map<String, ProcessData> processesData = Maps.newHashMap();
         for (Instance instance : instances) {
             ProcessData processData = new ProcessData();

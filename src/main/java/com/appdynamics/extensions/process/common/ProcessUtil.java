@@ -61,19 +61,6 @@ public class ProcessUtil {
         return filteredProcesses;
     }
 
-    public static Map<String, ProcessData> populateProcessesData(List<Instance> instances, BigDecimal memory, ListMultimap<String, String> filteredProcessLines) {
-        Map<String, ProcessData> processesData = Maps.newHashMap();
-        for (Instance instance : instances) {
-            ProcessData processData = new ProcessData();
-            Map<String, BigDecimal> processMetrics = Maps.newHashMap();
-            List<String> processLines = filteredProcessLines.get(instance.getDisplayName());
-            processMetrics.put(MonitorConstants.RUNNING_INSTANCES_COUNT, new BigDecimal(processLines.size()));
-            processData.setProcessMetrics(processMetrics);
-            processesData.put(instance.getDisplayName(), processData);
-        }
-        return processesData;
-    }
-
     public static BigDecimal toBigDecimal(String valueStr) {
         if (!Strings.isNullOrEmpty(valueStr.trim())) {
             try {
