@@ -2,33 +2,34 @@
 
 This extension works with the AppDynamics Java Machine agent.
 
-##Use Case
+## Use Case
 Process Monitoring Extension gathers process metrics from a Linux/Windows/Solaris/AIX machine and reports to AppDynamics Controller. It utilizes the ps command in Unix like systems and Sigar library in Windows to fetch basic process metrics.
 
-This can also be used as a process checker (identify whether a process is running/not running) by its metric "Running Instances". If the configured process is not running, the "Running Instances" metric value reported is "zero".
+This can also be used as a process checker (identify whether a process is running/not running) by its metric "Running Instances". If the configured process is not running, the "Running Instances" metric value reported is "ZERO".
 
 Apart from the "Running Instances" metric, other process metrics are reported only if the extension finds a single instance of the process ("Running Instances" metric value is "ONE").
 
 **Note**: If running on Windows, this extension has Sigar dependencies. Please make sure to copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>\lib` to `<MachineAgent>\monitorLibs`
 
-##Installation
+## Installation
 1. To build from source, clone this repository and run 'mvn clean install'. This will produce a ProcessMonitor-VERSION.zip in the target directory. Alternatively, download the latest release archive from [Github](https://github.com/Appdynamics/process-monitoring-extension/releases/latest).
 2. Unzip as "ProcessMonitor" and copy the "ProcessMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
-3. Configure the extension by editing the config.yml. Refer to the next section for details.
+3. Configure the extension by editing the config.yml. Refer to the Configuration section for details.
 4. Verify the extension output in workbench mode and make sure desired metrics are reported. Check in WorkBench section for details.
 5. Restart the Machine Agent
 
 In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Individual Nodes | <Node> | Custom Metrics | Process Monitor | \<OS\> Processes
 
 ## Configuration
-Note : Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/)
+**Note**: Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/)
+
 Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to update the following.
-   1. `metricPrefix`: If you wish to report metrics only to the tier which this MachineAgent is reporting to, please comment the second metricPrefix and update the "<Component-ID>" with TierID or TierName in the first metricPrefix.
+ 1. `metricPrefix`: If you wish to report metrics only to the tier which this MachineAgent is reporting to, please comment the second metricPrefix and update the "<Component-ID>" with TierID or TierName in the first metricPrefix.
    ```
    metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
    metricPrefix: "Custom Metrics|Process Monitor|"
    ```
-   2. `instances`: process instances that are to be monitored. `displayName` which is mandatory is rendered on the metric browser and the process metrics are reported under this name. The process to be monitored can be configured in three ways: `regex`/`pid`/`pidFile`. 
+ 2. `instances`: process instances that are to be monitored. `displayName` which is mandatory is rendered on the metric browser and the process metrics are reported under this name. The process to be monitored can be configured in three ways: `regex`/`pid`/`pidFile`. 
    For process checker, in case of regex, please make sure the pattern uniquely identifies the process of interest.
    ```
     instances:
@@ -41,7 +42,7 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
       - displayName: "mysql"
         pidFile: "/opt/mysql/db/mysql.pid"
    ```
-   3. Commands (Optional). The underlying OS command can be modified to fetch any additional metrics if required. Please execute the command and make sure there is a valid output in a tabular format. Please check man pages for unix like systems. We do not support this option for Windows environment.
+ 3. Commands (Optional). The underlying OS command can be modified to fetch any additional metrics if required. Please execute the command and make sure there is a valid output in a tabular format. Please check man pages for unix like systems. We do not support this option for Windows environment.
    ```
    linux:
      process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rsz=RSS,args"
@@ -53,7 +54,7 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
      process: "ps -eo pid,pcpu=CPU%,pmem=Memory%,rss=RSS,args"
 
    ```
-   4. `metric` (Optional). Existing metric properties can be modified in this section. If additional metrics are added in the commands, please configure them here with appropriate metric properties for extension to report these metrics. Supported properties are `alias`, `multiplier`, `delta`.
+ 4. `metrics` (Optional). Existing metric properties can be modified in this section. If additional metrics are added in the commands, please configure them here with appropriate metric properties for extension to report these metrics. Supported properties are `alias`, `multiplier`, `delta`.
    ```
    metrics:
      - CPU%:
@@ -67,7 +68,7 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
    ```
 ## Metrics
 1. Running Instances: Count of the matched processes that are identified by regex.
-2. CPU%, Memory%, Resident Set Size: Reported only if Running Instances value is ONE
+2. CPU%, Memory%, Resident Set Size: Reported only if Running Instances metric value is ONE
 
 ## WorkBench
 Workbench is a feature that lets you preview the metrics before registering it with the controller. This is useful if you want to fine tune the configurations. Workbench is embedded into the extension jar.
