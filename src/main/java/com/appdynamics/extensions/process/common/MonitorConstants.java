@@ -17,6 +17,12 @@ package com.appdynamics.extensions.process.common;
 
 public class MonitorConstants {
 
+    public static final String METRIC_SEPARATOR = "|";
+    public static final String SPACES = "\\s+";
+
+    // Metric Constants
+    public static final String RUNNING_INSTANCES_COUNT = "Running Instances";
+
     // Process Line Header Constants
     public static final String PID = "PID";
     public static final String COMMAND = "COMMAND";
@@ -24,44 +30,17 @@ public class MonitorConstants {
 
     // Commands
     //Linux
-    public static final String LINUX_PROCESS_LIST_COMMAND = "ps -eo pid,%cpu,%mem,command";
-    public static final String LINUX_MEMORY_COMMAND = "cat /proc/meminfo";
-
-    public static final String LINUX_PID = "PID";
-    public static final String LINUX_CPU_PERCENT = "%CPU";
-    public static final String LINUX_MEM_PERCENT = "%MEM";
-
+    public static final String LINUX_PROCESS_LIST_COMMAND = "ps -eo pid,%cpu=CPU%,%mem=Memory%,rsz=RSS,args";
 
     // Solaris
-    public static final String SOLARIS_PROCESS_LIST_COMMAND = "top -b";
+    public static final String SOLARIS_PROCESS_LIST_COMMAND = "ps -eo pid,pcpu=CPU% -o pmem=Memory% -o rss=RSS -o args";
 
-    public static final String SOLARIS_PID = "PID";
-    public static final String SOLARIS_CPU = "CPU";
-    public static final String SOLARIS_MEM = "SIZE";
-    public static final String SOLARIS_PROC_NAME = "COMMAND";
     // AIX
-    public static final String AIX_PROCESS_LIST_COMMAND = "ps -eo pid,pcpu,pmem,command";
-    public static final String AIX_MEMORY_COMMAND = "getconf REAL_MEMORY";
-
-    public static final String AIX_PID = "PID";
-    public static final String AIX_CPU_PERCENT = "%CPU";
-    public static final String AIX_MEM_PERCENT = "%MEM";
-    public static final String AIX_PROC_NAME = "COMMAND";
-
+    public static final String AIX_PROCESS_LIST_COMMAND = "ps -eo pid,pcpu=CPU%,pmem=Memory%,rss=RSS,args";
 
     // HP-UX
     // For Memory machinfo | grep -i memory doesn't work on HP-UX 11.1x, so parsing top command
     public static final String HPUX_TOP_COMMAND = "top -d 1";
     // UNIX95= ps -eo pid,pcpu,vsz,args
     public static final String HPUX_PROCESS_COMMAND = "ps -eo pid,pcpu,vsz,args";
-
-    public static final String HPUX_PID = "PID";
-    public static final String HPUX_SIZE = "VSZ";
-    public static final String HPUX_CPU = "%CPU";
-    public static final String HPUX_COMMAND = "COMMAND";
-
-
-    // Metric Constants
-    public static final String RUNNING_INSTANCES_COUNT = "Number of running instances";
-
 }

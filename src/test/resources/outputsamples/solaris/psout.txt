@@ -1,0 +1,114 @@
+﻿  PID  CPU%  Memory%  RSS COMMAND
+    0   0.0      0.0    0 sched
+    5   0.1      0.0    0 zpool-rpool
+    6   0.0      0.0    0 kmem_task
+    1   0.0      0.1 1928 /usr/sbin/init
+    2   0.0      0.0    0 pageout
+    3   0.1      0.0    0 fsflush
+    7   0.0      0.0    0 intrd
+    8   0.0      0.0    0 vmtasks
+    9   0.0      0.0    0 postwaittq
+   66   0.0      0.2 3228 /lib/inet/ipmgmtd
+   13   0.0      0.9 18712 /lib/svc/bin/svc.startd
+   15   0.0      1.1 21744 /lib/svc/bin/svc.configd
+  111   0.0      0.1 1480 /usr/lib/pfexecd
+   39   0.0      0.2 2524 /lib/inet/netcfgd
+   82   0.0      0.1 2252 /lib/svc/bin/svc.periodicd
+   42   0.0      0.1 2256 /usr/sbin/ibmgmtd
+   70   0.0      0.1 1408 /lib/crypto/kcfd
+   48   0.0      0.2 2676 /usr/sbin/dlmgmtd
+ 1560   0.0      0.3 6116 /usr/lib/rad/rad -m /usr/lib/rad/transport -m /usr/lib/rad/protocol -m /usr/lib
+  138   0.0      0.1 1420 /usr/sbin/vbiosd
+  540   0.0      0.2 4220 /usr/sbin/nscd
+   86   0.0      0.1 1108 /lib/inet/in.mpathd
+ 1563   0.0      0.9 17456 /usr/lib/notification-daemon
+ 1508   0.0      0.8 15164 /usr/lib/clock-applet --oaf-activate-iid=OAFIID:GNOME_ClockApplet_Factory --oaf
+  972   0.0      0.1 1264 /usr/bin/dbus-launch --exit-with-session
+  157   0.0      0.1 1916 /usr/lib/sysevent/syseventd
+  359   0.0      0.3 4764 /lib/inet/nwamd
+  159   0.0      0.3 4664 /usr/lib/rcm/rcm_daemon
+  171   0.0      0.3 4976 /usr/lib/rad/rad -sp
+  621   0.0      0.2 3500 /usr/lib/inet/inetd start
+  524   0.0      0.1  888 /lib/svc/method/iscsid
+  564   0.0      0.1 1052 /usr/lib/hotplugd
+  179   0.0      0.1  868 /usr/lib/utmpd
+  393   0.0      0.1 2288 /usr/lib/picl/picld
+  205   0.0      0.1 1380 /usr/lib/zones/zonestatd
+ 1453   0.0      0.1 1168 dbus-launch --exit-with-session --sh-syntax
+  556   0.0      0.1 1248 /usr/sbin/cron
+  243   0.0      0.3 4740 /usr/lib/devfsadm/devfsadmd
+  362   0.0      0.1 1452 /sbin/dhcpagent
+  550   0.1      0.1 1864 /usr/bin/VBoxService
+  552   0.0      0.2 3884 /usr/sbin/console-kit-daemon
+  220   0.0      0.2 3700 /usr/lib/rad/rad -sp
+  726   0.0      0.1 1952 /usr/sbin/auditd
+  700   0.0      0.1 2004 /usr/sbin/syslogd
+  233   0.0      0.1 2164 /usr/lib/dbus-daemon --system
+ 1510   0.0      0.5 9540 /usr/lib/notification-area-applet --oaf-activate-iid=OAFIID:GNOME_NotificationA
+  859   0.3      2.7 54996 /usr/bin/Xorg :0 -nolisten tcp -br -novtswitch -auth /tmp/gdm-auth-cookies-d5aa
+  856   0.0      0.2 3748 /usr/sbin/gdm-binary
+  580   0.0      0.3 5972 /usr/lib/hal/hald --daemon=yes
+  581   0.0      0.1 2188 hald-runner
+  686   0.0      0.2 3188 /usr/lib/ssh/sshd
+ 1492   0.0      0.2 3536 /usr/lib/gvfs-hal-volume-monitor
+  585   0.0      0.1 2300 /usr/lib/hal/hald-addon-cpufreq
+  586   0.0      0.2 2464 /usr/lib/hal/hald-addon-acpi
+ 1419   0.0      0.1 2116 /usr/lib/inet/sendmail -bl -q15m
+  617   0.0      0.1 1928 /usr/sbin/rpcbind
+  624   0.0      0.1 2088 /usr/lib/nfs/nfsmapid
+  641   0.0      0.1 1556 /usr/lib/autofs/automountd
+  732   0.0      0.1 1936 /usr/sbin/ttymon -g -d /dev/console -l console -m ldterm,ttcompat -h -p solaris
+  642   0.0      0.1 1560 /usr/lib/autofs/automountd
+  852   0.0      0.1 2172 /usr/lib/rmvolmgr -s
+  691   0.0      0.2 2352 /usr/lib/inet/in.ndpd
+ 1489   0.0      0.7 14544 metacity
+  913   0.0      0.1 1904 /usr/lib/fm/notify/smtp-notify
+ 1417   0.0      0.1 1776 /usr/lib/inet/sendmail -Ac -q15m
+ 1488   0.0      0.2 3244 /usr/lib/gvfsd
+  781   0.0      0.1 1848 /usr/sbin/ttymon -g -d /dev/vt/6 -l console -m ldterm,ttcompat -h -p solarisVM
+  765   0.0      0.1 1848 /usr/sbin/ttymon -g -d /dev/vt/2 -l console -m ldterm,ttcompat -h -p solarisVM
+  762   0.0      0.1 1268 /usr/lib/vtdaemon -c 16
+  912   0.0      0.1 2320 /usr/lib/fm/notify/asr-notify
+  797   0.0      0.1 1852 /usr/sbin/ttymon -g -d /dev/vt/5 -l console -m ldterm,ttcompat -h -p solarisVM
+ 1482   0.0      0.2 3200 /usr/bin/gnome-keyring-daemon --start --components=pkcs11
+  799   0.0      0.1 1860 /usr/sbin/ttymon -g -d /dev/vt/4 -l console -m ldterm,ttcompat -h -p solarisVM
+ 1485   0.0      0.9 17528 /usr/lib/gnome-settings-daemon
+  809   0.0      0.1 1848 /usr/sbin/ttymon -g -d /dev/vt/3 -l console -m ldterm,ttcompat -h -p solarisVM
+ 1493   0.0      1.7 34352 nautilus
+ 1516   0.0      0.2 3168 /usr/bin/VBoxClient --clipboard
+ 1599   0.1      0.1 1500 ps -eo pid,pcpu=CPU%, -o pmem=Memory%, -o rss=RSS, -o args
+  844   0.0      0.9 18172 /usr/lib/fm/fmd/fmd
+ 1478   0.0      0.3 5624 /usr/lib/gconfd-2
+ 1561   0.0      0.3 5068 /usr/lib/rad/rad -m /usr/lib/rad/transport -m /usr/lib/rad/protocol -m /usr/lib
+ 1499   0.0      0.8 16716 /usr/lib/wnck-applet --oaf-activate-iid=OAFIID:GNOME_Wncklet_Factory --oaf-ior-
+  858   0.0      0.3 6056 /usr/lib/gdm-simple-slave --display-id /org/gnome/DisplayManager/Display1
+  951   0.0      0.2 3688 /usr/sbin/cupsd -C /etc/cups/cupsd.conf
+ 1465   0.0      0.2 2512 /usr/bin/ssh-agent -- gnome-session
+ 1490   0.0      1.2 24192 gnome-panel
+ 1498   0.0      0.5 10536 /usr/lib/trashapplet --oaf-activate-iid=OAFIID:GNOME_Panel_TrashApplet_Factory
+ 1454   0.0      0.2 2416 /usr/lib/dbus-daemon --fork --print-pid 6 --print-address 8 --session
+ 1007   0.0      0.3 4584 /usr/lib/gdm-session-worker
+ 1427   0.0      0.4 7816 gnome-session
+ 1495   0.0      0.3 4876 /usr/lib/bonobo-activation-server --ac-activate --ior-output-fd=21
+ 1569   0.0      0.1 1252 gnome-pty-helper
+  915   0.0      0.1 1796 /usr/lib/devchassis/devchassisd
+ 1501   0.0      0.2 3924 /usr/lib/gvfsd-trash --spawner :1.9 /org/gtk/gvfs/exec_spaw/0
+ 1528   0.0      0.1 1256 /usr/bin/VBoxClient --draganddrop
+ 1515   0.0      0.1 1232 /usr/bin/VBoxClient --clipboard
+ 1521   0.0      0.1 1228 /usr/bin/VBoxClient --display
+ 1522   0.0      0.1 2328 /usr/bin/VBoxClient --display
+ 1526   0.0      0.1 1256 /usr/bin/VBoxClient --seamless
+ 1527   0.0      0.1 2280 /usr/bin/VBoxClient --seamless
+ 1529   0.3      0.2 2368 /usr/bin/VBoxClient --draganddrop
+ 1530   0.0      0.8 16404 gnome-power-manager
+ 1531   0.7      5.8 120012 java -Djava.security.policy=/usr/share/vpanels/java.policy com.oracle.solaris.v
+ 1558   0.0      0.2 3044 /usr/lib/gvfsd-metadata
+ 1536   0.0      0.7 13432 gnome-volume-control-applet
+ 1545   0.0      0.7 14472 /usr/lib/nwam-manager
+ 1546   0.0      1.1 22756 python2.7 /usr/lib/time-slider-notify
+ 1540   0.0      1.0 20160 python2.7 /usr/lib/system-config-printer/applet.py
+ 1547   0.1      0.3 5384 /usr/bin/xscreensaver -nosplash
+ 1548   0.0      1.8 36932 /usr/bin/python2.7 /usr/lib/updatemanagernotifier
+ 1559   0.0      0.3 5756 /usr/lib/rad/rad -m /usr/lib/rad/transport -m /usr/lib/rad/protocol -m /usr/lib
+ 1568   0.2      1.0 19308 gnome-terminal
+ 1571   0.0      0.2 3200 bash

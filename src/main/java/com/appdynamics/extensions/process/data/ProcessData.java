@@ -17,21 +17,20 @@ package com.appdynamics.extensions.process.data;
 
 import com.google.common.collect.Maps;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 public class ProcessData {
 
-    Map<String, BigDecimal> processMetrics;
+    Map<String, String> processMetrics;
 
-    public Map<String, BigDecimal> getProcessMetrics() {
+    public Map<String, String> getProcessMetrics() {
         if (processMetrics == null) {
             processMetrics = Maps.newHashMap();
         }
         return processMetrics;
     }
 
-    public void setProcessMetrics(Map<String, BigDecimal> processMetrics) {
+    public void setProcessMetrics(Map<String, String> processMetrics) {
         this.processMetrics = processMetrics;
     }
 }

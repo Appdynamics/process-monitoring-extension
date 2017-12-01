@@ -17,8 +17,11 @@ package com.appdynamics.extensions.process.configuration;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +36,8 @@ public class ConfigProcessor {
             Instance instance = new Instance();
             String displayName = (String) configuredProcess.get("displayName");
             String regex = (String) configuredProcess.get("regex");
-            Integer pid = (Integer) configuredProcess.get("pid");
+            String pid = (String) configuredProcess.get("pid");
+            String pidFile = (String) configuredProcess.get("pidFile");
 
             if (!Strings.isNullOrEmpty(displayName)) {
                 instance.setDisplayName(displayName);
@@ -42,11 +46,28 @@ public class ConfigProcessor {
                 break;
             }
             instance.setRegex(regex);
-            instance.setPid(pid);
+            String pidStr = getPid(pid, pidFile);
+            instance.setPid(pidStr);
 
             instances.add(instance);
         }
         return instances;
+    }
+
+    private String getPid(String pid, String pidFile) {
+        if (!Strings.isNullOrEmpty(pid)) {
+            return pid;
+        } else if (!Strings.isNullOrEmpty(pidFile)) {
+            File file = new File(pidFile);
+            try {
+                String fileOutputString = FileUtils.readFileToString(file);
+                logger.debug("Contents of pidFile at " + pidFile + " is " + fileOutputString);
+                return fileOutputString.trim();
+            } catch (IOException e) {
+                logger.error("Error while reading pidFile " + pidFile, e);
+            }
+        }
+        return null;
     }
 
 }

@@ -1,4 +1,8 @@
 
+metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
+
+# displayName: required - Metrics to be reported under this name in Controller's Metric Browser
+# regex/pid/pidFile - process is fetched using this field
 instances:
   - displayName: "docker"
     regex: ".*docker.*"
@@ -12,13 +16,35 @@ instances:
     regex: "java -jar machine-agent.jar"
 
 
+# Not necessary to modify
+linux:
+  process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rsz=RSS,args"
 
-commands:
-  -linuxProcess: "ps -eo pid,command"
-  -solarisProcess: "top -b"
+solaris:
+  process: "ps -eo pid,pcpu=CPU%, -o pmem=Memory%, -o rss=RSS -o args"
+
+aix:
+  process: "ps -eo pid,pcpu=CPU%,pmem=Memory%,rss=RSS,args"
+
+
+metrics:
+  - CPU%:
+     multiplier: 1
+     aggregationType: "SUM"
+  - Memory%:
+     alias: "Memory%"
+  - RSS:
+     alias: "Resident Set Size"
+  - Running Instances:
+     alias: "Running Instances"
+
 
 # number of concurrent tasks
-numberOfThreads: 5
+numberOfThreads: 3
 
-
-metricPrefix: "Custom Metrics|Process Monitor|"
+# This is to run this in scheduled mode. In this case, the extension will fetch the data every 300 seconds
+# and caches the data. The cached data will be reported to controller every min. This way there is no metric drop.
+# Can be used when the data rarely changes or to reduce the load while fetching metrics every minute.
+taskSchedule:
+  numberOfThreads: 1
+  taskDelaySeconds: 300

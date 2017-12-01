@@ -16,7 +16,6 @@
 package com.appdynamics.extensions.process.parser;
 
 import com.appdynamics.extensions.process.common.MonitorConstants;
-import com.appdynamics.extensions.process.common.ProcessUtil;
 import com.appdynamics.extensions.process.configuration.ConfigProcessor;
 import com.appdynamics.extensions.process.configuration.Instance;
 import com.appdynamics.extensions.process.data.ProcessData;
@@ -27,21 +26,20 @@ import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 import org.hyperic.sigar.*;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class WindowsParser implements Parser {
+public class WindowsParser extends Parser {
 
     public static final Logger logger = Logger.getLogger(WindowsParser.class);
 
-    public Map<String, ProcessData> parseProcesses(Map<String, ?> config) {
+    public Map<String, ProcessData> fetchMetrics(Map<String, ?> config) {
         List<Instance> instances = new ConfigProcessor().processConfig(config);
         // all process lines
         List<String> processListOutput = fetchProcessListFromSigar();
         // filter process lines based on configuration
-        ListMultimap<String, String> filteredProcessLines = ProcessUtil.filterProcessLinesFromCompleteList(processListOutput, instances, buildHeaderInfo());
+        ListMultimap<String, String> filteredProcessLines = filterProcessLinesFromCompleteList(processListOutput, instances, buildHeaderInfo());
         // process the filtered lines and retrieve the data
         Map<String, ProcessData> processesData = populateProcessesData(instances, filteredProcessLines);
         return processesData;
@@ -73,28 +71,28 @@ public class WindowsParser implements Parser {
         Map<String, ProcessData> processesData = Maps.newHashMap();
         for (Instance instance : instances) {
             ProcessData processData = new ProcessData();
-            Map<String, BigDecimal> processMetrics = Maps.newHashMap();
+            Map<String, String> processMetrics = Maps.newHashMap();
             List<String> processLines = filteredProcessLines.get(instance.getDisplayName());
             if (processLines.size() == 1) {
-                String pid = processLines.get(0).trim().split("\\s+")[0];
+                String pid = processLines.get(0).trim().split(MonitorConstants.SPACES)[0];
                 Sigar sigar = new Sigar();
                 Double cpuPercent = getProcCPU(sigar, pid);
                 Long residentMem = getProcMem(sigar, pid);
                 if (cpuPercent != null) {
-                    processMetrics.put("CPU Utilization %", new BigDecimal(cpuPercent));
+                    processMetrics.put("CPU%", String.valueOf(cpuPercent));
                 }
                 if (residentMem != null) {
-                    processMetrics.put("Resident Mem(MB)", new BigDecimal(residentMem).divide(new BigDecimal(1024*1024)));
+                    processMetrics.put("RSS", String.valueOf(residentMem));
                 }
             }
-            processMetrics.put(MonitorConstants.RUNNING_INSTANCES_COUNT, new BigDecimal(processLines.size()));
+            processMetrics.put(MonitorConstants.RUNNING_INSTANCES_COUNT, String.valueOf(processLines.size()));
             processData.setProcessMetrics(processMetrics);
             processesData.put(instance.getDisplayName(), processData);
         }
         return processesData;
     }
 
-    private Double getProcCPU(Sigar sigar, String pid) {
+    protected Double getProcCPU(Sigar sigar, String pid) {
         try {
             ProcCpu procCpu = sigar.getProcCpu(pid);
             return procCpu.getPercent();
@@ -104,7 +102,7 @@ public class WindowsParser implements Parser {
         return null;
     }
 
-    private Long getProcMem(Sigar sigar, String pid) {
+    protected Long getProcMem(Sigar sigar, String pid) {
         try {
             ProcMem procMem = sigar.getProcMem(pid);
             return procMem.getResident();
@@ -118,11 +116,14 @@ public class WindowsParser implements Parser {
         List<String> headerInfo = Lists.newArrayList();
         headerInfo.add(MonitorConstants.PID);
         headerInfo.add(MonitorConstants.COMMAND);
-
         return headerInfo;
     }
 
     public String getProcessGroupName() {
         return "Windows Processes";
+    }
+
+    protected Map<String, String> getCommands(Map<String, ?> config) {
+        return null;
     }
 }

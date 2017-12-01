@@ -34,9 +34,9 @@ public class ParserFactory {
         } else if (os.contains("hp-ux")) {
             return new HPUXParser();
         } else {
-            logger.error("Error in initializing Parser for " + os);
+            logger.error("Error in initializing Parser for " + os +  " Process Extension doesn't support this OS");
             return null;
-            // null is handled in ProcessMonitor
+            // null is handled in ProcessMonitorTask
         }
 
     }
