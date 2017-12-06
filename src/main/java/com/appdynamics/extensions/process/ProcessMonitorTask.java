@@ -15,53 +15,70 @@
  */
 package com.appdynamics.extensions.process;
 
+import com.appdynamics.extensions.AMonitorTaskRunnable;
+import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.metrics.Metric;
+import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.data.ProcessData;
 import com.appdynamics.extensions.process.parser.Parser;
 import com.appdynamics.extensions.process.parser.ParserFactory;
+import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 
-import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
-public class ProcessMonitorTask implements Runnable {
+public class ProcessMonitorTask implements AMonitorTaskRunnable {
 
     private static final Logger logger = Logger.getLogger(ProcessMonitorTask.class);
     private MonitorConfiguration monitorConfiguration;
+    private MetricWriteHelper metricWriteHelper;
     private String os;
-    public int numberOfMetricsReported;
 
-    public ProcessMonitorTask(MonitorConfiguration monitorConfiguration, String os) {
+    public ProcessMonitorTask(MonitorConfiguration monitorConfiguration, MetricWriteHelper metricWriteHelper, String os) {
         this.monitorConfiguration = monitorConfiguration;
+        this.metricWriteHelper = metricWriteHelper;
         this.os = os;
     }
     public void run() {
         Map<String, ?> config = monitorConfiguration.getConfigYml();
         Parser parser = ParserFactory.createParser(os);
         if (parser != null) {
-        Map<String, ProcessData> processDataMap = parser.parseProcesses(config);
-        printMetrics(parser, processDataMap);
+            Map<String, ProcessData> processDataMap = parser.fetchMetrics(config);
+            String metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).append(MonitorConstants.METRIC_SEPARATOR).toString();
+            List<Metric> metrics = buildMetrics(metricPrefix, processDataMap, config);
+            metricWriteHelper.transformAndPrintMetrics(metrics);
         }
     }
 
-    private void printMetrics(Parser parser, Map<String, ProcessData> processDataMap) {
-        StringBuilder metricPath = new StringBuilder(monitorConfiguration.getMetricPrefix() + "|" + parser.getProcessGroupName()).append("|");
+    public List<Metric> buildMetrics(String metricPrefix, Map<String, ProcessData> processDataMap, Map<String, ?> config) {
+        List<Metric> metrics = Lists.newArrayList();
+        List<Map<String, ?>> metricsFromConfig = (List<Map<String, ?>>) config.get("metrics");
+        // Iterate through fetched metrics
         for (Map.Entry<String, ProcessData> entry : processDataMap.entrySet()) {
             String processName = entry.getKey();
-            Map<String, BigDecimal> processMetrics = entry.getValue().getProcessMetrics();
-            for (Map.Entry<String, BigDecimal> metric : processMetrics.entrySet()) {
-                printMetric(metricPath.toString() + processName + "|" + metric.getKey(), metric.getValue());
+            Map<String, String> processMetrics = entry.getValue().getProcessMetrics();
+            // iterate through metrics configuration in config.yml
+            for (Map<String, ?> metricFromConfig : metricsFromConfig) {
+                String metricNameFromConfig = metricFromConfig.entrySet().iterator().next().getKey();
+                Map<String, ?> metricModifierMap = (Map<String, ?>) metricFromConfig.get(metricNameFromConfig);
+                if (processMetrics.containsKey(metricNameFromConfig)) {
+                    String finalMetricPath = metricPrefix + MonitorConstants.METRIC_SEPARATOR + processName + MonitorConstants.METRIC_SEPARATOR + metricNameFromConfig;
+                    Metric metric;
+                    if (metricModifierMap != null) {
+                        metric = new Metric(metricNameFromConfig, processMetrics.get(metricNameFromConfig), finalMetricPath, metricModifierMap);
+                    } else {
+                        metric = new Metric(metricNameFromConfig, processMetrics.get(metricNameFromConfig), finalMetricPath);
+                    }
+                    metrics.add(metric);
+                }
             }
         }
-        logger.debug("Number of metrics reported by Process Monitor in this iteration " + numberOfMetricsReported);
-
+        return metrics;
     }
 
-    protected void printMetric(String metricPath, BigDecimal metricValue) {
-        if (metricValue != null) {
-            logger.debug("Metric:" + metricPath + ", Raw Value:" + metricValue);
-            monitorConfiguration.getMetricWriter().printMetric(metricPath, metricValue, "AVG.AVG.COL");
-            numberOfMetricsReported++;
-        }
+    public void onTaskComplete() {
+        logger.info("Process Monitoring Extension Task completed");
     }
 }

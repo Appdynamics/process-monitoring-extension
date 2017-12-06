@@ -17,7 +17,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -38,18 +37,20 @@ public class AIXParserTest {
     }
 
     @Test
-    public void testParseProcesses() {
+    public void testFetchMetrics() {
         Map<String, ?> configArgs = YmlReader.readFromFile(new File("src/test/resources/conf/config-aix.yml"));
         PowerMockito.when(CommandExecutor.execute(MonitorConstants.AIX_PROCESS_LIST_COMMAND)).thenReturn(processList);
-        Map<String, ProcessData> processDataMap = parser.parseProcesses(configArgs);
+        Map<String, ProcessData> processDataMap = parser.fetchMetrics(configArgs);
 
-        Map<String, BigDecimal> javaProcessData = processDataMap.get("java").getProcessMetrics();
-        Assert.assertEquals(BigDecimal.valueOf(3), javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Map<String, String> javaProcessData = processDataMap.get("java").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(3), javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Assert.assertNull(javaProcessData.get("CPU%"));
 
-        Map<String, BigDecimal> sshProcessData = processDataMap.get("ssh").getProcessMetrics();
-        Assert.assertEquals(BigDecimal.ONE, sshProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Map<String, String> sshProcessData = processDataMap.get("ssh").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(1), sshProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Assert.assertEquals(String.valueOf(1548), sshProcessData.get("RSS"));
 
-        Map<String, BigDecimal> testProcessData = processDataMap.get("test").getProcessMetrics();
-        Assert.assertEquals(BigDecimal.ZERO, testProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Map<String, String> testProcessData = processDataMap.get("test").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(0), testProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
     }
 }

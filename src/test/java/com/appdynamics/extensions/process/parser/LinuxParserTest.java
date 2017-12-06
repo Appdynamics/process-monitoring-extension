@@ -2,9 +2,12 @@ package com.appdynamics.extensions.process.parser;
 
 import com.appdynamics.extensions.process.common.CommandExecutor;
 import com.appdynamics.extensions.process.common.MonitorConstants;
+import com.appdynamics.extensions.process.configuration.Instance;
 import com.appdynamics.extensions.process.data.ProcessData;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,7 +20,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -38,21 +40,62 @@ public class LinuxParserTest {
     }
 
     @Test
-    public void testParseProcesses() {
+    public void testFetchMetrics() {
         Map<String, ?> configArgs = YmlReader.readFromFile(new File("src/test/resources/conf/config-linux.yml"));
         PowerMockito.when(CommandExecutor.execute(MonitorConstants.LINUX_PROCESS_LIST_COMMAND)).thenReturn(processList);
-        Map<String, ProcessData> processDataMap = parser.parseProcesses(configArgs);
+        Map<String, ProcessData> processDataMap = parser.fetchMetrics(configArgs);
 
-        Map<String, BigDecimal> dockerProcessData = processDataMap.get("docker").getProcessMetrics();
-        Assert.assertEquals(BigDecimal.valueOf(2), dockerProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Map<String, String> dockerProcessData = processDataMap.get("docker").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(2), dockerProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
-        Map<String, BigDecimal> biosetProcessData = processDataMap.get("bioset").getProcessMetrics();
-        Assert.assertEquals(BigDecimal.valueOf(26), biosetProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Map<String, String> biosetProcessData = processDataMap.get("bioset").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(10), biosetProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        // If instance count is > 1, no metrics will be reported
+        Assert.assertNull(biosetProcessData.get("CPU%"));
 
-        Map<String, BigDecimal> javaProcessData = processDataMap.get("java").getProcessMetrics();
-        Assert.assertEquals(BigDecimal.ZERO, javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Map<String, String> javaProcessData = processDataMap.get("java").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(1), javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Assert.assertEquals(String.valueOf(264708), javaProcessData.get("RSS"));
 
-        Map<String, BigDecimal> hadoopProcessData = processDataMap.get("hadoop").getProcessMetrics();
-        Assert.assertEquals(BigDecimal.ZERO, hadoopProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Map<String, String> hadoopProcessData = processDataMap.get("hadoop").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(0), hadoopProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+    }
+
+    @Test
+    public void testFilterProcessLinesFromCompleteList() throws IOException {
+        List<Instance> instances = Lists.newArrayList();
+
+        Instance instance = new Instance();
+        instance.setDisplayName("java");
+        instance.setRegex("java.exe");
+        instances.add(instance);
+
+        Instance instance1 = new Instance();
+        instance.setDisplayName("ssh");
+        instance.setRegex(".*sshd.*");
+        instances.add(instance1);
+
+        List<String> headerColumns = Lists.newArrayList();
+        headerColumns.add("PID");
+        headerColumns.add("CPU%");
+        headerColumns.add("Memory%");
+        headerColumns.add("RSS");
+        headerColumns.add("COMMAND");
+
+        ListMultimap<String, String> filteredLines = parser.filterProcessLinesFromCompleteList(processList, instances, headerColumns);
+        Assert.assertEquals(0, filteredLines.get("java").size());
+        Assert.assertEquals(3, filteredLines.get("ssh").size());
+    }
+
+    @Test
+    public void testStringSplitWithLimit() {
+        String string = "  0.0   0.0 /sbin/init splash";
+        String [] columns = string.trim().split("\\s+");
+        Assert.assertNotEquals(3, columns.length);
+        Assert.assertEquals("/sbin/init", columns[2]);
+
+        String [] columns1 = string.trim().split("\\s+", 3);
+        Assert.assertEquals(3, columns1.length);
+        Assert.assertEquals("/sbin/init splash", columns1[2]);
     }
 }

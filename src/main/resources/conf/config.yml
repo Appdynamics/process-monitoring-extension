@@ -1,22 +1,48 @@
 
 metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
+# metricPrefix: "Custom Metrics|Process Monitor|"
 
 # displayName: required - Metrics to be reported under this name in Controller's Metric Browser
-# regex OR pid - process is fetched using this field
+# regex/pid/pidFile - process is fetched using this field
 instances:
   - displayName: "machine agent"
     regex: ".* machineagent.jar"
 
   - displayName: "ssh"
-    pid: 1056
+    pid: "1056"
 
+  - displayName: "mysql"
+    pidFile: "/opt/mysql/db/mysql.pid"
 
 
 # Not necessary to modify
-commands:
-  -linuxProcess: "ps -eo pid,command"
-  -solarisProcess: "top -b"
-  -aixProcess: "ps -eo pid,args"
+linux:
+  process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rsz=RSS,args"
+
+solaris:
+  process: "ps -eo pid,pcpu=CPU%, -o pmem=Memory%, -o rss=RSS -o args"
+
+aix:
+  process: "ps -eo pid,pcpu=CPU%,pmem=Memory%,rss=RSS,args"
+
+
+metrics:
+  - CPU%:
+     multiplier: 1
+  - Memory%:
+     alias: "Memory%"
+  - RSS:
+     alias: "Resident Set Size"
+  - Running Instances:
+     alias: "Running Instances"
+
 
 # number of concurrent tasks
-numberOfThreads: 3
+numberOfThreads: 2
+
+# This is to run this in scheduled mode. In this case, the extension will fetch the data every 300 seconds
+# and caches the data. The cached data will be reported to controller every min. This way there is no metric drop.
+# Can be used when the data rarely changes or to reduce the load while fetching metrics every minute.
+taskSchedule:
+  numberOfThreads: 1
+  taskDelaySeconds: 300

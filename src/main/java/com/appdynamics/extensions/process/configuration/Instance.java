@@ -18,7 +18,7 @@ package com.appdynamics.extensions.process.configuration;
 public class Instance {
     private String displayName;
     private String regex;
-    private Integer pid;
+    private String pid;
 
     public String getDisplayName() {
         return displayName;
@@ -36,11 +36,11 @@ public class Instance {
         this.regex = regex;
     }
 
-    public Integer getPid() {
+    public String getPid() {
         return pid;
     }
 
-    public void setPid(Integer pid) {
+    public void setPid(String pid) {
         this.pid = pid;
     }
 }
