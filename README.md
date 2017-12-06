@@ -7,7 +7,7 @@ Process Monitoring Extension gathers process metrics from a Linux/Windows/Solari
 
 This can also be used as a process checker (identify whether a process is running/not running) by its metric "Running Instances". If the configured process is not running, the "Running Instances" metric value reported is "ZERO".
 
-Apart from the "Running Instances" metric, other process metrics are reported only if the extension finds a single instance of the process ("Running Instances" metric value is "ONE").
+Apart from the "Running Instances" metric, other process metrics are reported ONLY if the extension detects a single instance of the process running ("Running Instances" metric value is "ONE").
 
 **Note**: If running on Windows, this extension has Sigar dependencies. Please make sure to copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>\lib` to `<MachineAgent>\monitorLibs`
 
@@ -18,7 +18,7 @@ Apart from the "Running Instances" metric, other process metrics are reported on
 4. Verify the extension output in workbench mode and make sure desired metrics are reported. Check in WorkBench section for details.
 5. Restart the Machine Agent
 
-In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Individual Nodes | <Node> | Custom Metrics | Process Monitor | \<OS\> Processes
+In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Individual Nodes | \<Node\> | Custom Metrics | Process Monitor | \<OS\> Processes
 
 ## Configuration
 **Note**: Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/)
@@ -29,7 +29,7 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
    metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
    metricPrefix: "Custom Metrics|Process Monitor|"
    ```
- 2. `instances`: process instances that are to be monitored. `displayName` which is mandatory is rendered on the metric browser and the process metrics are reported under this name. The process to be monitored can be configured in three ways: `regex`/`pid`/`pidFile`. 
+ 2. `instances`: process instances that are to be monitored. `displayName` which is mandatory is used to render the process name on the metric browser and all the process metrics are reported under this name. The process to be monitored can be configured in three ways: `regex`/`pid`/`pidFile`. 
    For process checker, in case of regex, please make sure the pattern uniquely identifies the process of interest.
    ```
     instances:
@@ -70,6 +70,19 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
 1. Running Instances: Count of the matched processes that are identified by regex.
 2. CPU%, Memory%, Resident Set Size: Reported only if Running Instances metric value is ONE
 
+## Configuring additional Metrics
+Additional metrics can be configured in unix like systems by adding them to the respective commands in config.yml. For example if Virtual Memory Size of a Linux process is needed, the linux command can be modified to the following
+```
+ linux:
+      process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rsz=RSS,vsz=VSZ,args"
+```
+and the metric properties to 
+```
+ metrics:
+   - VSZ:
+      alias: "Virtual Memory Size"
+```
+
 ## WorkBench
 Workbench is a feature that lets you preview the metrics before registering it with the controller. This is useful if you want to fine tune the configurations. Workbench is embedded into the extension jar.
 To use the workbench
@@ -90,13 +103,13 @@ This starts an http server at `http://host:9090/`. This can be accessed from the
 4. Collect Debug Logs: Edit the file, `<MachineAgent>/conf/logging/log4j.xml` and update the level of the appender "com.appdynamics" and "com.singularity" to debug.
 5. In windows, if there is a java.lang.NoClassDefFoundError: org/hyperic/sigar/SigarException in machine-agent.log, please copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>/lib` to `<MachineAgent>/monitorsLibs`.
 
-##Contributing
+## Contributing
 Always feel free to fork and contribute any changes directly here on GitHub.
 
-##Community
+## Community
 
 Find out more in the [AppSphere](https://www.appdynamics.com/community/exchange/extension/process-monitoring-extension/) community.
 
-##Support
+## Support
 
 For any questions or feature request, please contact [AppDynamics Support](mailto:help@appdynamics.com).

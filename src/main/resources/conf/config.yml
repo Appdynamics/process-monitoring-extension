@@ -43,6 +43,6 @@ numberOfThreads: 2
 # This is to run this in scheduled mode. In this case, the extension will fetch the data every 300 seconds
 # and caches the data. The cached data will be reported to controller every min. This way there is no metric drop.
 # Can be used when the data rarely changes or to reduce the load while fetching metrics every minute.
-taskSchedule:
-  numberOfThreads: 1
-  taskDelaySeconds: 300
+#taskSchedule:
+#  numberOfThreads: 1
+#  taskDelaySeconds: 300
