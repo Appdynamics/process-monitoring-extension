@@ -21,7 +21,9 @@ Apart from the "Running Instances" metric, other process metrics are reported ON
 In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Individual Nodes | \<Node\> | Custom Metrics | Process Monitor | \<OS\> Processes
 
 ## Configuration
-**Note**: Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/)
+**Note**: Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/). 
+
+**Note**: Please use workbench mode to verify the metrics while experimenting with various configurations in config.yml to arrive at the desired result.
 
 Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to update the following.
  1. `metricPrefix`: If you wish to report metrics only to the tier which this MachineAgent is reporting to, please comment the second metricPrefix and update the "<Component-ID>" with TierID or TierName in the first metricPrefix.
@@ -42,6 +44,7 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
       - displayName: "mysql"
         pidFile: "/opt/mysql/db/mysql.pid"
    ```
+   While using regex, it is advisable to use any of the online regex validators (eg: [regextester](https://www.regextester.com/)) to match the regex against the process command line path to verify if it matches.
  3. Commands (Optional). The underlying OS command can be modified to fetch any additional metrics if required. Please execute the command and make sure there is a valid output in a tabular format. Please check man pages for unix like systems. We do not support this option for Windows environment.
    ```
    linux:
@@ -67,8 +70,10 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
         alias: "Running Instances"
    ```
 ## Metrics
-1. Running Instances: Count of the matched processes that are identified by regex.
-2. CPU%, Memory%, Resident Set Size: Reported only if Running Instances metric value is ONE
+1. Running Instances: Count of the matched processes that are identified by regex. The following metrics are reported only if this metric value is ONE.
+2. CPU%
+3. Resident Set Size
+4. Memory% (Not reported for Windows)
 
 ## Configuring additional Metrics
 Additional metrics can be configured in unix like systems by adding them to the respective commands in config.yml. For example if Virtual Memory Size of a Linux process is needed, the linux command can be modified to the following
@@ -98,11 +103,17 @@ This starts an http server at `http://host:9090/`. This can be accessed from the
 
 ## Troubleshooting
 1. For missing custom metrics, please refer to the KB article [here](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695)
-2. Verify Machine Agent Data:Please start the Machine Agent without the extension and make sure that it reports data. Verify that the machine agent status is UP and it is reporting Machine Agent Availability Metric.
-3. Metric Limit: Please start the machine agent with the argument -Dappdynamics.agent.maxMetrics=2000, if there is a metric limit reached error in the logs [Ref](http://docs.appdynamics.com/display/PRO14S/Metrics+Limits).
-4. Collect Debug Logs: Edit the file, `<MachineAgent>/conf/logging/log4j.xml` and update the level of the appender "com.appdynamics" and "com.singularity" to debug.
-5. In windows, if there is a java.lang.NoClassDefFoundError: org/hyperic/sigar/SigarException in machine-agent.log, please copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>/lib` to `<MachineAgent>/monitorsLibs`.
-
+2. In windows, if there is a java.lang.NoClassDefFoundError: org/hyperic/sigar/SigarException in machine-agent.log, please copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>/lib` to `<MachineAgent>/monitorsLibs`.
+3. For regex, some examples and their outcomes:
+```
+ process command line: "/opt/push-jobs-client/bin/ruby /opt/push-jobs-client/bin/pushy-client -c /etc/push-jobs-clientb"
+   regex                         Matches
+   ".*pushy-client.*"            True
+   ".*pushy-client .*"           True
+   ".*pushy-client  .*"          False
+   ".* pushy-client.*"           False
+```
+Please test your regex using any of the online validators (eg: [regextester](https://www.regextester.com/)).
 ## Contributing
 Always feel free to fork and contribute any changes directly here on GitHub.
 

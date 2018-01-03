@@ -98,4 +98,13 @@ public class LinuxParserTest {
         Assert.assertEquals(3, columns1.length);
         Assert.assertEquals("/sbin/init splash", columns1[2]);
     }
+
+    @Test
+    public void testRegexMatch() {
+        String str = "/opt/push-jobs-client/bin/ruby /opt/push-jobs-client/bin/pushy-client -c /etc/push-jobs-clientb";
+        Assert.assertTrue(str.matches(".*pushy-client.*"));
+        Assert.assertTrue(str.matches(".*pushy-client .*"));
+        Assert.assertFalse(str.matches(".*pushy-client  .*"));
+        Assert.assertFalse(str.matches(".* pushy-client.*"));
+    }
 }

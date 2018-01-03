@@ -54,7 +54,6 @@ public class CommandExecutor {
             long endTime = System.currentTimeMillis() - startTime;
             logger.debug("Executing the command " + command + " ended. Time taken is " + endTime);
             List<String> commandOutput = responseParser.getData();
-            logger.trace("Command Output: " + commandOutput);
             return commandOutput;
         } catch (Exception e) {
             logger.error("Error while executing the process " + command, e);

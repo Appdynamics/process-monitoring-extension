@@ -69,6 +69,7 @@ public abstract class Parser {
 
     protected ListMultimap<String, String> filterProcessLinesFromCompleteList(List<String> processOutputList, List<Instance> instances, List<String> headerColumns) {
         ListMultimap<String, String> filteredProcesses = ArrayListMultimap.create();
+        logger.debug("Process list output is: " + processOutputList);
         for (String processLine : processOutputList) {
             if (!Strings.isNullOrEmpty(processLine)) {
                 // Second argument limit in split is to prevent last header (command) from splitting in case of spaces and maintain the size of the array
