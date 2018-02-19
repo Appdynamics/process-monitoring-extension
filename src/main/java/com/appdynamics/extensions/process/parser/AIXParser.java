@@ -1,3 +1,10 @@
+/*
+ * Copyright 2016. AppDynamics LLC and its affiliates.
+ *  All Rights Reserved.
+ *  This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
+ *  The copyright notice above does not evidence any actual or intended publication of such source code.
+ */
+
 package com.appdynamics.extensions.process.parser;
 
 import com.appdynamics.extensions.process.common.MonitorConstants;
