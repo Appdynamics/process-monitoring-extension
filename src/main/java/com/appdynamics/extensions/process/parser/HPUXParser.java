@@ -7,13 +7,29 @@
 
 package com.appdynamics.extensions.process.parser;
 
+import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.data.ProcessData;
+import com.google.common.base.Strings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class HPUXParser extends Parser {
     public Map<String, ProcessData> fetchMetrics(Map<String, ?> config) {
-        return null;
+        List<String> env = new ArrayList<String>();
+        env.add("UNIX95=\"\"");
+        return fetchMetrics(config, getProcessListCommand(getCommands(config)), env);
+    }
+
+    private String getProcessListCommand(Map<String, String> commands) {
+        String cmd;
+        if (commands != null && !Strings.isNullOrEmpty(commands.get("process"))) {
+            cmd = commands.get("process");
+        } else {
+            cmd = MonitorConstants.HPUX_PROCESS_COMMAND;
+        }
+        return cmd;
     }
 
     public String getProcessGroupName() {
@@ -21,6 +37,6 @@ public class HPUXParser extends Parser {
     }
 
     protected Map<String, String> getCommands(Map<String, ?> config) {
-        return null;
+        return (Map) config.get("hpux");
     }
 }

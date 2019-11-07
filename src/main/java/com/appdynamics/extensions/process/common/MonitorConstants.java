@@ -42,5 +42,5 @@ public class MonitorConstants {
     // For Memory machinfo | grep -i memory doesn't work on HP-UX 11.1x, so parsing top command
     public static final String HPUX_TOP_COMMAND = "top -d 1";
     // UNIX95= ps -eo pid,pcpu,vsz,args
-    public static final String HPUX_PROCESS_COMMAND = "ps -eo pid,pcpu,vsz,args";
+    public static final String HPUX_PROCESS_COMMAND = "ps -eo pid,pcpu=CPU%,vsz=VSZ,args";
 }

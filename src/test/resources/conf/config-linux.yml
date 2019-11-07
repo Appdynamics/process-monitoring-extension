@@ -11,6 +11,8 @@ instances:
     regex: ".*java .*"
   - displayName: "hadoop"
     regex: "hadoop"
+  - displayName: "vpn"
+    regex: ".*javaagent.jar.* --spring.application.name=vpnman"
 
 
 # Not necessary to modify

@@ -39,9 +39,10 @@ public class ProcessMonitor extends ABaseMonitor {
     }
 
     public void determineOS() {
-        os = System.getProperty("os.name").toLowerCase();
+        os = System.getProperty("os.name").trim().toLowerCase();
         if (!(os.contains("win") || os.contains("linux") || os.contains("sunos") || os.contains("aix") || os.contains("hp-ux"))) {
             logger.error("Your OS (" + os + ") is not supported by this extension");
+            throw new RuntimeException("Your OS (" + os + ") is not supported by this extension");
         } else {
             logger.debug("OS of the System detected: " + os);
         }

@@ -12,9 +12,13 @@ instances:
   - displayName: "java"
     regex: ".*java.exe.*"
   - displayName: "MachineAgent"
-    regex: ".*java.exe .* machineagent.jar"
+    regex: "D:\\\\Alchemy\\\\environments\\\\PROD_LIB-6000\\\\bin\\\\jdk\\\\win32\\\\jre\\\\bin\\\\java.exe .*"
   - displayName: "Notepad"
     pid: "5384"
+  - displayName: "TryTryAgain"
+    regex: ".*\\\\Service.exe$"
+  - displayName: "wmiprvse"
+    regex: ".*\\\\WmiPrvSE.exe$"
 
 # Not necessary to modify
 linux:

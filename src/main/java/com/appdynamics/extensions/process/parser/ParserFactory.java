@@ -22,7 +22,7 @@ public class ParserFactory {
     public static final Logger logger = Logger.getLogger(ParserFactory.class);
 
     public static Parser createParser(String os) {
-
+        logger.debug("ParserFactory::createParser Creating Parser");
         if (os.contains("linux")) {
             return new LinuxParser();
         } else if (os.contains("win")) {

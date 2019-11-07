@@ -51,3 +51,7 @@
 4736 C:\Windows\system32\java.exe java -Dappdynamics.agent.maxMetrics=2000 -jar machineagent.jar
 5384 C:\Program Files\Notepad++\notepad++.exe C:\Program Files\Notepad++\notepad++.exe
 1044 C:\Windows\system32\java.exe java -Djava.library.path=hyperic-sigar-1.6.4\sigar-bin\lib -jar sigar-tests.jar
+104444 D:\Alchemy\environments\PROD_LIB-6000\bin\jdk\win32\jre\bin\java.exe d:\Alchemy\environments\PROD_LIB-6000\bin\jdk\win32\jre\bin\java
+5936 D:\Program Files\Kaazing\JMS\4.5\Gateway\service\Service.exe D:\Program Files\Kaazing\JMS\4.5\Gateway\service\Service.exe
+8612 D:\MachineAgent\machineagent-bundle-64bit-windows-4.4.3.1214\bin\MachineAgentService.exe D:\MachineAgent\machineagent-bundle-64bit-windows-4.4.3.1214\bin\MachineAgentService.exe
+28836 C:\Windows\system32\wbem\wmiprvse.exe C:\Windows\system32\wbem\wmiprvse.exe

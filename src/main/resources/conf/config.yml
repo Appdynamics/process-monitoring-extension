@@ -25,10 +25,15 @@ solaris:
 aix:
   process: "ps -eo pid,pcpu=CPU%,pmem=Memory%,rss=RSS,args"
 
+hpux:
+  process: "ps -e -o pid -o pcpu=CPU%  -o vsz=VSZ -o args"
+
 
 metrics:
   - CPU%:
      multiplier: 1
+  - VSZ:
+      alias: "VSZ"
   - Memory%:
      alias: "Memory%"
   - RSS:

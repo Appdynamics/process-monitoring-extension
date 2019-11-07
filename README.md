@@ -31,8 +31,9 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
    metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
    metricPrefix: "Custom Metrics|Process Monitor|"
    ```
- 2. `instances`: process instances that are to be monitored. `displayName` which is mandatory is used to render the process name on the metric browser and all the process metrics are reported under this name. The process to be monitored can be configured in three ways: `regex`/`pid`/`pidFile`. 
-   For process checker, in case of regex, please make sure the pattern uniquely identifies the process of interest.
+ 2. `instances`: process instances that are to be monitored. `displayName` which is mandatory is used to render the process name on the metric browser and all the process metrics are reported under this name. The process to be monitored can be configured in three ways: `regex`/`pid`/`pidFile`. regex is a regular expression used to match the process and is built based on the command line path to the process. For process checker use case with regex, please make sure the pattern uniquely identifies the process of interest. 
+   
+    For help picking the regex in various OS's please refer to the Troubleshooting section Step 3.
    ```
     instances:
       - displayName: "machine agent"
@@ -105,7 +106,43 @@ This starts an http server at `http://host:9090/`. This can be accessed from the
 ## Troubleshooting
 1. For missing custom metrics, please refer to the KB article [here](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695)
 2. In windows, if there is a java.lang.NoClassDefFoundError: org/hyperic/sigar/SigarException in machine-agent.log, please copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>/lib` to `<MachineAgent>/monitorsLibs`.
-3. For regex, some examples and their outcomes:
+3. Retrieving command line path and building regex for a process:
+   
+   regex in config.yml is a regular expression used to match the process and is built on the command line path to the process. 
+   
+   Command line of the process can be retrieved by executing ps/wmic command on a terminal in *nix/windows systems.
+   
+   **Unix-like systems**
+   
+   The args option in the command used (in config.yml) to fetch process statistics gives the command line path to the process.
+   
+   Linux command:
+   ```
+    ps -eo pid,%cpu=CPU%,%mem=Memory%,rsz=RSS,args | grep "java"
+    Output: 
+    2877 57.3     1.6    264708 java -jar machineagent.jar
+   ```   
+   command line here is "java -jar machineagent.jar" and regex could be ".*machineagent.jar"
+   
+   **Windows**
+   
+   The command line path to the process can be figured out either using Task Manager or by using wmic command.
+   
+   Task Manager:
+   Open Task Manager and in the Processes tab, check if "Command Line" column is already displayed. If not, click on View -> Select Columns in the menu bar and checkbox the "Command Line" column to appear on the Processes page. Pick the Command Line of the process of interest.
+   
+   Command: 
+   ```
+    wmic process get /format:list | findstr java
+    Output:
+    Caption=java.exe
+    CommandLine=jre\bin\java.exe  -jar machineagent.jar
+    Description=java.exe
+    ExecutablePath=C:\machineagent-bundle-32bit-windows-4.3.3.8\jre\bin\java.exe
+   ```
+   command line here is "C:\machineagent-bundle-32bit-windows-4.3.3.8\jre\bin\java.exe -jar machineagent.jar" and regex could be ".*java.exe -jar machineagent.jar"
+
+4. For regex, some examples and their outcomes:
 ```
  process command line: "/opt/push-jobs-client/bin/ruby /opt/push-jobs-client/bin/pushy-client -c /etc/push-jobs-clientb"
    regex                         Matches

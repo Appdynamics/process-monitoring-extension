@@ -28,7 +28,7 @@ import java.util.List;
 public class CommandExecutor {
     private static Logger logger = Logger.getLogger(CommandExecutor.class);
 
-    public List<String> execute(String command, List<String> env) {
+    public static List<String> execute(String command, List<String> env) {
         return init(command, env);
     }
 

@@ -60,12 +60,15 @@ public class LinuxParserTest {
         // If instance count is > 1, no metrics will be reported
         Assert.assertNull(biosetProcessData.get("CPU%"));
 
-        Map<String, String> javaProcessData = processDataMap.get("java").getProcessMetrics();
-        Assert.assertEquals(String.valueOf(1), javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
-        Assert.assertEquals(String.valueOf(264708), javaProcessData.get("RSS"));
+        /*Map<String, String> javaProcessData = processDataMap.get("java").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(2), javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Assert.assertEquals(String.valueOf(264708), javaProcessData.get("RSS"));*/
 
         Map<String, String> hadoopProcessData = processDataMap.get("hadoop").getProcessMetrics();
         Assert.assertEquals(String.valueOf(0), hadoopProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+
+        Map<String, String> vpn = processDataMap.get("vpn").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(1), vpn.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
     }
 
     @Test

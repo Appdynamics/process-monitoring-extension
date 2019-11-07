@@ -39,16 +39,24 @@ public class ProcessMonitorTask implements AMonitorTaskRunnable {
     public ProcessMonitorTask(MonitorConfiguration monitorConfiguration, MetricWriteHelper metricWriteHelper, String os) {
         this.monitorConfiguration = monitorConfiguration;
         this.metricWriteHelper = metricWriteHelper;
-        this.os = os;
+        this.os = os.toLowerCase();
     }
     public void run() {
-        Map<String, ?> config = monitorConfiguration.getConfigYml();
-        Parser parser = ParserFactory.createParser(os);
-        if (parser != null) {
-            Map<String, ProcessData> processDataMap = parser.fetchMetrics(config);
-            String metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).append(MonitorConstants.METRIC_SEPARATOR).toString();
-            List<Metric> metrics = buildMetrics(metricPrefix, processDataMap, config);
-            metricWriteHelper.transformAndPrintMetrics(metrics);
+        try {
+            logger.debug("ProcessMonitorTask::run Started");
+            Map<String, ?> config = monitorConfiguration.getConfigYml();
+            Parser parser = ParserFactory.createParser(os);
+            if (parser != null) {
+                Map<String, ProcessData> processDataMap = parser.fetchMetrics(config);
+                String metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).append(MonitorConstants.METRIC_SEPARATOR).toString();
+                List<Metric> metrics = buildMetrics(metricPrefix, processDataMap, config);
+                logger.debug("Metrics size is " + metrics.size());
+                metricWriteHelper.transformAndPrintMetrics(metrics);
+            } else {
+                logger.debug("No matching parser found for this OS:" + os);
+            }
+        } catch (Exception e) {
+            logger.error("Exception in ProcessMonitorTask: ", e);
         }
     }
 

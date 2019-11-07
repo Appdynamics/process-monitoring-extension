@@ -35,6 +35,7 @@ public class WindowsParser extends Parser {
     public static final Logger logger = Logger.getLogger(WindowsParser.class);
 
     public Map<String, ProcessData> fetchMetrics(Map<String, ?> config) {
+        logger.debug("WindowsParser::fetchMetrics");
         List<Instance> instances = new ConfigProcessor().processConfig(config);
         // all process lines
         List<String> processListOutput = fetchProcessListFromSigar();
@@ -47,6 +48,7 @@ public class WindowsParser extends Parser {
 
     public List<String> fetchProcessListFromSigar() {
         List<String> processLines = new ArrayList<String>();
+        logger.debug("Fetching process list from Sigar ");
         Sigar sigar = new Sigar();
         try {
             long [] pids = sigar.getProcList();
@@ -64,6 +66,7 @@ public class WindowsParser extends Parser {
         } catch (SigarException e) {
             logger.warn(e.getMessage());
         }
+        logger.debug("Completed fetching process list from Sigar");
         return processLines;
     }
 
@@ -95,7 +98,9 @@ public class WindowsParser extends Parser {
     protected Double getProcCPU(Sigar sigar, String pid) {
         try {
             ProcCpu procCpu = sigar.getProcCpu(pid);
-            return procCpu.getPercent();
+            Double cpuPercent = procCpu.getPercent();
+            logger.debug("CPU% returned from Sigar is " + cpuPercent);
+            return cpuPercent;
         } catch (SigarException e) {
             logger.error("Error while fetching cpu% for process " + pid, e);
         }
