@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2013. AppDynamics LLC and its affiliates.
-  ~  All Rights Reserved.
-  ~  This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
-  ~  The copyright notice above does not evidence any actual or intended publication of such source code.
+  ~ Copyright 2020 AppDynamics LLC and its affiliates
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -185,8 +195,10 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>com.appdynamics.extensions.workbench.WorkbenchServerLauncher</Main-Class>
-                                        <Implementation-Title>Process Monitor v${project.version} Build Date ${maven.build.timestamp}
+                                        <Main-Class>com.appdynamics.extensions.workbench.WorkbenchServerLauncher
+                                        </Main-Class>
+                                        <Implementation-Title>Process Monitor v${project.version} Build Date
+                                            ${maven.build.timestamp}
                                         </Implementation-Title>
                                     </manifestEntries>
                                 </transformer>
@@ -218,7 +230,8 @@
                                     <fileset dir="${project.basedir}" includes="NOTICE.txt"/>
                                 </copy>
                                 <copy todir="${target.dir}">
-                                    <fileset dir="${project.build.directory}" includes="${project.artifactId}.${project.packaging}"/>
+                                    <fileset dir="${project.build.directory}"
+                                             includes="${project.artifactId}.${project.packaging}"/>
                                 </copy>
                                 <zip destfile="${target.dir}-${project.version}.zip">
                                     <zipfileset dir="${target.dir}" filemode="755" prefix="ProcessMonitor/"/>
