@@ -25,7 +25,6 @@ solaris:
 aix:
   process: "ps -eo pid,pcpu=CPU%,pmem=Memory%,rss=RSS,args"
 
-
 metrics:
   - CPU%:
      multiplier: 1
