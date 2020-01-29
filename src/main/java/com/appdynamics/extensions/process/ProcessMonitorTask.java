@@ -18,7 +18,7 @@ package com.appdynamics.extensions.process;
 
 import com.appdynamics.extensions.AMonitorTaskRunnable;
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.data.ProcessData;
@@ -33,11 +33,11 @@ import java.util.Map;
 public class ProcessMonitorTask implements AMonitorTaskRunnable {
 
     private static final Logger logger = Logger.getLogger(ProcessMonitorTask.class);
-    private MonitorConfiguration monitorConfiguration;
+    private MonitorContextConfiguration monitorConfiguration;
     private MetricWriteHelper metricWriteHelper;
     private String os;
 
-    public ProcessMonitorTask(MonitorConfiguration monitorConfiguration, MetricWriteHelper metricWriteHelper, String os) {
+    public ProcessMonitorTask(MonitorContextConfiguration monitorConfiguration, MetricWriteHelper metricWriteHelper, String os) {
         this.monitorConfiguration = monitorConfiguration;
         this.metricWriteHelper = metricWriteHelper;
         this.os = os;
