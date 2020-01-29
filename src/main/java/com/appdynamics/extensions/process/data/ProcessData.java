@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class ProcessData {
 
-    Map<String, String> processMetrics;
+    private Map<String, String> processMetrics;
 
     public Map<String, String> getProcessMetrics() {
         if (processMetrics == null) {

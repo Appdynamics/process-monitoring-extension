@@ -16,29 +16,31 @@
  */
 package com.appdynamics.extensions.process.parser;
 
-import org.apache.log4j.Logger;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
+import org.slf4j.Logger;
+
+import static com.appdynamics.extensions.process.common.MonitorConstants.*;
 
 public class ParserFactory {
 
-    public static final Logger logger = Logger.getLogger(ParserFactory.class);
+    public static final Logger logger = ExtensionsLoggerFactory.getLogger(ParserFactory.class);
 
     public static Parser createParser(String os) {
 
-        if (os.contains("linux")) {
+        if (os.contains(LINUX)) {
             return new LinuxParser();
-        } else if (os.contains("win")) {
+        } else if (os.contains(WINDOWS)) {
             return new WindowsParser();
-        } else if (os.contains("sunos")) {
+        } else if (os.contains(SUNOS)) {
             return new SolarisParser();
-        } else if (os.contains("aix")) {
+        } else if (os.contains(AIX)) {
             return new AIXParser();
-        } else if (os.contains("hp-ux")) {
+        } else if (os.contains(HP_UX)) {
             return new HPUXParser();
         } else {
             logger.error("Error in initializing Parser for " + os + " Process Extension doesn't support this OS");
             return null;
             // null is handled in ProcessMonitorTask
         }
-
     }
 }

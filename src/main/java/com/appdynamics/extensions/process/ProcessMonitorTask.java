@@ -19,20 +19,23 @@ package com.appdynamics.extensions.process;
 import com.appdynamics.extensions.AMonitorTaskRunnable;
 import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.data.ProcessData;
 import com.appdynamics.extensions.process.parser.Parser;
 import com.appdynamics.extensions.process.parser.ParserFactory;
 import com.google.common.collect.Lists;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Map;
 
+import static com.appdynamics.extensions.process.common.MonitorConstants.METRICS;
+
 public class ProcessMonitorTask implements AMonitorTaskRunnable {
 
-    private static final Logger logger = Logger.getLogger(ProcessMonitorTask.class);
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(ProcessMonitorTask.class);
     private MonitorContextConfiguration monitorConfiguration;
     private MetricWriteHelper metricWriteHelper;
     private String os;
@@ -56,7 +59,7 @@ public class ProcessMonitorTask implements AMonitorTaskRunnable {
 
     public List<Metric> buildMetrics(String metricPrefix, Map<String, ProcessData> processDataMap, Map<String, ?> config) {
         List<Metric> metrics = Lists.newArrayList();
-        List<Map<String, ?>> metricsFromConfig = (List<Map<String, ?>>) config.get("metrics");
+        List<Map<String, ?>> metricsFromConfig = (List<Map<String, ?>>) config.get(METRICS);
         // Iterate through fetched metrics
         for (Map.Entry<String, ProcessData> entry : processDataMap.entrySet()) {
             String processName = entry.getKey();

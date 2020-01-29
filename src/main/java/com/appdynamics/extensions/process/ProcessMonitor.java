@@ -25,8 +25,7 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.Map;
 
-import static com.appdynamics.extensions.process.utils.Constants.*;
-
+import static com.appdynamics.extensions.process.common.MonitorConstants.*;
 
 public class ProcessMonitor extends ABaseMonitor {
 
@@ -46,8 +45,8 @@ public class ProcessMonitor extends ABaseMonitor {
     }
 
     private boolean determineValidOS() {
-        os = System.getProperty("os.name").toLowerCase();
-        if (!(os.contains("win") || os.contains("linux") || os.contains("sunos") || os.contains("aix") || os.contains("hp-ux"))) {
+        os = System.getProperty(OS_NAME).toLowerCase();
+        if (!(os.contains(WINDOWS) || os.contains(LINUX) || os.contains(SUNOS) || os.contains(AIX) || os.contains(HP_UX))) {
             return false;
         }
         return true;
@@ -55,17 +54,17 @@ public class ProcessMonitor extends ABaseMonitor {
 
     @Override
     protected String getDefaultMetricPrefix() {
-        return CUSTOMMETRICS + METRICS_SEPARATOR + MONITORNAME;
+        return CUSTOM_METRICS + METRIC_SEPARATOR + MONITOR_NAME;
     }
 
     @Override
     public String getMonitorName() {
-        return MONITORNAME;
+        return MONITOR_NAME;
     }
 
     protected List<Map<String, ?>> getServers() {
-        List<Map<String, ?>> servers = (List<Map<String, ?>>) getContextConfiguration().getConfigYml().get("instances");
-        AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
+        List<Map<String, ?>> servers = (List<Map<String, ?>>) getContextConfiguration().getConfigYml().get(INSTANCES);
+        AssertUtils.assertNotNull(servers, "The 'instances' section in config.yml is not initialised");
         return servers;
     }
 }

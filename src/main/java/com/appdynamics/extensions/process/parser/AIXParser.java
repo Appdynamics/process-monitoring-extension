@@ -17,15 +17,18 @@
 
 package com.appdynamics.extensions.process.parser;
 
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.data.ProcessData;
 import com.google.common.base.Strings;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.util.Map;
 
+import static com.appdynamics.extensions.process.common.MonitorConstants.*;
+
 public class AIXParser extends Parser {
-    public static final Logger logger = Logger.getLogger(AIXParser.class);
+    public static final Logger logger = ExtensionsLoggerFactory.getLogger(AIXParser.class);
 
     public Map<String, ProcessData> fetchMetrics(Map<String, ?> config) {
         return fetchMetrics(config, getProcessListCommand(getCommands(config)));
@@ -33,8 +36,8 @@ public class AIXParser extends Parser {
 
     private String getProcessListCommand(Map<String, String> commands) {
         String cmd;
-        if (commands != null && !Strings.isNullOrEmpty(commands.get("process"))) {
-            cmd = commands.get("process");
+        if (commands != null && !Strings.isNullOrEmpty(commands.get(PROCESS))) {
+            cmd = commands.get(PROCESS);
         } else {
             cmd = MonitorConstants.AIX_PROCESS_LIST_COMMAND;
         }
@@ -43,10 +46,10 @@ public class AIXParser extends Parser {
 
 
     public String getProcessGroupName() {
-        return "AIX Processes";
+        return AIX_PROCESSES;
     }
 
     protected Map<String, String> getCommands(Map<String, ?> config) {
-        return (Map) config.get("aix");
+        return (Map) config.get(AIX);
     }
 }

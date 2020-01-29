@@ -16,6 +16,7 @@
  */
 package com.appdynamics.extensions.process.parser;
 
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.configuration.ConfigProcessor;
 import com.appdynamics.extensions.process.configuration.Instance;
@@ -24,16 +25,18 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.log4j.Logger;
 import org.hyperic.sigar.*;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.appdynamics.extensions.process.common.MonitorConstants.*;
+
 public class WindowsParser extends Parser {
 
-    public static final Logger logger = Logger.getLogger(WindowsParser.class);
+    public static final Logger logger = ExtensionsLoggerFactory.getLogger(WindowsParser.class);
 
     public Map<String, ProcessData> fetchMetrics(Map<String, ?> config) {
         List<Instance> instances = new ConfigProcessor().processConfig(config);
@@ -80,10 +83,10 @@ public class WindowsParser extends Parser {
                 Double cpuPercent = getProcCPU(sigar, pid);
                 Long residentMem = getProcMem(sigar, pid);
                 if (cpuPercent != null) {
-                    processMetrics.put("CPU%", String.valueOf(cpuPercent));
+                    processMetrics.put(CPU_PERCENT, String.valueOf(cpuPercent));
                 }
                 if (residentMem != null) {
-                    processMetrics.put("RSS", String.valueOf(residentMem));
+                    processMetrics.put(RSS, String.valueOf(residentMem));
                 }
             }
             processMetrics.put(MonitorConstants.RUNNING_INSTANCES_COUNT, String.valueOf(processLines.size()));
@@ -121,7 +124,7 @@ public class WindowsParser extends Parser {
     }
 
     public String getProcessGroupName() {
-        return "Windows Processes";
+        return WINDOWS_PROCESSES;
     }
 
     protected Map<String, String> getCommands(Map<String, ?> config) {

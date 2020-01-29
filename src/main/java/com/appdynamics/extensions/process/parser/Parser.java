@@ -16,6 +16,7 @@
  */
 package com.appdynamics.extensions.process.parser;
 
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.process.common.CommandExecutor;
 import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.configuration.ConfigProcessor;
@@ -27,7 +28,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.Map;
 
 public abstract class Parser {
 
-    public static final Logger logger = Logger.getLogger(Parser.class);
+    public static final Logger logger = ExtensionsLoggerFactory.getLogger(Parser.class);
 
     public abstract String getProcessGroupName();
 
@@ -49,8 +50,7 @@ public abstract class Parser {
         AssertUtils.assertNotNull(processListOutput, "The output from " + cmd + " is null");
         List<String> headers = getHeaders(processListOutput, cmd);
         ListMultimap<String, String> filteredProcessLines = filterProcessLinesFromCompleteList(processListOutput.subList(1, processListOutput.size()), instances, headers);
-        Map<String, ProcessData> processMetrics = populateProcessesData(instances, filteredProcessLines, headers);
-        return processMetrics;
+        return populateProcessesData(instances, filteredProcessLines, headers);
 
     }
 
