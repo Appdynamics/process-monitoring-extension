@@ -51,7 +51,7 @@ public class ProcessMonitorTask implements AMonitorTaskRunnable {
         Parser parser = ParserFactory.createParser(os);
         if (parser != null) {
             Map<String, ProcessData> processDataMap = parser.fetchMetrics(config);
-            String metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).append(MonitorConstants.METRIC_SEPARATOR).toString();
+            String metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).toString();
             List<Metric> metrics = buildMetrics(metricPrefix, processDataMap, config);
             metricWriteHelper.transformAndPrintMetrics(metrics);
         }

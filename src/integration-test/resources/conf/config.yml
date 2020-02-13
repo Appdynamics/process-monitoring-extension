@@ -1,5 +1,5 @@
 #metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
-metricPrefix: "Custom Metrics|Process Monitor|"
+metricPrefix: "Custom Metrics|Process Monitor"
 
 # displayName: required - Metrics to be reported under this name in Controller's Metric Browser
 # regex/pid/pidFile - process is fetched using this field
@@ -7,16 +7,16 @@ instances:
   - displayName: "machine agent"
     regex: ".* machineagent.jar"
 
-#  - displayName: "ssh"
-#    pid: "1056"
-
-#  - displayName: "mysql"
-#    pidFile: "/opt/mysql/db/mysql.pid"
+  - displayName: "ssh"
+    pid: "1056"
 
 
 # Not necessary to modify
+#linux:
+#  process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rss=RSS,args"
+# Alpine Linux on docker container
 linux:
-  process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rss=RSS,args"
+  process: "ps -eo pid,rss,sid,args"
 
 solaris:
   process: "ps -eo pid,pcpu=CPU%, -o pmem=Memory%, -o rss=RSS -o args"
@@ -33,6 +33,8 @@ metrics:
       alias: "Resident Set Size"
   - Running Instances:
       alias: "Running Instances"
+  - SID:
+      alias: "Security Identifier"
 
 
 # number of concurrent tasks

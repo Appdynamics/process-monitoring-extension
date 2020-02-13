@@ -28,7 +28,7 @@ public class MonitorConstants {
     public static final String LINUX_PROCESSES = "Linux Processes";
     public static final String METRICS = "metrics";
     public static final String METRIC_SEPARATOR = "|";
-    public static final String MONITOR_NAME = "JMX Monitor";
+    public static final String MONITOR_NAME = "Process Monitor";
     public static final String OS_NAME = "os.name";
     public static final String PID_FILE = "pidFile";
     public static final String PID_LOWERCASE = "pid";

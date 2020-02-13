@@ -8,7 +8,7 @@ COPY target/ProcessMonitor-*.zip ProcessMonitor.zip
 RUN unzip -q ProcessMonitor.zip && \
     rm ProcessMonitor.zip
 WORKDIR /opt/appdynamics/machine-agent/monitors/ProcessMonitor
-COPY src/integration-test/resources/conf/config_ci.yml config.yml
+COPY src/integration-test/resources/conf/config.yml config.yml
 # Setup JAVA_HOME
 ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
 ENV PATH="$JAVA_HOME/bin:${PATH}"
