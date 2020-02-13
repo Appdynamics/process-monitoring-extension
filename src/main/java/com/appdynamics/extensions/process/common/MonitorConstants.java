@@ -51,7 +51,7 @@ public class MonitorConstants {
 
     // Commands
     //Linux
-    public static final String LINUX_PROCESS_LIST_COMMAND = "ps -eo pid,%cpu=CPU%,%mem=Memory%,rsz=RSS,args";
+    public static final String LINUX_PROCESS_LIST_COMMAND = "ps -eo pid,%cpu=CPU%,%mem=Memory%,rss=RSS,args";
 
     // Solaris
     public static final String SOLARIS_PROCESS_LIST_COMMAND = "ps -eo pid,pcpu=CPU% -o pmem=Memory% -o rss=RSS -o args";
