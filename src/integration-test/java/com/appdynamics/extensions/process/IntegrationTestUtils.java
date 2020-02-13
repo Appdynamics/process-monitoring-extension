@@ -38,7 +38,7 @@ import static com.appdynamics.extensions.util.JsonUtils.getTextValue;
 public class IntegrationTestUtils {
     private static final Logger logger = ExtensionsLoggerFactory.getLogger(IntegrationTestUtils.class);
     private static File installDir = new File("src/integration-test/resources/conf/");
-    private static File configFile = new File("src/integration-test/resources/conf/config_ci.yml");
+    private static File configFile = new File("src/integration-test/resources/conf/config.yml");
 
     static MetricAPIService initializeMetricAPIService() {
         ControllerAPIService controllerAPIService = initializeControllerAPIService();

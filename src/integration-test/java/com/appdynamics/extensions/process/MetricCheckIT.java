@@ -40,7 +40,7 @@ public class MetricCheckIT {
         JsonNode jsonNode = null;
         if (metricAPIService != null) {
             jsonNode = metricAPIService.getMetricData("",
-                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CCassandra%7CLocal%20Cassandra%20Server%201%7CHeart%20Beat&time-range-type=BEFORE_NOW&duration-in-mins=60&output=JSON");
+                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CProcess%20Monitor%7CHeart%20Beat&time-range-type=BEFORE_NOW&duration-in-mins=60&output=JSON");
         }
         Assert.assertNotNull("Cannot connect to controller API", jsonNode);
         if (jsonNode != null) {
@@ -70,14 +70,14 @@ public class MetricCheckIT {
         JsonNode jsonNode = null;
         if (metricAPIService != null) {
             jsonNode = metricAPIService.getMetricData("",
-                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CCassandra%7CLocal%20Cassandra%20Server%201%7CCache%7CChunkCache%7CSize%7CCache%20Size&time-range-type=BEFORE_NOW&duration-in-mins=60&output=JSON");
+                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CProcess%20Monitor%7CLinux%20Processes%7Cmachine%20agent%7CResident%20Set%20Size&time-range-type=BEFORE_NOW&duration-in-mins=60&output=JSON");
         }
         Assert.assertNotNull("Cannot connect to controller API", jsonNode);
         if (jsonNode != null) {
             JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "metricName");
             String metricName = (valueNode == null) ? "" : valueNode.get(0).toString();
             int metricValue = (valueNode == null) ? 0 : valueNode.get(0).asInt();
-            Assert.assertEquals("Metric alias is invalid", "\"Custom Metrics|Cassandra|Local Cassandra Server 1|Cache|ChunkCache|Size|Cache Size\"", metricName);
+            Assert.assertEquals("Metric alias is invalid", "\"Custom Metrics|Process Monitor|Linux Processes|machine agent|Resident Set Size\"", metricName);
             Assert.assertNotNull("Metric Value is  null in last 15min, maybe a stale metric ", metricValue);
         }
     }
@@ -87,7 +87,7 @@ public class MetricCheckIT {
         boolean dashboardPresent = false;
         if (customDashboardAPIService != null) {
             JsonNode allDashboardsNode = customDashboardAPIService.getAllDashboards();
-            dashboardPresent = IntegrationTestUtils.isDashboardPresent("Cassandra SIM Dashboard", allDashboardsNode);
+            dashboardPresent = IntegrationTestUtils.isDashboardPresent("Process Monitor SIM Dashboard", allDashboardsNode);
             Assert.assertTrue(dashboardPresent);
         } else {
             Assert.assertTrue(false);
@@ -99,7 +99,7 @@ public class MetricCheckIT {
         JsonNode jsonNode = null;
         if (metricAPIService != null) {
             jsonNode = metricAPIService.getMetricData("",
-                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CCassandra%7CLocal%20Cassandra%20Server%201%7CCommit%20Log%7CCompletedTasks%7CNumber%20of%20Completed%20Tasks&time-range-type=BEFORE_NOW&duration-in-mins=60&output=JSON");
+                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CProcess%20Monitor%7CLinux%20Processes%7Cmachine%20agent%7CResident%20Set%20Size&time-range-type=BEFORE_NOW&duration-in-mins=60&output=JSON");
         }
         Assert.assertNotNull("Cannot connect to controller API", jsonNode);
         if (jsonNode != null) {

@@ -22,6 +22,7 @@ public class MonitorConstants {
     public static final String CPU_PERCENT = "CPU%";
     public static final String CUSTOM_METRICS = "Custom Metrics";
     public static final String DISPLAY_NAME = "displayName";
+    public static final String HEARTBEAT = "Heart Beat";
     public static final String HP_UX = "hp-ux";
     public static final String INSTANCES = "instances";
     public static final String LINUX = "linux";

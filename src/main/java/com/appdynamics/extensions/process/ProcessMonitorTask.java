@@ -39,6 +39,8 @@ public class ProcessMonitorTask implements AMonitorTaskRunnable {
     private MonitorContextConfiguration monitorConfiguration;
     private MetricWriteHelper metricWriteHelper;
     private String os;
+    private Boolean heartBeatStatus = true;
+    private String metricPrefix; // take from context
 
     public ProcessMonitorTask(MonitorContextConfiguration monitorConfiguration, MetricWriteHelper metricWriteHelper, String os) {
         this.monitorConfiguration = monitorConfiguration;
@@ -51,8 +53,9 @@ public class ProcessMonitorTask implements AMonitorTaskRunnable {
         Parser parser = ParserFactory.createParser(os);
         if (parser != null) {
             Map<String, ProcessData> processDataMap = parser.fetchMetrics(config);
-            String metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).toString();
+            metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).toString();
             List<Metric> metrics = buildMetrics(metricPrefix, processDataMap, config);
+            heartBeatStatus = metrics.isEmpty() ? false : true;
             metricWriteHelper.transformAndPrintMetrics(metrics);
         }
     }
@@ -83,7 +86,11 @@ public class ProcessMonitorTask implements AMonitorTaskRunnable {
         return metrics;
     }
 
+
     public void onTaskComplete() {
+        logger.debug("Task Complete");
+        String metricValue = heartBeatStatus ? "1" : "0";
+        metricWriteHelper.printMetric(monitorConfiguration.getMetricPrefix() +  MonitorConstants.METRIC_SEPARATOR + MonitorConstants.HEARTBEAT, metricValue, "AVERAGE", "AVERAGE", "INDIVIDUAL");
         logger.info("Process Monitoring Extension Task completed");
     }
 }

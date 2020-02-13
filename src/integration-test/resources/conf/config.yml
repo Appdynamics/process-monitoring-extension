@@ -12,11 +12,8 @@ instances:
 
 
 # Not necessary to modify
-#linux:
-#  process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rss=RSS,args"
-# Alpine Linux on docker container
 linux:
-  process: "ps -eo pid,rss,sid,args"
+  process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rss=RSS,args"
 
 solaris:
   process: "ps -eo pid,pcpu=CPU%, -o pmem=Memory%, -o rss=RSS -o args"
@@ -46,3 +43,49 @@ numberOfThreads: 2
 #taskSchedule:
 #  numberOfThreads: 1
 #  taskDelaySeconds: 300
+
+
+
+# Generate a custom dashboard based on the provided template
+customDashboard:
+  enabled: true
+  dashboardName: "Process Monitor SIM Dashboard"
+  # Update the path to the dashboard file.
+  pathToSIMDashboard: "monitors/ProcessMonitor/CustomDashboard_SIM.json"
+  pathToNormalDashboard: "monitors/ProcessMonitor/CustomDashboard_Cassandra.json"
+  periodicDashboardCheckInSeconds: 60
+
+controllerInfo:
+  controllerHost: "${APPDYNAMICS_CONTROLLER_HOST_NAME}"
+  controllerPort: 8080
+  account: "customer1"
+  username: "user1"
+  password: "welcome"
+  encryptedPassword: ""
+  encryptionKey: ""
+  controllerSslEnabled: false
+  enableOrchestration: false
+  uniqueHostId: ""
+  accountAccessKey: "${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY}"
+  machinePath: ""
+  simEnabled: true
+  applicationName: ""
+  tierName: ""
+  nodeName: ""
+
+# Note: If the current "metricPathReplacements" is not working on your current machine,
+# please add escape charaters "\\" before your value. It changes from OS to OS, some need it, some don't
+# For Example, replace: "%" -> Becomes -> replace: "\\%"
+metricPathReplacements:
+  - replace: "%"
+    replaceWith: " %"
+  - replace: "OneMinuteRate"
+    replaceWith: "1 min Rate"
+  - replace: "Running Instances"
+    replaceWith: "Num Of Running Instances"
+  - replace: ","
+    replaceWith: "-"
+  - replace: "."
+    replaceWith: "-"
+  - replace: "ms"
+    replaceWith: ""
