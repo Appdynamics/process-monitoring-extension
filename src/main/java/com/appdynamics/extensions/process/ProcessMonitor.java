@@ -23,6 +23,7 @@ import com.appdynamics.extensions.util.AssertUtils;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,8 +67,10 @@ public class ProcessMonitor extends ABaseMonitor {
 
     protected List<Map<String, ?>> getServers() {
         List<Map<String, ?>> servers = (List<Map<String, ?>>) getContextConfiguration().getConfigYml().get(INSTANCES);
-        AssertUtils.assertNotNull(servers, "The 'instances' section in config.yml is not initialised");
-        return servers;
+        List<Map<String, ?>> oneServer = new ArrayList<>();
+        oneServer.add(servers.get(0));
+        AssertUtils.assertNotNull(oneServer, "The 'instances' section in config.yml is not initialised");
+        return oneServer;
     }
 
     public static void main(String[] args) throws TaskExecutionException {
@@ -76,6 +79,5 @@ public class ProcessMonitor extends ABaseMonitor {
         argsMap.put("config-file", "/Users/bhuvneshkumar/repos/appdynamics/extensions/process-monitoring-extension/src/main/resources/conf/config.yml");
         fileWatcher.execute(argsMap, null);
     }
-
 
 }

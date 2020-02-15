@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.Map;
 
-import static com.appdynamics.extensions.process.common.MonitorConstants.METRICS;
 
 public class ProcessMonitorTask implements AMonitorTaskRunnable {
 
@@ -40,7 +39,6 @@ public class ProcessMonitorTask implements AMonitorTaskRunnable {
     private MetricWriteHelper metricWriteHelper;
     private String os;
     private Boolean heartBeatStatus = true;
-    private String metricPrefix; // take from context
 
     public ProcessMonitorTask(MonitorContextConfiguration monitorConfiguration, MetricWriteHelper metricWriteHelper, String os) {
         this.monitorConfiguration = monitorConfiguration;
@@ -53,16 +51,16 @@ public class ProcessMonitorTask implements AMonitorTaskRunnable {
         Parser parser = ParserFactory.createParser(os);
         if (parser != null) {
             Map<String, ProcessData> processDataMap = parser.fetchMetrics(config);
-            metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).toString();
+            String metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).toString();
             List<Metric> metrics = buildMetrics(metricPrefix, processDataMap, config);
-            heartBeatStatus = metrics.isEmpty() ? false : true;
+            heartBeatStatus = !metrics.isEmpty();
             metricWriteHelper.transformAndPrintMetrics(metrics);
         }
     }
 
     public List<Metric> buildMetrics(String metricPrefix, Map<String, ProcessData> processDataMap, Map<String, ?> config) {
         List<Metric> metrics = Lists.newArrayList();
-        List<Map<String, ?>> metricsFromConfig = (List<Map<String, ?>>) config.get(METRICS);
+        List<Map<String, ?>> metricsFromConfig = (List<Map<String, ?>>) config.get(MonitorConstants.METRICS);
         // Iterate through fetched metrics
         for (Map.Entry<String, ProcessData> entry : processDataMap.entrySet()) {
             String processName = entry.getKey();

@@ -44,3 +44,45 @@ numberOfThreads: 2
 #taskSchedule:
 #  numberOfThreads: 1
 #  taskDelaySeconds: 300
+
+
+# Generate a custom dashboard based on the provided template
+customDashboard:
+  enabled: true
+  dashboardName: "Process Monitor Dashboard"
+  # Update the path to the dashboard file.
+  pathToSIMDashboard: "monitors/ProcessMonitor/CustomDashboard_SIM.json"
+  pathToNormalDashboard: "monitors/ProcessMonitor/ProcessMonitorDashboard.json"
+
+controllerInfo:
+  controllerHost: "controller"
+  controllerPort: 8080
+  account: "customer1"
+  username: "user1"
+  password: "welcome"
+  encryptedPassword: ""
+  encryptionKey: ""
+  controllerSslEnabled: false
+  enableOrchestration: false
+  uniqueHostId: ""
+  accountAccessKey: ""
+  machinePath: ""
+  simEnabled: true
+  applicationName: ""
+  tierName: ""
+  nodeName: ""
+
+# Note: If the current "metricPathReplacements" is not working on your current machine,
+# please add escape charaters "\\" before your value. It changes from OS to OS, some need it, some don't
+# For Example, replace: "%" -> Becomes -> replace: "\\%"
+metricPathReplacements:
+  - replace: "Percent"
+    replaceWith: "%"
+  - replace: "OneMinuteRate"
+    replaceWith: "1 min Rate"
+  - replace: ","
+    replaceWith: "-"
+  - replace: "."
+    replaceWith: "-"
+  - replace: "ms"
+    replaceWith: ""

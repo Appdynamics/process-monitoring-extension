@@ -49,10 +49,10 @@ numberOfThreads: 2
 # Generate a custom dashboard based on the provided template
 customDashboard:
   enabled: true
-  dashboardName: "Process Monitor SIM Dashboard"
+  dashboardName: "Process Monitor Dashboard"
   # Update the path to the dashboard file.
   pathToSIMDashboard: "monitors/ProcessMonitor/CustomDashboard_SIM.json"
-  pathToNormalDashboard: "monitors/ProcessMonitor/CustomDashboard_Cassandra.json"
+  pathToNormalDashboard: "monitors/ProcessMonitor/ProcessMonitorDashboard.json"
   periodicDashboardCheckInSeconds: 60
 
 controllerInfo:

@@ -50,12 +50,13 @@ public class MetricCheckIT {
         }
     }
 
+
     @Test
     public void checkTotalNumberOfMetricsReportedIsGreaterThan1() {
         JsonNode jsonNode = null;
         if (metricAPIService != null) {
             jsonNode = metricAPIService.getMetricData("",
-                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CCassandra%7CMetrics%20Uploaded&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
+                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CProcess%20Monitor%7CMetrics%20Uploaded&time-range-type=BEFORE_NOW&duration-in-mins=15&output=JSON");
         }
         Assert.assertNotNull("Cannot connect to controller API", jsonNode);
         if (jsonNode != null) {
@@ -106,7 +107,7 @@ public class MetricCheckIT {
             JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "metricName");
             String metricName = (valueNode == null) ? "" : valueNode.get(0).toString();
             int metricValue = (valueNode == null) ? 0 : valueNode.get(0).asInt();
-            Assert.assertEquals("Metric char replacement is not done", "\"Custom Metrics|Cassandra|Local Cassandra Server 1|Commit Log|CompletedTasks|Number of Completed Tasks\"", metricName);
+            Assert.assertEquals("Metric char replacement is not done", "\"Custom Metrics|Process Monitor|Linux Processes|machine agent|Resident Set Size\"", metricName);
             Assert.assertNotNull("Metric Value is  null in last 15min, maybe a stale metric ", metricValue);
         }
     }

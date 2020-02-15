@@ -245,9 +245,11 @@
                         <configuration>
                             <target>
                                 <mkdir dir="${target.dir}"/>
-                                <copy todir="${target.dir}">
+                                config.yml   <copy todir="${target.dir}">
                                     <fileset dir="src/main/resources/conf" includes="monitor.xml"/>
                                     <fileset dir="src/main/resources/conf" includes="config.yml"/>
+                                    <fileset dir="src/main/resources/conf" includes="CustomDashboard_SIM.json"/>
+                                    <fileset dir="src/main/resources/conf" includes="ProcessMonitorDashboard.json"/>
                                 </copy>
                                 <copy todir="${target.dir}">
                                     <fileset dir="${project.basedir}" includes="LICENSE"/>
