@@ -1,4 +1,5 @@
 FROM alpine:latest
+RUN apk add --no-cache procps
 RUN apk add --no-cache openjdk8
 RUN apk add --no-cache curl
 WORKDIR /opt/appdynamics/machine-agent
@@ -13,4 +14,3 @@ COPY src/integration-test/resources/conf/config.yml config.yml
 ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
 ENV PATH="$JAVA_HOME/bin:${PATH}"
 CMD ["sh", "-c", "java -jar process-monitoring-extension.jar"]
-
