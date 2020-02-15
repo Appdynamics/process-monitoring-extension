@@ -52,7 +52,7 @@ customDashboard:
   dashboardName: "Process Monitor Dashboard"
   # Update the path to the dashboard file.
   pathToSIMDashboard: "monitors/ProcessMonitor/CustomDashboard_SIM.json"
-  pathToNormalDashboard: "monitors/ProcessMonitor/ProcessMonitorDashboard.json"
+  pathToNormalDashboard: "monitors/ProcessMonitor/CustomDashboard_Process.json"
   periodicDashboardCheckInSeconds: 60
 
 controllerInfo:
