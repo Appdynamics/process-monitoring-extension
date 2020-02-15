@@ -88,7 +88,7 @@ public class MetricCheckIT {
         boolean dashboardPresent = false;
         if (customDashboardAPIService != null) {
             JsonNode allDashboardsNode = customDashboardAPIService.getAllDashboards();
-            dashboardPresent = IntegrationTestUtils.isDashboardPresent("Process Monitor SIM Dashboard", allDashboardsNode);
+            dashboardPresent = IntegrationTestUtils.isDashboardPresent("Process Monitor Dashboard", allDashboardsNode);
             Assert.assertTrue(dashboardPresent);
         } else {
             Assert.assertTrue(false);

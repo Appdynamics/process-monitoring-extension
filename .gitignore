@@ -8,7 +8,11 @@
 dist
 *.iml
 /target
-/logs
 .classpath
 .project
 .settings/
+
+*.log
+logs/
+/logs
+.DS_Store
