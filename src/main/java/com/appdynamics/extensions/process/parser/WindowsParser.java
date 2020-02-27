@@ -67,6 +67,8 @@ public class WindowsParser extends Parser {
             }
         } catch (SigarException e) {
             logger.warn(e.getMessage());
+        } finally {
+            sigar.close();
         }
         return processLines;
     }
@@ -80,6 +82,7 @@ public class WindowsParser extends Parser {
             if (processLines.size() == 1) {
                 String pid = processLines.get(0).trim().split(MonitorConstants.SPACES)[0];
                 Sigar sigar = new Sigar();
+
                 Double cpuPercent = getProcCPU(sigar, pid);
                 Long residentMem = getProcMem(sigar, pid);
                 if (cpuPercent != null) {

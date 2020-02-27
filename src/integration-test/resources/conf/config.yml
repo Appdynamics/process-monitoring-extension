@@ -30,9 +30,6 @@ metrics:
       alias: "Resident Set Size"
   - Running Instances:
       alias: "Running Instances"
-  - SID:
-      alias: "Security Identifier"
-
 
 # number of concurrent tasks
 numberOfThreads: 2

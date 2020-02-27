@@ -20,11 +20,9 @@ import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.util.AssertUtils;
-import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,12 +70,4 @@ public class ProcessMonitor extends ABaseMonitor {
         AssertUtils.assertNotNull(oneServer, "The 'instances' section in config.yml is not initialised");
         return oneServer;
     }
-
-    public static void main(String[] args) throws TaskExecutionException {
-        ProcessMonitor fileWatcher = new ProcessMonitor();
-        Map<String, String> argsMap = new HashMap<String, String>();
-        argsMap.put("config-file", "/Users/bhuvneshkumar/repos/appdynamics/extensions/process-monitoring-extension/src/main/resources/conf/config.yml");
-        fileWatcher.execute(argsMap, null);
-    }
-
 }

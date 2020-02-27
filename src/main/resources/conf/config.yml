@@ -7,11 +7,11 @@ instances:
   - displayName: "machine agent"
     regex: ".* machineagent.jar"
 
-#  - displayName: "ssh"
-#    pid: "1056"
+  - displayName: "ssh"
+    pid: "1056"
 
-#  - displayName: "mysql"
-#    pidFile: "/opt/mysql/db/mysql.pid"
+  - displayName: "mysql"
+    pidFile: "/opt/mysql/db/mysql.pid"
 
 
 # Not necessary to modify

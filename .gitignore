@@ -16,3 +16,5 @@ dist
 logs/
 /logs
 .DS_Store
+
+src/test/logs/testCases.log
