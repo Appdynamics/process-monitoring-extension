@@ -82,7 +82,6 @@ public class WindowsParser extends Parser {
             if (processLines.size() == 1) {
                 String pid = processLines.get(0).trim().split(MonitorConstants.SPACES)[0];
                 Sigar sigar = new Sigar();
-
                 Double cpuPercent = getProcCPU(sigar, pid);
                 Long residentMem = getProcMem(sigar, pid);
                 if (cpuPercent != null) {
@@ -105,6 +104,8 @@ public class WindowsParser extends Parser {
             return procCpu.getPercent();
         } catch (SigarException e) {
             logger.error("Error while fetching cpu% for process " + pid, e);
+        } finally {
+            sigar.close();
         }
         return null;
     }
@@ -115,6 +116,8 @@ public class WindowsParser extends Parser {
             return procMem.getResident();
         } catch (SigarException e) {
             logger.error("Error while fetching mem for process " + pid, e);
+        } finally {
+            sigar.close();
         }
         return null;
     }
