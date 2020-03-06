@@ -1,26 +1,37 @@
 # AppDynamics Process Monitoring Extension
-
-This extension works with the AppDynamics Java Machine agent.
+An AppDynamics extension to be used with a standalone Java Machine Agent to provide metrics about the Processes on a machine.
 
 ## Use Case
-Process Monitoring Extension gathers process metrics from a Linux/Windows/Solaris/AIX machine and reports to AppDynamics Controller. It utilizes the ps command in Unix like systems and Sigar library in Windows to fetch basic process metrics.
+Process Monitoring Extension gathers process metrics from a Linux/Windows/Solaris/AIX machine and reports to AppDynamics Controller.
+ It utilizes the ``ps`` command in Unix-like systems and Sigar library in Windows to fetch basic process metrics.
 
-This can also be used as a process checker (identify whether a process is running/not running) by its metric "Running Instances". If the configured process is not running, the "Running Instances" metric value reported is "ZERO".
+This can also be used as a process checker (identify whether a process is running/not running) by its metric "Running Instances". 
+If the configured process is not running, the "Running Instances" metric value reported is "ZERO".
 
-Apart from the "Running Instances" metric, other process metrics are reported ONLY if the extension detects a single instance of the process running ("Running Instances" metric value is "ONE").
+Apart from the "Running Instances" metric, other process metrics are reported ONLY if the extension detects a single instance of the 
+process running ("Running Instances" metric value is "ONE").
 
-**Note**: If running on Windows, this extension has Sigar dependencies. Please make sure to copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>\lib` to `<MachineAgent>\monitorsLibs`
+## Prerequisites
+1. Before the extension is installed, the prerequisites mentioned [here](https://community.appdynamics.com/t5/Knowledge-Base/Extensions-Prerequisites-Guide/ta-p/35213) need to be met. Please do not proceed with the extension installation if the specified prerequisites are not met.
+2.  If running on Windows, this extension has Sigar dependencies. 
+    Please make sure to copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>\lib` to `<MachineAgent>\monitorsLibs`
+
 
 ## Installation
 1. To build from source, clone this repository and run 'mvn clean install'. This will produce a ProcessMonitor-VERSION.zip in the target directory. Alternatively, download the latest release archive from [Github](https://github.com/Appdynamics/process-monitoring-extension/releases/latest).
 2. Unzip as "ProcessMonitor" and copy the "ProcessMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
-3. Configure the extension by editing the config.yml. Refer to the Configuration section for details.
-4. Verify the extension output in workbench mode and make sure desired metrics are reported. Check in WorkBench section for details.
-5. Restart the Machine Agent
+3. Please place the extension in the "monitors" directory of your Machine Agent installation directory. 
+Do not place the extension in the "extensions" directory of your Machine Agent installation directory.
+4.  Edit the config.yml file. An example config.yml file follows these installation instructions.
+5. Verify the extension output in workbench mode and make sure desired metrics are reported. Check in WorkBench section for details.
+6.  Restart the Machine Agent.
+
+
+## Configuration
+
 
 In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Individual Nodes | \<Node\> | Custom Metrics | Process Monitor | \<OS\> Processes
 
-## Configuration
 **Note**: Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/). 
 
 **Note**: Please use workbench mode to verify the metrics while experimenting with various configurations in config.yml to arrive at the desired result.
@@ -70,39 +81,61 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
      - Running Instances:
         alias: "Running Instances"
    ```
-## Metrics
-1. Running Instances: Count of the matched processes that are identified by regex. The following metrics are reported only if this metric value is ONE.
-2. CPU%
-3. Resident Set Size
-4. Memory% (Not reported for Windows)
-
-## Configuring additional Metrics
+### Configuring additional Metrics
 Additional metrics can be configured in unix like systems by adding them to the respective commands in config.yml. For example if Virtual Memory Size of a Linux process is needed, the linux command can be modified to the following
-```
- linux:
-      process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rsz=RSS,vsz=VSZ,args"
-```
+        ```
+         linux:
+              process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rsz=RSS,vsz=VSZ,args"
+        ```
 and the metric properties to 
-```
- metrics:
-   - VSZ:
-      alias: "Virtual Memory Size"
-```
+        ```
+         metrics:
+           - VSZ:
+              alias: "Virtual Memory Size"
+        ```
 
-## WorkBench
-Workbench is a feature that lets you preview the metrics before registering it with the controller. This is useful if you want to fine tune the configurations. Workbench is embedded into the extension jar.
-To use the workbench
+## Metrics
+The following metrics are returned from the extension: 
+    1. Running Instances: Count of the matched processes that are identified by regex. The following metrics are reported only if this metric value is ONE.
+    2. CPU%
+    3. Resident Set Size
+    4. Memory% (Not reported for Windows)
 
-1. Deploy the extension and make all tne necessary configurations.
-2. Start the workbench with the command
-`java -jar /path/to/MachineAgent/monitors/ProcessMonitor/process-monitoring-extension.jar`
-This starts an http server at `http://host:9090/`. This can be accessed from the browser.
-3. If the server is not accessible from outside/browser, you can use the following end points to see the list of registered metrics and errors. #Get the stats `curl http://localhost:9090/api/stats` #Get the registered metrics `curl http://localhost:9090/api/metric-paths`
-4. You can make the changes to config.yml and validate it from the browser or the API
-5. Once the configuration is complete, you can kill the workbench and start the Machine Agent
+ There are several properties that are associated with each metric. They are: 
+    * alias
+    * aggregationType
+    * timeRollUpType
+    * clusterRollUpType
+    * multiplier
+    * convert
+    * delta
+   
+   This format enables you to change some of the metric properties from what the default configurations are.
+
+    In Order to use them for each metric, please use the following example.
+    ```
+            metrics:
+              - CPU%:
+                multiplier: 1
+                alias: "CPU Percentage"
+                clusterRollUpType: "AVERAGE"
+                timeRollUpType: "SUM"
+                aggregationType: "SUM"
+    ```
 
 
-## Troubleshooting
+### metricPathReplacements
+Please visit [this](https://community.appdynamics.com/t5/Knowledge-Base/Metric-Path-CharSequence-Replacements-in-Extensions/ta-p/35412) page to get detailed instructions on configuring Metric Path Character sequence replacements in Extensions.
+    
+
+### Credentials Encryption
+
+Please visit [this page](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-Password-Encryption-with-Extensions/ta-p/29397) to get detailed instructions on password encryption. The steps in this document will guide you through the whole process.
+
+### Extensions Workbench
+Workbench is an inbuilt feature provided with each extension in order to assist you to fine tune the extension setup before you actually deploy it on the controller. Please review the following document on [How to use the Extensions WorkBench](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-the-Extensions-WorkBench/ta-p/30130)
+
+### Troubleshooting
 1. For missing custom metrics, please refer to the KB article [here](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695)
 2. In windows, if there is a java.lang.NoClassDefFoundError: org/hyperic/sigar/SigarException in machine-agent.log, please copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>/lib` to `<MachineAgent>/monitorsLibs`.
 3. For regex, some examples and their outcomes:
@@ -115,13 +148,32 @@ This starts an http server at `http://host:9090/`. This can be accessed from the
    ".* pushy-client.*"           False
 ```
 Please test your regex using any of the online validators (eg: [regextester](https://www.regextester.com/)).
-## Contributing
-Always feel free to fork and contribute any changes directly here on GitHub.
 
-## Community
+### Support Tickets
+If after going through the [Troubleshooting Document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) you have not been able to get your extension working, please file a ticket and add the following information.
 
-Find out more in the [AppSphere](https://www.appdynamics.com/community/exchange/extension/process-monitoring-extension/) community.
+Please provide the following in order for us to assist you better.
 
-## Support
+    1. Stop the running machine agent.
+    2. Delete all existing logs under <MachineAgent>/logs.
+    3. Please enable debug logging by editing the file <MachineAgent>/conf/logging/log4j.xml. Change the level value of the following <logger> elements to debug.
+        <logger name="com.singularity">
+        <logger name="com.appdynamics">
+    4. Start the machine agent and please let it run for 10 mins. Then zip and upload all the logs in the directory <MachineAgent>/logs/*.
+    5. Attach the zipped <MachineAgent>/conf/* directory here.
+    6. Attach the zipped <MachineAgent>/monitors/ExtensionFolderYouAreHavingIssuesWith directory here.
 
-For any questions or feature request, please contact [AppDynamics Support](mailto:help@appdynamics.com).
+For any support related questions, you can also contact help@appdynamics.com.
+
+
+
+### Contributing
+Always feel free to fork and contribute any changes directly here on [GitHub](https://www.appdynamics.com/community/exchange/extension/process-monitoring-extension/).
+
+### Version
+|          Name            |  Version   |
+|--------------------------|------------|
+|Extension Version         |2.1       |
+|Controller Compatibility  |3.7 or Later|
+|Product Tested On         |Linux, Windows 10|
+|Last Update               |1/10/2020|

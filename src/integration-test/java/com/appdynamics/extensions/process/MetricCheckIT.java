@@ -36,22 +36,6 @@ public class MetricCheckIT {
     }
 
     @Test
-    public void whenInstanceIsUpThenHeartBeatIs1ForServer() {
-        JsonNode jsonNode = null;
-        if (metricAPIService != null) {
-            jsonNode = metricAPIService.getMetricData("",
-                    "Server%20&%20Infrastructure%20Monitoring/metric-data?metric-path=Application%20Infrastructure%20Performance%7CRoot%7CCustom%20Metrics%7CProcess%20Monitor%7CHeart%20Beat&time-range-type=BEFORE_NOW&duration-in-mins=60&output=JSON");
-        }
-        Assert.assertNotNull("Cannot connect to controller API", jsonNode);
-        if (jsonNode != null) {
-            JsonNode valueNode = JsonUtils.getNestedObject(jsonNode, "*", "metricValues", "*", "value");
-            int heartBeat = (valueNode == null) ? 0 : valueNode.get(0).asInt();
-            Assert.assertEquals("heartbeat is 0", heartBeat, 1);
-        }
-    }
-
-
-    @Test
     public void checkTotalNumberOfMetricsReportedIsGreaterThan1() {
         JsonNode jsonNode = null;
         if (metricAPIService != null) {
