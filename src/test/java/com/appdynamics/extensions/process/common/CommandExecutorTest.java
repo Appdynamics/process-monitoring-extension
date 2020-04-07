@@ -17,7 +17,6 @@
 
 package com.appdynamics.extensions.process.common;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +26,6 @@ import java.util.List;
 
 public class CommandExecutorTest {
 
-    public static final Logger logger = Logger.getLogger(CommandExecutorTest.class);
     private CommandExecutor commandExecutor;
 
     @Before
