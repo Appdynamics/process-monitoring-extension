@@ -15,6 +15,10 @@ instances:
     regex: ".*java.exe .* machineagent.jar"
   - displayName: "Notepad"
     pid: "5384"
+  - displayName: "TryTryAgain"
+    regex: ".*\\\\Service.exe$"
+  - displayName: "wmiprvse"
+    regex: ".*\\\\WmiPrvSE.exe$"
 
 # Not necessary to modify
 linux:

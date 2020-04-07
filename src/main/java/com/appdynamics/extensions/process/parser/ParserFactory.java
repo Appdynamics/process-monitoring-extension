@@ -26,7 +26,7 @@ public class ParserFactory {
     public static final Logger logger = ExtensionsLoggerFactory.getLogger(ParserFactory.class);
 
     public static Parser createParser(String os) {
-
+        logger.debug("ParserFactory::createParser Creating Parser for OS " + os);
         if (os.contains(LINUX)) {
             return new LinuxParser();
         } else if (os.contains(WINDOWS)) {

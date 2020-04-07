@@ -48,8 +48,8 @@ public class WindowsParserTest {
     public void testParseProcesses() {
         Map<String, ?> configArgs = YmlReader.readFromFile(new File("src/test/resources/conf/config-windows.yml"));
         Mockito.doReturn(processList).when(parser).fetchProcessListFromSigar();
-        Mockito.doReturn(20.0).when(parser).getProcCPU((Sigar) Mockito.anyObject(), Mockito.anyString());
-        Mockito.doReturn(Long.valueOf(20)).when(parser).getProcMem((Sigar) Mockito.anyObject(), Mockito.anyString());
+        Mockito.doReturn(20.0).when(parser).getProcCPU(Mockito.anyString());
+        Mockito.doReturn(Long.valueOf(20)).when(parser).getProcMem(Mockito.anyString());
         Map<String, ProcessData> processDataMap = parser.fetchMetrics(configArgs);
 
         Map<String, String> dockerProcessData = processDataMap.get("docker").getProcessMetrics();
@@ -69,5 +69,11 @@ public class WindowsParserTest {
 
         Map<String, String> notepadProcessData = processDataMap.get("Notepad").getProcessMetrics();
         Assert.assertEquals(String.valueOf(1), notepadProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+
+        Map<String, String> ServiceProcessData = processDataMap.get("TryTryAgain").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(1), ServiceProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+
+        Map<String, String> wmiprvse = processDataMap.get("wmiprvse").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(1), wmiprvse.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
     }
 }

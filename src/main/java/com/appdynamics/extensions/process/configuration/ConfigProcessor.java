@@ -35,6 +35,7 @@ public class ConfigProcessor {
 
     public List<Instance> processConfig(Map<String, ?> config) {
         List<Map> configuredProcesses = (List) config.get(INSTANCES);
+        logger.debug("Number of processes configured to monitor in config.yml is " + configuredProcesses.size());
         List<Instance> instances = Lists.newArrayList();
         for (Map configuredProcess : configuredProcesses) {
             Instance instance = new Instance();

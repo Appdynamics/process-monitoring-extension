@@ -46,7 +46,7 @@ public class ProcessMonitor extends ABaseMonitor {
     }
 
     private boolean determineValidOS() {
-        os = System.getProperty(OS_NAME).toLowerCase();
+        os = System.getProperty(OS_NAME).trim().toLowerCase();
         if (!(os.contains(WINDOWS) || os.contains(LINUX) || os.contains(SUNOS) || os.contains(AIX) || os.contains(HP_UX))) {
             return false;
         }

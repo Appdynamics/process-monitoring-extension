@@ -46,14 +46,22 @@ public class ProcessMonitorTask implements AMonitorTaskRunnable {
     }
 
     public void run() {
-        Map<String, ?> config = monitorConfiguration.getConfigYml();
-        Parser parser = ParserFactory.createParser(os);
-        if (parser != null) {
-            Map<String, ProcessData> processDataMap = parser.fetchMetrics(config);
-            String metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).toString();
-            List<Metric> metrics = buildMetrics(metricPrefix, processDataMap, config);
-            metricWriteHelper.transformAndPrintMetrics(metrics);
+        try{
+            logger.debug("ProcessMonitorTask::run Started");
+            Map<String, ?> config = monitorConfiguration.getConfigYml();
+            Parser parser = ParserFactory.createParser(os);
+            if (parser != null) {
+                Map<String, ProcessData> processDataMap = parser.fetchMetrics(config);
+                String metricPrefix = new StringBuilder(monitorConfiguration.getMetricPrefix()).append(MonitorConstants.METRIC_SEPARATOR).append(parser.getProcessGroupName()).toString();
+                List<Metric> metrics = buildMetrics(metricPrefix, processDataMap, config);
+                metricWriteHelper.transformAndPrintMetrics(metrics);
+            } else {
+                logger.debug("No matching parser found for this OS:" + os);
+            }
+        } catch (Exception e) {
+            logger.error("Exception in ProcessMonitorTask: ", e);
         }
+
     }
 
     public List<Metric> buildMetrics(String metricPrefix, Map<String, ProcessData> processDataMap, Map<String, ?> config) {

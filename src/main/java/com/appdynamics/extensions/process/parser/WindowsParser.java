@@ -39,6 +39,7 @@ public class WindowsParser extends Parser {
     public static final Logger logger = ExtensionsLoggerFactory.getLogger(WindowsParser.class);
 
     public Map<String, ProcessData> fetchMetrics(Map<String, ?> config) {
+        logger.debug("WindowsParser:: In fetchMetrics method");
         List<Instance> instances = new ConfigProcessor().processConfig(config);
         // all process lines
         List<String> processListOutput = fetchProcessListFromSigar();
@@ -51,8 +52,11 @@ public class WindowsParser extends Parser {
 
     public List<String> fetchProcessListFromSigar() {
         List<String> processLines = new ArrayList<String>();
-        Sigar sigar = new Sigar();
+        logger.debug("WindowsParser:: In fetchProcessListFromSigar method ");
+        Sigar sigar = null;
         try {
+            sigar = new Sigar();
+            logger.debug("Fetching process list from Sigar");
             long[] pids = sigar.getProcList();
             for (long pid : pids) {
                 String line = "";
@@ -61,14 +65,16 @@ public class WindowsParser extends Parser {
                     String processArgs = Joiner.on(" ").join(sigar.getProcArgs(pid));
                     line = pid + " " + processName + " " + processArgs;
                 } catch (SigarPermissionDeniedException e) {
-                    logger.trace("Unable to retrieve process name for pid " + pid + " " + e.getMessage());
+                    logger.trace("Unable to retrieve process name for pid " + pid, e);
                 }
                 processLines.add(line);
             }
-        } catch (SigarException e) {
-            logger.warn(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Exception while fetching metrics from Sigar", e);
         } finally {
-            sigar.close();
+            if (sigar != null) {
+                sigar.close();
+            }
         }
         return processLines;
     }
@@ -81,9 +87,8 @@ public class WindowsParser extends Parser {
             List<String> processLines = filteredProcessLines.get(instance.getDisplayName());
             if (processLines.size() == 1) {
                 String pid = processLines.get(0).trim().split(MonitorConstants.SPACES)[0];
-                Sigar sigar = new Sigar();
-                Double cpuPercent = getProcCPU(sigar, pid);
-                Long residentMem = getProcMem(sigar, pid);
+                Double cpuPercent = getProcCPU(pid);
+                Long residentMem = getProcMem(pid);
                 if (cpuPercent != null) {
                     processMetrics.put(CPU_PERCENT, String.valueOf(cpuPercent));
                 }
@@ -98,26 +103,36 @@ public class WindowsParser extends Parser {
         return processesData;
     }
 
-    protected Double getProcCPU(Sigar sigar, String pid) {
+    protected Double getProcCPU(String pid) {
+        Sigar sigar = null;
         try {
+            sigar = new Sigar();
             ProcCpu procCpu = sigar.getProcCpu(pid);
-            return procCpu.getPercent();
+            Double cpuPercent = procCpu.getPercent();
+            logger.debug("CPU% returned from Sigar for {} is {}", pid, cpuPercent);
+            return cpuPercent;
         } catch (SigarException e) {
             logger.error("Error while fetching cpu% for process " + pid, e);
         } finally {
-            sigar.close();
+            if (sigar != null) {
+                sigar.close();
+            }
         }
         return null;
     }
 
-    protected Long getProcMem(Sigar sigar, String pid) {
+    protected Long getProcMem(String pid) {
+        Sigar sigar = null;
         try {
+            sigar = new Sigar();
             ProcMem procMem = sigar.getProcMem(pid);
             return procMem.getResident();
         } catch (SigarException e) {
             logger.error("Error while fetching mem for process " + pid, e);
         } finally {
-            sigar.close();
+            if (sigar != null) {
+                sigar.close();
+            }
         }
         return null;
     }
