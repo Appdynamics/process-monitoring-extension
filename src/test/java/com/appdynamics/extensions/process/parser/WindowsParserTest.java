@@ -62,7 +62,7 @@ public class WindowsParserTest {
         Assert.assertEquals(String.valueOf(1), svchostFilteredData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, String> javaProcessData = processDataMap.get("java").getProcessMetrics();
-        Assert.assertEquals(String.valueOf(2), javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Assert.assertEquals(String.valueOf(3), javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, String> machineAgentProcessData = processDataMap.get("MachineAgent").getProcessMetrics();
         Assert.assertEquals(String.valueOf(1), machineAgentProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
@@ -74,6 +74,6 @@ public class WindowsParserTest {
         Assert.assertEquals(String.valueOf(1), ServiceProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, String> wmiprvse = processDataMap.get("wmiprvse").getProcessMetrics();
-        Assert.assertEquals(String.valueOf(1), wmiprvse.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Assert.assertEquals(String.valueOf(0), wmiprvse.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
     }
 }

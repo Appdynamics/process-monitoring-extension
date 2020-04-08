@@ -8,7 +8,7 @@ instances:
   - displayName: "bioset"
     regex: "\\[bioset\\]"
   - displayName: "java"
-    regex: ".*java .*"
+    regex: ".*machineagent.jar.*"
   - displayName: "hadoop"
     regex: "hadoop"
   - displayName: "vpn"
