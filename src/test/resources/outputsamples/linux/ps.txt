@@ -207,3 +207,4 @@
  3021  1.3     0.0      3928 bash
  3315  0.0     0.0       808 sleep 30
  3317  0.0     0.0      1448 ps -eo pid,%cpu=%CPU,%mem=%Memory,rsz=Memory_KB,args
+ 3390  0.1     1.8    580956 /usr/lib/jvm/jre-1.8.0-openjdk/bin/java -Xmn50m -XX:MaxRAM=1312M -javaagent:/opt/Appdynamics/javaagent.jar -Dappdynamics.agent.applicationName=TDC-OSS-BP-EFT -Dappdynamics.agent.tierName=OSSI_vpnman -Dappdynamics.agent.nodeName=t-ossi-web01.yousee.idk_OSSI_vpnmanEFT -Dspring.cloud.config.uri=http://t-ossi-web01.yousee.idk:8888 -Djavax.net.ssl.trustStore=/var/lib/ossi/conf/ossi-cacerts -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/ossi/heaps -Dfile.encoding=UTF-8 -Dspring.http.multipart.location=/var/cache/tomcat-upload -Djava.io.tmpdir=/var/tmp -XX:+UseG1GC -jar /opt/ossi/vpnman-9041/ossi-vpnman-app-1.2.0-SwaggerDoc-SNAPSHOT.jar --spring.config.location=/var/lib/ossi/conf/ --server.port=9041 --spring.profiles.active=test --spring.application.name=vpnman

@@ -1,8 +1,18 @@
 /*
- * Copyright 2013. AppDynamics LLC and its affiliates.
- *  All Rights Reserved.
- *  This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
- *  The copyright notice above does not evidence any actual or intended publication of such source code.
+ * Copyright 2020 AppDynamics LLC and its affiliates
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
 package com.appdynamics.extensions.process.parser;
@@ -25,8 +35,8 @@ import java.util.Map;
 
 public class WindowsParserTest {
 
-    private WindowsParser parser;
     List<String> processList;
+    private WindowsParser parser;
 
     @Before
     public void setup() throws IOException {
@@ -38,8 +48,8 @@ public class WindowsParserTest {
     public void testParseProcesses() {
         Map<String, ?> configArgs = YmlReader.readFromFile(new File("src/test/resources/conf/config-windows.yml"));
         Mockito.doReturn(processList).when(parser).fetchProcessListFromSigar();
-        Mockito.doReturn(20.0).when(parser).getProcCPU((Sigar) Mockito.anyObject(), Mockito.anyString());
-        Mockito.doReturn(Long.valueOf(20)).when(parser).getProcMem((Sigar) Mockito.anyObject(), Mockito.anyString());
+        Mockito.doReturn(20.0).when(parser).getProcCPU(Mockito.anyString());
+        Mockito.doReturn(Long.valueOf(20)).when(parser).getProcMem(Mockito.anyString());
         Map<String, ProcessData> processDataMap = parser.fetchMetrics(configArgs);
 
         Map<String, String> dockerProcessData = processDataMap.get("docker").getProcessMetrics();
@@ -52,12 +62,18 @@ public class WindowsParserTest {
         Assert.assertEquals(String.valueOf(1), svchostFilteredData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, String> javaProcessData = processDataMap.get("java").getProcessMetrics();
-        Assert.assertEquals(String.valueOf(2), javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Assert.assertEquals(String.valueOf(3), javaProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, String> machineAgentProcessData = processDataMap.get("MachineAgent").getProcessMetrics();
         Assert.assertEquals(String.valueOf(1), machineAgentProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, String> notepadProcessData = processDataMap.get("Notepad").getProcessMetrics();
         Assert.assertEquals(String.valueOf(1), notepadProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+
+        Map<String, String> ServiceProcessData = processDataMap.get("TryTryAgain").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(1), ServiceProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+
+        Map<String, String> wmiprvse = processDataMap.get("wmiprvse").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(0), wmiprvse.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
     }
 }

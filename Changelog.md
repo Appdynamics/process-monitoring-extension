@@ -1,0 +1,32 @@
+# AppDynamics Process Monitoring Extension
+
+
+## Version 2.1
+ * Extension moved to 2.2 framework of Commons Library
+ * Extension tested through the internal testing pipeline
+ * Extension supports all features of the new framework like auto upload of dashboards, metric character replacer, etc.
+ 
+
+
+## Version 2.0.2
+* Moving extension to 2.0 framework.
+* Minor bug fixes
+
+
+## Version 1.1.1
+
+* Main part and Windows part of the Process Monitor now have debug level logging. To see the debug level logs,
+configure the log4j.xml file in your MachineAgent.
+* Minor bug fixes
+
+
+## Version 1.2.0
+
+* Continued reporting of processes that fell below the memory threshold, even after restarting the machine agent. 
+
+
+## Version 1.0.0
+
+* Initial open source release
+
+

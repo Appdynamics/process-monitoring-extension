@@ -1,5 +1,5 @@
 #metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
-metricPrefix: "Custom Metrics|Process Monitor|"
+metricPrefix: "Custom Metrics|Process Monitor"
 
 # displayName: required - Metrics to be reported under this name in Controller's Metric Browser
 # regex/pid/pidFile - process is fetched using this field
@@ -9,9 +9,6 @@ instances:
 
   - displayName: "ssh"
     pid: "1056"
-
-  - displayName: "mysql"
-    pidFile: "/opt/mysql/db/mysql.pid"
 
 
 # Not necessary to modify
@@ -34,7 +31,6 @@ metrics:
   - Running Instances:
       alias: "Running Instances"
 
-
 # number of concurrent tasks
 numberOfThreads: 2
 
@@ -46,6 +42,7 @@ numberOfThreads: 2
 #  taskDelaySeconds: 300
 
 
+
 # Generate a custom dashboard based on the provided template
 customDashboard:
   enabled: true
@@ -53,10 +50,10 @@ customDashboard:
   # Update the path to the dashboard file.
   pathToSIMDashboard: "monitors/ProcessMonitor/CustomDashboard_SIM.json"
   pathToNormalDashboard: "monitors/ProcessMonitor/CustomDashboard_Process.json"
+  periodicDashboardCheckInSeconds: 60
 
-# Default information needs to be updated
 controllerInfo:
-  controllerHost: "controller"
+  controllerHost: "${APPDYNAMICS_CONTROLLER_HOST_NAME}"
   controllerPort: 8080
   account: "customer1"
   username: "user1"
@@ -66,7 +63,7 @@ controllerInfo:
   controllerSslEnabled: false
   enableOrchestration: false
   uniqueHostId: ""
-  accountAccessKey: ""
+  accountAccessKey: "${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY}"
   machinePath: ""
   simEnabled: true
   applicationName: ""
@@ -77,10 +74,12 @@ controllerInfo:
 # please add escape charaters "\\" before your value. It changes from OS to OS, some need it, some don't
 # For Example, replace: "%" -> Becomes -> replace: "\\%"
 metricPathReplacements:
-  - replace: "Percent"
-    replaceWith: "%"
+  - replace: "%"
+    replaceWith: " %"
   - replace: "OneMinuteRate"
     replaceWith: "1 min Rate"
+  - replace: "Running Instances"
+    replaceWith: "Num Of Running Instances"
   - replace: ","
     replaceWith: "-"
   - replace: "."

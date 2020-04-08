@@ -1,20 +1,22 @@
-/**
- * Copyright 2016 AppDynamics
+/*
+ * Copyright 2020 AppDynamics LLC and its affiliates
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 package com.appdynamics.extensions.process.parser;
 
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.process.common.CommandExecutor;
 import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.configuration.ConfigProcessor;
@@ -26,7 +28,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +36,7 @@ import java.util.Map;
 
 public abstract class Parser {
 
-    public static final Logger logger = Logger.getLogger(Parser.class);
+    public static final Logger logger = ExtensionsLoggerFactory.getLogger(Parser.class);
 
     public abstract String getProcessGroupName();
 
@@ -48,8 +50,7 @@ public abstract class Parser {
         AssertUtils.assertNotNull(processListOutput, "The output from " + cmd + " is null");
         List<String> headers = getHeaders(processListOutput, cmd);
         ListMultimap<String, String> filteredProcessLines = filterProcessLinesFromCompleteList(processListOutput.subList(1, processListOutput.size()), instances, headers);
-        Map<String, ProcessData> processMetrics = populateProcessesData(instances, filteredProcessLines, headers);
-        return processMetrics;
+        return populateProcessesData(instances, filteredProcessLines, headers);
 
     }
 
@@ -73,7 +74,7 @@ public abstract class Parser {
         for (String processLine : processOutputList) {
             if (!Strings.isNullOrEmpty(processLine)) {
                 // Second argument limit in split is to prevent last header (command) from splitting in case of spaces and maintain the size of the array
-                String [] processLineColumns = processLine.trim().split(MonitorConstants.SPACES, headerColumns.size());
+                String[] processLineColumns = processLine.trim().split(MonitorConstants.SPACES, headerColumns.size());
                 if (processLineColumns.length == headerColumns.size()) {
                     for (Instance instance : instances) {
                         String regex = instance.getRegex();
@@ -86,7 +87,7 @@ public abstract class Parser {
                                 filteredProcesses.put(displayName, processLine);
                                 logger.debug("Found match for regex " + regex + " in " + commandPath);
                             }
-                        } else if (!Strings.isNullOrEmpty(pidToMatch)){
+                        } else if (!Strings.isNullOrEmpty(pidToMatch)) {
                             String pid = processLineColumns[headerColumns.indexOf(MonitorConstants.PID)].trim();
                             if (pidToMatch.equals(pid)) {
                                 filteredProcesses.put(displayName, processLine);
@@ -111,7 +112,7 @@ public abstract class Parser {
             Map<String, String> processMetrics = Maps.newHashMap();
             List<String> processLines = filteredProcessLines.get(instance.getDisplayName());
             if (processLines.size() == 1) {
-                String [] processLineColumns = processLines.get(0).trim().split(MonitorConstants.SPACES);
+                String[] processLineColumns = processLines.get(0).trim().split(MonitorConstants.SPACES);
                 // ignoring first and last columns (pid and command)
                 for (int i = 1; i < headerColumns.size(); i++) {
                     processMetrics.put(headerColumns.get(i), processLineColumns[i]);

@@ -12,7 +12,7 @@ instances:
 
 # Not necessary to modify
 linux:
-  process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rsz=RSS,args"
+  process: "ps -eo pid,%cpu=CPU%,%mem=Memory%,rss=RSS,args"
 
 solaris:
   process: "ps -eo pid,pcpu=CPU%, -o pmem=Memory%, -o rss=RSS -o args"
@@ -23,13 +23,13 @@ aix:
 
 metrics:
   - CPU%:
-     multiplier: 1
+      multiplier: 1
   - Memory%:
-     alias: "Memory%"
+      alias: "Memory%"
   - RSS:
-     alias: "Resident Set Size"
+      alias: "Resident Set Size"
   - Running Instances:
-     alias: "Running Instances"
+      alias: "Running Instances"
 
 
 # number of concurrent tasks
