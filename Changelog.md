@@ -1,5 +1,7 @@
 # AppDynamics Process Monitoring Extension
 
+## Version 2.2
+ * Updated to appd-exts-commons 2.2.3
 
 ## Version 2.1
  * Extension moved to 2.2 framework of Commons Library

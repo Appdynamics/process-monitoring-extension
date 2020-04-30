@@ -52,6 +52,9 @@ public class CommandExecutor {
             long endTime = System.currentTimeMillis() - startTime;
             logger.debug("Executing the command " + command + " ended. Time taken is " + endTime);
             List<String> commandOutput = responseParser.getData();
+            if (commandOutput.isEmpty()) {
+                logger.error("The process output of the command {} is empty", command);
+            }
             return commandOutput;
         } catch (Exception e) {
             logger.error("Error while executing the process " + command, e);

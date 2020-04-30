@@ -64,8 +64,8 @@ public class WindowsParser extends Parser {
                     String processName = sigar.getProcExe(pid).getName();
                     String processArgs = Joiner.on(" ").join(sigar.getProcArgs(pid));
                     line = pid + " " + processName + " " + processArgs;
-                } catch (SigarPermissionDeniedException e) {
-                    logger.trace("Unable to retrieve process name for pid " + pid, e);
+                } catch (Exception e) {
+                    logger.debug("Unable to retrieve process info for pid " + pid, e);
                 }
                 processLines.add(line);
             }
