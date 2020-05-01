@@ -18,3 +18,10 @@ logs/
 .DS_Store
 
 src/test/logs/testCases.log
+
+.teamcity/*
+docker-compose.yml
+Dockerfile_MA
+Dockerfile_WorkBench
+Makefile
+src/integration-test/*
