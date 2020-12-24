@@ -1,5 +1,5 @@
-#metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
-metricPrefix: "Custom Metrics|Process Monitor|"
+metricPrefix: "Server|Component:<Component-ID>|Custom Metrics|Process Monitor|"
+#metricPrefix: "Custom Metrics|Process Monitor|"
 
 # displayName: required - Metrics to be reported under this name in Controller's Metric Browser
 # regex/pid/pidFile - process is fetched using this field
@@ -36,7 +36,7 @@ metrics:
 
 
 # number of concurrent tasks
-numberOfThreads: 2
+numberOfThreads: 5
 
 # This is to run this in scheduled mode. In this case, the extension will fetch the data every 300 seconds
 # and caches the data. The cached data will be reported to controller every min. This way there is no metric drop.
@@ -48,7 +48,7 @@ numberOfThreads: 2
 
 # Generate a custom dashboard based on the provided template
 customDashboard:
-  enabled: true
+  enabled: false
   dashboardName: "Process Monitor Dashboard"
   # Update the path to the dashboard file.
   pathToSIMDashboard: "monitors/ProcessMonitor/CustomDashboard_SIM.json"
@@ -61,8 +61,7 @@ controllerInfo:
   account: "customer1"
   username: "user1"
   password: "welcome"
-  encryptedPassword: ""
-  encryptionKey: ""
+#  encryptedPassword: ""
   controllerSslEnabled: false
   enableOrchestration: false
   uniqueHostId: ""
@@ -72,6 +71,8 @@ controllerInfo:
   applicationName: ""
   tierName: ""
   nodeName: ""
+
+encryptionKey: ""
 
 # Note: If the current "metricPathReplacements" is not working on your current machine,
 # please add escape charaters "\\" before your value. It changes from OS to OS, some need it, some don't
