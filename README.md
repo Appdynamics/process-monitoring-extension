@@ -210,8 +210,8 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 ### Version
 |          Name            |  Version   |
 |--------------------------|------------|
-|Extension Version         |2.3       |
+|Extension Version         |2.3.1       |
 |Controller Compatibility  |4.5+|
 |Agent Compatibility  |4.5.13+|
 |Product Tested On         |Linux, Windows 10|
-|Last Update               |21/12/2020|
+|Last Update               |26/05/2021|
