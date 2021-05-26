@@ -119,7 +119,7 @@ public class CommandExecutor {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String temp;
             try {
-                while (in.available() > 0 && (temp = reader.readLine()) != null) {
+                while (reader.ready() && (temp = reader.readLine()) != null) {
                     logger.error("Process Error - " + temp);
                 }
             } catch (IOException e) {
