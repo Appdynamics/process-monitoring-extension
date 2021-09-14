@@ -14,12 +14,12 @@ process running ("Running Instances" metric value is "ONE").
 ## Prerequisites
 1. Before the extension is installed, the prerequisites mentioned [here](https://community.appdynamics.com/t5/Knowledge-Base/Extensions-Prerequisites-Guide/ta-p/35213) need to be met. Please do not proceed with the extension installation if the specified prerequisites are not met.
 2.  If running on Windows, this extension has Sigar dependencies. 
-    Please make sure to copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>\lib` to `<MachineAgent>\monitorsLibs`
+    Please make sure to copy all Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>\lib` to `<MachineAgent>\monitorsLibs`
 
 
 ## Installation
-1. To build from source, clone this repository and run 'mvn clean install'. This will produce a ProcessMonitor-VERSION.zip in the target directory. Alternatively, download the latest release archive from [Github](https://github.com/Appdynamics/process-monitoring-extension/releases/latest).
-2. Unzip as "ProcessMonitor" and copy the "ProcessMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
+1. To build from source, clone this repository and run 'mvn clean install'. This will produce a ProcessMonitor-VERSION.zip in the target directory.
+2. Unzip as "ProcessMonitor" from targets folder and copy the "ProcessMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
 3. Please place the extension in the "monitors" directory of your Machine Agent installation directory. 
 Do not place the extension in the "extensions" directory of your Machine Agent installation directory.
 4.  Edit the config.yml file. An example config.yml file follows these installation instructions.
@@ -184,7 +184,7 @@ Workbench is an inbuilt feature provided with each extension in order to assist 
    ".*pushy-client  .*"          False
    ".* pushy-client.*"           False
 ```
-Please test your regex using any of the online validators (eg: [regextester](https://www.regextester.com/)).
+Please test your regex using any of the online validators (eg: [regextester](https://www.freeformatter.com/java-regex-tester.html)).
 
 ### Contributing
 Always feel free to fork and contribute any changes directly here on [GitHub](https://www.appdynamics.com/community/exchange/extension/process-monitoring-extension/).
@@ -193,7 +193,9 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 |          Name            |  Version   |
 |--------------------------|------------|
 |Extension Version         |2.3.1       |
-|Controller Compatibility  |4.5+|
-|Agent Compatibility  |4.5.13+|
 |Product Tested On         |Linux, Windows 10|
 |Last Update               |26/05/2021|
+|List of Changes|[Change Log](https://github.com/Appdynamics/process-monitoring-extension/blob/master/Changelog.md)|
+ 
+**Note**: While extensions are maintained and supported by customers under the open-source licensing model, they interact with agents and Controllers that are subject to [AppDynamics’ maintenance and support policy](https://docs.appdynamics.com/latest/en/product-and-release-announcements/maintenance-support-for-software-versions). Some extensions have been tested with AppDynamics 4.5.13+ artifacts, but you are strongly recommended against using versions that are no longer supported. 
+ 
