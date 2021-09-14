@@ -32,7 +32,7 @@ Do not place the extension in the "extensions" directory of your Machine Agent i
 
 In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Individual Nodes | \<Node\> | Custom Metrics | Process Monitor | \<OS\> Processes
 
-**Note**: Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](http://yamllint.com/). 
+**Note**: Please make sure to not use tab (\t) while editing yaml files. You may want to validate the yaml file using a [yaml validator](https://jsonformatter.org/yaml-validator). 
 
 **Note**: Please use workbench mode to verify the metrics while experimenting with various configurations in config.yml to arrive at the desired result.
 
