@@ -57,7 +57,7 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
       - displayName: "mysql"
         pidFile: "/opt/mysql/db/mysql.pid"
    ```
-   While using regex, it is advisable to use any of the online regex validators (eg: [regextester](https://www.regextester.com/)) to match the regex against the process command line path to verify if it matches.
+   While using regex, it is advisable to use any of the online regex validators (eg: [regextester](https://www.freeformatter.com/java-regex-tester.html)) to match the regex against the process command line path to verify if it matches.
  
  3. Commands (Optional). The underlying OS command can be modified to fetch any additional metrics if required. Please execute the command and make sure there is a valid output in a tabular format. Please check man pages for unix like systems. We do not support this option for Windows environment.
    ```
