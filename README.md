@@ -13,18 +13,20 @@ process running ("Running Instances" metric value is "ONE").
 
 ## Prerequisites
 1. Before the extension is installed, the prerequisites mentioned [here](https://community.appdynamics.com/t5/Knowledge-Base/Extensions-Prerequisites-Guide/ta-p/35213) need to be met. Please do not proceed with the extension installation if the specified prerequisites are not met.
-2.  If running on Windows, this extension has Sigar dependencies. 
+2. Download and install [Apache Maven](https://maven.apache.org/) which is configured with `Java 8` to build the extension artifact from source. You can check the java version used in maven using command `mvn -v` or `mvn --version`. If your maven is using some other java version then please download java 8 for your platform and set JAVA_HOME parameter before starting maven.
+3.  If running on Windows, this extension has Sigar dependencies. 
     Please make sure to copy all Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>\lib` to `<MachineAgent>\monitorsLibs`
 
 
 ## Installation
-1. To build from source, clone this repository and run 'mvn clean install'. This will produce a ProcessMonitor-VERSION.zip in the target directory.
-2. Unzip as "ProcessMonitor" from targets folder and copy the "ProcessMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
-3. Please place the extension in the "monitors" directory of your Machine Agent installation directory. 
-Do not place the extension in the "extensions" directory of your Machine Agent installation directory.
+1. Clone the "process-monitoring-extension" repo using `git clone <repoUrl>` command.
+2. Run 'mvn clean install' from "process-monitoring-extension". This will produce a ProcessMonitor-VERSION.zip in the target directory.
+3. Unzip as "ProcessMonitor" from targets folder and copy the "ProcessMonitor" directory to `<MACHINE_AGENT_HOME>/monitors`
 4.  Edit the config.yml file. An example config.yml file follows these installation instructions.
 5. Verify the extension output in workbench mode and make sure desired metrics are reported. Check in WorkBench section for details.
 6.  Restart the Machine Agent.
+
+Please place the extension in the **"monitors"** directory of your Machine Agent installation directory. Do not place the extension in the **"extensions"** directory of your Machine Agent installation directory.
 
 
 ## Configuration
