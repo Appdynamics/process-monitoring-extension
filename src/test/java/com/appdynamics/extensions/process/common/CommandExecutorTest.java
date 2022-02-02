@@ -34,12 +34,6 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testCommand1() {
-        List<String> processLines = commandExecutor.execute("ps aux");
-        Assert.assertNotNull(processLines);
-    }
-
-    @Test
     public void testCommand2() {
         List<String> processLines = commandExecutor.execute("abc");
         Assert.assertNull(processLines);
