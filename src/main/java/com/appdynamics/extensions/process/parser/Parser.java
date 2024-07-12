@@ -44,9 +44,9 @@ public abstract class Parser {
 
     public abstract Map<String, ProcessData> fetchMetrics(Map<String, ?> config);
 
-    public Map<String, ProcessData> fetchMetrics(Map<String, ?> config, String cmd) {
+    public Map<String, ProcessData> fetchMetrics(Map<String, ?> config, String cmd, String[] envp) {
         List<Instance> instances = new ConfigProcessor().processConfig(config);
-        List<String> processListOutput = CommandExecutor.execute(cmd);
+        List<String> processListOutput = CommandExecutor.execute(cmd, envp);
         AssertUtils.assertNotNull(processListOutput, "The output from " + cmd + " is null");
         List<String> headers = getHeaders(processListOutput, cmd);
         ListMultimap<String, String> filteredProcessLines = filterProcessLinesFromCompleteList(processListOutput.subList(1, processListOutput.size()), instances, headers);

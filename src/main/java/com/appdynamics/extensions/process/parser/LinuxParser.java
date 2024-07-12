@@ -31,7 +31,7 @@ public class LinuxParser extends Parser {
     public static final Logger logger = ExtensionsLoggerFactory.getLogger(LinuxParser.class);
 
     public Map<String, ProcessData> fetchMetrics(Map<String, ?> config) {
-        return fetchMetrics(config, getProcessListCommand(getCommands(config)));
+        return fetchMetrics(config, getProcessListCommand(getCommands(config)), null);
     }
 
     private String getProcessListCommand(Map<String, String> commands) {
