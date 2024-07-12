@@ -24,7 +24,14 @@ solaris:
 aix:
   process: "ps -eo pid,pcpu=CPU%,pmem=Memory%,rss=RSS,args"
 
+hp-ux:
+  process: "ps -eo pid,pcpu,vsz,args"
+
 metrics:
+  - "%CPU":
+      alias: "CPU%"
+  - VSZ:
+      alias: "Virtual Memory Size"
   - CPU%:
       multiplier: 1
   - Memory%:

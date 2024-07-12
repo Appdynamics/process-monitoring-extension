@@ -17,20 +17,35 @@
 
 package com.appdynamics.extensions.process.parser;
 
+import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.data.ProcessData;
+import com.google.common.base.Strings;
 
 import java.util.Map;
 
+import static com.appdynamics.extensions.process.common.MonitorConstants.HP_UX;
+import static com.appdynamics.extensions.process.common.MonitorConstants.PROCESS;
+
 public class HPUXParser extends Parser {
     public Map<String, ProcessData> fetchMetrics(Map<String, ?> config) {
-        return null;
+        String[] envp = {"UNIX95= "};
+        return fetchMetrics(config, getProcessListCommand(getCommands(config)), envp);
     }
 
     public String getProcessGroupName() {
         return "HP-UX Processes";
     }
 
+    private String getProcessListCommand(Map<String, String> commands) {
+        String cmd;
+        if (commands != null && !Strings.isNullOrEmpty(commands.get(PROCESS))) {
+            cmd = commands.get(PROCESS);
+        } else {
+            cmd = MonitorConstants.HP_UX_PROCESS_LIST_COMMAND;
+        }
+        return cmd;
+    }
     protected Map<String, String> getCommands(Map<String, ?> config) {
-        return null;
+        return (Map) config.get(HP_UX);
     }
 }

@@ -34,13 +34,13 @@ public class CommandExecutor {
         return init(command, null);
     }
 
-    public static List<String> init(String command, List<String> env) {
+    public static List<String> init(String command, String[] env) {
         Process process;
         long startTime = System.currentTimeMillis();
         try {
             logger.debug("Executing the command " + command);
             if (env != null) {
-                process = Runtime.getRuntime().exec(command, env.toArray(new String[1]));
+                process = Runtime.getRuntime().exec(command, env);
             } else {
                 process = Runtime.getRuntime().exec(command);
             }
@@ -62,7 +62,7 @@ public class CommandExecutor {
         }
     }
 
-    public List<String> execute(String command, List<String> env) {
+    public static List<String> execute(String command, String[] env) {
         return init(command, env);
     }
 
