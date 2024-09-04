@@ -1,5 +1,8 @@
 # AppDynamics Process Monitoring Extension
 
+## Version 2.3.2
+* Updated appd-exts-commons 2.2.13 to fix vulnerabilities.
+
 ## Version 2.3.1
 * Fixed ErrorReader class issue
 
