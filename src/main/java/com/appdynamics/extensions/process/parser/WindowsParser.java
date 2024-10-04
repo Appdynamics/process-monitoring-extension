@@ -25,7 +25,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.hyperic.sigar.*;
+import org.hyperic.sigar.ProcCpu;
+import org.hyperic.sigar.ProcMem;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarException;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -95,6 +98,24 @@ public class WindowsParser extends Parser {
                 if (residentMem != null) {
                     processMetrics.put(RSS, String.valueOf(residentMem));
                 }
+            } else if (processLines.size() > 1) {
+                Double cpuPercent = 0.0;
+                Double processCpuPercent;
+                Long residentMem = 0L;
+                Long processResidentMem;
+                for (String processLine : processLines) {
+                    String pid = processLine.trim().split(MonitorConstants.SPACES)[0];
+                    processCpuPercent = getProcCPU(pid);
+                    if (processCpuPercent != null) {
+                        cpuPercent += getProcCPU(pid);
+                    }
+                    processResidentMem = getProcMem(pid);
+                    if (processResidentMem != null) {
+                        residentMem += getProcMem(pid);
+                    }
+                }
+                processMetrics.put(CPU_PERCENT, String.valueOf(cpuPercent));
+                processMetrics.put(RSS, String.valueOf(residentMem));
             }
             processMetrics.put(MonitorConstants.RUNNING_INSTANCES_COUNT, String.valueOf(processLines.size()));
             processData.setProcessMetrics(processMetrics);
