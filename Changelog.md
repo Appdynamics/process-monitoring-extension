@@ -1,7 +1,7 @@
 # AppDynamics Process Monitoring Extension
 
 ## Version 2.3.3
-* Add CPU & memory calculation for more processes via Regex
+* Add CPU & memory calculation for more processes via Regex on Windows
 
 ## Version 2.3.2
 * Updated appd-exts-commons 2.2.13 to fix vulnerabilities.
