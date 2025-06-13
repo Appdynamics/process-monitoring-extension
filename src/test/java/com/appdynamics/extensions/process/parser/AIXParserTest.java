@@ -56,7 +56,7 @@ public class AIXParserTest {
     @Test
     public void testFetchMetrics() {
         Map<String, ?> configArgs = YmlReader.readFromFile(new File("src/test/resources/conf/config-aix.yml"));
-        PowerMockito.when(CommandExecutor.execute(MonitorConstants.AIX_PROCESS_LIST_COMMAND)).thenReturn(processList);
+        PowerMockito.when(CommandExecutor.execute(MonitorConstants.AIX_PROCESS_LIST_COMMAND, null)).thenReturn(processList);
         Map<String, ProcessData> processDataMap = parser.fetchMetrics(configArgs);
 
         Map<String, String> javaProcessData = processDataMap.get("java").getProcessMetrics();
