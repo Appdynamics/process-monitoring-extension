@@ -56,7 +56,7 @@ public class SolarisParserTest {
     @Test
     public void testFetchMetrics() {
         Map<String, ?> configArgs = YmlReader.readFromFile(new File("src/test/resources/conf/config-solaris.yml"));
-        PowerMockito.when(CommandExecutor.execute(MonitorConstants.SOLARIS_PROCESS_LIST_COMMAND)).thenReturn(processList);
+        PowerMockito.when(CommandExecutor.execute(MonitorConstants.SOLARIS_PROCESS_LIST_COMMAND, null)).thenReturn(processList);
         Map<String, ProcessData> processDataMap = parser.fetchMetrics(configArgs);
 
         Map<String, String> dockerProcessData = processDataMap.get("docker").getProcessMetrics();
