@@ -3,7 +3,7 @@ An AppDynamics extension to be used with a standalone Java Machine Agent to prov
 
 ## Use Case
 Process Monitoring Extension gathers process metrics from a Linux/Windows/Solaris/AIX machine and reports to AppDynamics Controller.
- It utilizes the ``ps`` command in Unix-like systems and Sigar library in Windows to fetch basic process metrics.
+ It utilizes the ``ps`` command in Unix-like systems and the [OSHI](https://github.com/oshi/oshi) library on Windows to fetch basic process metrics.
 
 This can also be used as a process checker (identify whether a process is running/not running) by its metric "Running Instances". 
 If the configured process is not running, the "Running Instances" metric value reported is "ZERO".
@@ -14,8 +14,6 @@ process running ("Running Instances" metric value is "ONE").
 ## Prerequisites
 1. Before the extension is installed, the prerequisites mentioned [here](https://community.appdynamics.com/t5/Knowledge-Base/Extensions-Prerequisites-Guide/ta-p/35213) need to be met. Please do not proceed with the extension installation if the specified prerequisites are not met.
 2. Download and install [Apache Maven](https://maven.apache.org/) which is configured with `Java 8` to build the extension artifact from source. You can check the java version used in maven using command `mvn -v` or `mvn --version`. If your maven is using some other java version then please download java 8 for your platform and set JAVA_HOME parameter before starting maven.
-3.  If running on Windows, this extension has Sigar dependencies. 
-    Please make sure to copy all Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>\lib` to `<MachineAgent>\monitorsLibs`
 
 
 ## Installation
@@ -81,7 +79,7 @@ Edit the config.yml file in `<MACHINE_AGENT_HOME>/monitors/ProcessMonitor/` to u
      - Memory%:
         alias: "Memory%"
      - RSS:
-        alias: "Resident Set Size"
+        alias: "Resident Set Size (KB)"
      - Running Instances:
         alias: "Running Instances"
    ```
@@ -102,7 +100,7 @@ and the metric properties to
 The following metrics are returned from the extension: 
     1. Running Instances: Count of the matched processes that are identified by regex. The following metrics are reported only if this metric value is ONE.
     2. CPU%
-    3. Resident Set Size
+    3. Resident Set Size (KB)
     4. Memory% (Not reported for Windows)
 
  There are several properties that are associated with each metric. They are: 
@@ -141,8 +139,7 @@ Workbench is an inbuilt feature provided with each extension in order to assist 
 
 ### Troubleshooting
 1. For missing custom metrics, please refer to the KB article [here](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695)
-2. In windows, if there is a java.lang.NoClassDefFoundError: org/hyperic/sigar/SigarException in machine-agent.log, please copy Windows OS related Sigar files (sigar-*.jar, sigar-amd64-winnt.dll, sigar-x86-winnt.dll) from `<MachineAgent>/lib` to `<MachineAgent>/monitorsLibs`.
-3. Retrieving command line path and building regex for a process:
+2. Retrieving command line path and building regex for a process:
    
    regex in config.yml is a regular expression used to match the process and is built on the command line path to the process. 
    
@@ -194,9 +191,9 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 ### Version
 |          Name            | Version                                                                                            |
 |--------------------------|----------------------------------------------------------------------------------------------------|
-|Extension Version         | 2.3.4                                                                                              |
-|Product Tested On         | Linux                                                                                              |
-|Last Update               | May 28, 2026                                                                                       |
+|Extension Version         | 2.3.5                                                                                              |
+|Product Tested On         | Linux, Windows                                                                                     |
+|Last Update               | August 3, 2026                                                                                     |
 |List of Changes| [Change Log](https://github.com/Appdynamics/process-monitoring-extension/blob/master/Changelog.md) |
  
 **Note**: While extensions are maintained and supported by customers under the open-source licensing model, they interact with agents and Controllers that are subject to [AppDynamics’ maintenance and support policy](https://docs.appdynamics.com/latest/en/product-and-release-announcements/maintenance-support-for-software-versions). Some extensions have been tested with AppDynamics 4.5.13+ artifacts, but you are strongly recommended against using versions that are no longer supported. 
