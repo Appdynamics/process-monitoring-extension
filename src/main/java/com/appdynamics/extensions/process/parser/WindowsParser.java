@@ -57,7 +57,12 @@ public class WindowsParser extends Parser {
                     instance.getDisplayName(), instance.getRegex(),
                     filteredProcessLines.get(instance.getDisplayName()).size());
         }
-        return populateProcessesData(instances, filteredProcessLines);
+        Map<String, ProcessData> result = populateProcessesData(instances, filteredProcessLines);
+        // Replace previous snapshots atomically after all instances are processed.
+        // Stale PIDs are dropped automatically; overlapping rules see the same baseline.
+        previousSnapshots.clear();
+        previousSnapshots.putAll(currentSnapshots);
+        return result;
     }
 
     public List<String> fetchProcessList() {
@@ -84,7 +89,6 @@ public class WindowsParser extends Parser {
             if (skipped > 0) {
                 logger.debug("WindowsParser:: {} processes skipped due to errors", skipped);
             }
-            previousSnapshots.keySet().retainAll(currentSnapshots.keySet());
         } catch (Exception e) {
             logger.error("WindowsParser:: exception while fetching process list via OSHI", e);
         }
@@ -146,7 +150,7 @@ public class WindowsParser extends Parser {
             if (current == null) {
                 return null;
             }
-            OSProcess previous = previousSnapshots.put(pid, current);
+            OSProcess previous = previousSnapshots.get(pid);
             if (previous == null) {
                 logger.debug("WindowsParser:: pid={} first sample — CPU% available on next poll", pid);
                 return null;

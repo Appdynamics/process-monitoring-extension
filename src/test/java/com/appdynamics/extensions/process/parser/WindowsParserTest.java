@@ -18,19 +18,25 @@
 package com.appdynamics.extensions.process.parser;
 
 import com.appdynamics.extensions.process.common.MonitorConstants;
+import com.appdynamics.extensions.process.configuration.Instance;
 import com.appdynamics.extensions.process.data.ProcessData;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import oshi.software.os.OSProcess;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WindowsParserTest {
 
@@ -74,5 +80,60 @@ public class WindowsParserTest {
 
         Map<String, String> wmiprvse = processDataMap.get("wmiprvse").getProcessMetrics();
         Assert.assertEquals(String.valueOf(0), wmiprvse.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+    }
+
+    /**
+     * Regression test: a PID matched by two overlapping rules (e.g. "java" and "MachineAgent")
+     * must report the same interval-based CPU% in both instances.
+     */
+    @Test
+    public void testOverlappingRulesProduceSameCpuForSharedPid() throws Exception {
+        // Build two instances whose regexes both match the same PID "4736"
+        // (java.exe machineagent.jar in win_proc_out.txt).
+        Instance javaInstance = new Instance();
+        javaInstance.setDisplayName("java");
+        javaInstance.setRegex(".*java.exe.*");
+
+        Instance machineAgentInstance = new Instance();
+        machineAgentInstance.setDisplayName("MachineAgent");
+        machineAgentInstance.setRegex(".*java.exe .* machineagent.jar");
+
+        List<Instance> instances = new ArrayList<>();
+        instances.add(javaInstance);
+        instances.add(machineAgentInstance);
+
+        // Shared line for PID 4736 — matches both rules.
+        String sharedLine = "4736 C:\\Windows\\system32\\java.exe java -Dappdynamics.agent.maxMetrics=2000 -jar machineagent.jar";
+        ListMultimap<String, String> filteredLines = ArrayListMultimap.create();
+        filteredLines.put("java", sharedLine);
+        filteredLines.put("MachineAgent", sharedLine);
+
+        // Seed previousSnapshots via reflection so getProcCPU sees a valid previous snapshot.
+        OSProcess prevProc = Mockito.mock(OSProcess.class);
+        Mockito.when(prevProc.getStartTime()).thenReturn(1000L);
+        java.lang.reflect.Field prevField = WindowsParser.class.getDeclaredField("previousSnapshots");
+        prevField.setAccessible(true);
+        Map<String, OSProcess> prevMap = (ConcurrentHashMap<String, OSProcess>) prevField.get(null);
+        prevMap.put("4736", prevProc);
+
+        // Seed currentSnapshots so fetchValidProcess finds the process.
+        OSProcess currentProc = Mockito.mock(OSProcess.class);
+        Mockito.when(currentProc.getStartTime()).thenReturn(1000L);
+        // Interval CPU should be 30%; cumulative fallback would differ.
+        Mockito.when(currentProc.getProcessCpuLoadBetweenTicks(prevProc)).thenReturn(0.30);
+        java.lang.reflect.Field currField = WindowsParser.class.getDeclaredField("currentSnapshots");
+        currField.setAccessible(true);
+        Map<String, OSProcess> currMap = (Map<String, OSProcess>) currField.get(parser);
+        currMap.put("4736", currentProc);
+
+        Map<String, ProcessData> result = parser.populateProcessesData(instances, filteredLines);
+
+        // Both instances must report the same CPU% — interval-based, not cumulative.
+        String javaCpu = result.get("java").getProcessMetrics().get(MonitorConstants.CPU_PERCENT);
+        String maCpu = result.get("MachineAgent").getProcessMetrics().get(MonitorConstants.CPU_PERCENT);
+        Assert.assertNotNull("java CPU% must not be null", javaCpu);
+        Assert.assertNotNull("MachineAgent CPU% must not be null", maCpu);
+        Assert.assertEquals("Overlapping rules must report the same CPU% for a shared PID", javaCpu, maCpu);
+        Assert.assertEquals("30.0", javaCpu);
     }
 }
