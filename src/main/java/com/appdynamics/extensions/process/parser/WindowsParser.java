@@ -138,7 +138,6 @@ public class WindowsParser extends Parser {
         if (previous != null && previous.getStartTime() != current.getStartTime()) {
             logger.info("WindowsParser:: PID {} was reused (prev startTime={} current startTime={})",
                     pid, previous.getStartTime(), current.getStartTime());
-            previousSnapshots.put(pid, current);
             return null;
         }
         return current;
@@ -166,7 +165,7 @@ public class WindowsParser extends Parser {
 
     protected Long getProcMem(String pid) {
         try {
-            OSProcess proc = fetchValidProcess(pid);
+            OSProcess proc = currentSnapshots.get(pid);
             if (proc == null) {
                 return null;
             }

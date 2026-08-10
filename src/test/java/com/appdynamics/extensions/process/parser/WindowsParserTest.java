@@ -136,4 +136,55 @@ public class WindowsParserTest {
         Assert.assertEquals("Overlapping rules must report the same CPU% for a shared PID", javaCpu, maCpu);
         Assert.assertEquals("30.0", javaCpu);
     }
+
+    /**
+     * Regression test: when a PID is reused (start time changed), CPU% must be null for ALL
+     * overlapping rules that match that PID in the same polling cycle.
+     */
+    @Test
+    public void testReusedPidSuppressesCpuForAllOverlappingRules() throws Exception {
+        Instance javaInstance = new Instance();
+        javaInstance.setDisplayName("java");
+        javaInstance.setRegex(".*java.exe.*");
+
+        Instance machineAgentInstance = new Instance();
+        machineAgentInstance.setDisplayName("MachineAgent");
+        machineAgentInstance.setRegex(".*java.exe .* machineagent.jar");
+
+        List<Instance> instances = new ArrayList<>();
+        instances.add(javaInstance);
+        instances.add(machineAgentInstance);
+
+        String sharedLine = "4736 C:\\Windows\\system32\\java.exe java -Dappdynamics.agent.maxMetrics=2000 -jar machineagent.jar";
+        ListMultimap<String, String> filteredLines = ArrayListMultimap.create();
+        filteredLines.put("java", sharedLine);
+        filteredLines.put("MachineAgent", sharedLine);
+
+        // Previous snapshot has a different start time — PID was reused.
+        OSProcess prevProc = Mockito.mock(OSProcess.class);
+        Mockito.when(prevProc.getStartTime()).thenReturn(1000L);
+        java.lang.reflect.Field prevField = WindowsParser.class.getDeclaredField("previousSnapshots");
+        prevField.setAccessible(true);
+        Map<String, OSProcess> prevMap = (ConcurrentHashMap<String, OSProcess>) prevField.get(null);
+        prevMap.put("4736", prevProc);
+
+        OSProcess currentProc = Mockito.mock(OSProcess.class);
+        Mockito.when(currentProc.getStartTime()).thenReturn(9999L); // different → reused PID
+        Mockito.when(currentProc.getResidentSetSize()).thenReturn(204800L);
+        java.lang.reflect.Field currField = WindowsParser.class.getDeclaredField("currentSnapshots");
+        currField.setAccessible(true);
+        Map<String, OSProcess> currMap = (Map<String, OSProcess>) currField.get(parser);
+        currMap.put("4736", currentProc);
+
+        Map<String, ProcessData> result = parser.populateProcessesData(instances, filteredLines);
+
+        // Neither rule should emit CPU% for the reused PID.
+        Assert.assertNull("java CPU% must be null for reused PID",
+                result.get("java").getProcessMetrics().get(MonitorConstants.CPU_PERCENT));
+        Assert.assertNull("MachineAgent CPU% must be null for reused PID",
+                result.get("MachineAgent").getProcessMetrics().get(MonitorConstants.CPU_PERCENT));
+        // Memory is a point-in-time metric — must still be reported even for reused PID.
+        Assert.assertEquals("200", result.get("java").getProcessMetrics().get(MonitorConstants.RSS));
+        Assert.assertEquals("200", result.get("MachineAgent").getProcessMetrics().get(MonitorConstants.RSS));
+    }
 }
