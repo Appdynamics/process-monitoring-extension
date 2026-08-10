@@ -33,7 +33,7 @@ metrics:
   - Memory%:
       alias: "Memory%"
   - RSS:
-      alias: "Resident Set Size"
+      alias: "Resident Set Size (KB)"
   - Running Instances:
       alias: "Running Instances"
 

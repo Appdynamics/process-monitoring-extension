@@ -18,20 +18,25 @@
 package com.appdynamics.extensions.process.parser;
 
 import com.appdynamics.extensions.process.common.MonitorConstants;
+import com.appdynamics.extensions.process.configuration.Instance;
 import com.appdynamics.extensions.process.data.ProcessData;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
-import org.hyperic.sigar.Sigar;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import oshi.software.os.OSProcess;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WindowsParserTest {
 
@@ -47,7 +52,7 @@ public class WindowsParserTest {
     @Test
     public void testParseProcesses() {
         Map<String, ?> configArgs = YmlReader.readFromFile(new File("src/test/resources/conf/config-windows.yml"));
-        Mockito.doReturn(processList).when(parser).fetchProcessListFromSigar();
+        Mockito.doReturn(processList).when(parser).fetchProcessList();
         Mockito.doReturn(20.0).when(parser).getProcCPU(Mockito.anyString());
         Mockito.doReturn(Long.valueOf(20)).when(parser).getProcMem(Mockito.anyString());
         Map<String, ProcessData> processDataMap = parser.fetchMetrics(configArgs);
@@ -70,10 +75,116 @@ public class WindowsParserTest {
         Map<String, String> notepadProcessData = processDataMap.get("Notepad").getProcessMetrics();
         Assert.assertEquals(String.valueOf(1), notepadProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
-        Map<String, String> ServiceProcessData = processDataMap.get("TryTryAgain").getProcessMetrics();
-        Assert.assertEquals(String.valueOf(1), ServiceProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+        Map<String, String> serviceProcessData = processDataMap.get("TryTryAgain").getProcessMetrics();
+        Assert.assertEquals(String.valueOf(1), serviceProcessData.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
 
         Map<String, String> wmiprvse = processDataMap.get("wmiprvse").getProcessMetrics();
         Assert.assertEquals(String.valueOf(0), wmiprvse.get(MonitorConstants.RUNNING_INSTANCES_COUNT));
+    }
+
+    /**
+     * Regression test: a PID matched by two overlapping rules (e.g. "java" and "MachineAgent")
+     * must report the same interval-based CPU% in both instances.
+     */
+    @Test
+    public void testOverlappingRulesProduceSameCpuForSharedPid() throws Exception {
+        // Build two instances whose regexes both match the same PID "4736"
+        // (java.exe machineagent.jar in win_proc_out.txt).
+        Instance javaInstance = new Instance();
+        javaInstance.setDisplayName("java");
+        javaInstance.setRegex(".*java.exe.*");
+
+        Instance machineAgentInstance = new Instance();
+        machineAgentInstance.setDisplayName("MachineAgent");
+        machineAgentInstance.setRegex(".*java.exe .* machineagent.jar");
+
+        List<Instance> instances = new ArrayList<>();
+        instances.add(javaInstance);
+        instances.add(machineAgentInstance);
+
+        // Shared line for PID 4736 — matches both rules.
+        String sharedLine = "4736 C:\\Windows\\system32\\java.exe java -Dappdynamics.agent.maxMetrics=2000 -jar machineagent.jar";
+        ListMultimap<String, String> filteredLines = ArrayListMultimap.create();
+        filteredLines.put("java", sharedLine);
+        filteredLines.put("MachineAgent", sharedLine);
+
+        // Seed previousSnapshots via reflection so getProcCPU sees a valid previous snapshot.
+        OSProcess prevProc = Mockito.mock(OSProcess.class);
+        Mockito.when(prevProc.getStartTime()).thenReturn(1000L);
+        java.lang.reflect.Field prevField = WindowsParser.class.getDeclaredField("previousSnapshots");
+        prevField.setAccessible(true);
+        Map<String, OSProcess> prevMap = (ConcurrentHashMap<String, OSProcess>) prevField.get(null);
+        prevMap.put("4736", prevProc);
+
+        // Seed currentSnapshots so fetchValidProcess finds the process.
+        OSProcess currentProc = Mockito.mock(OSProcess.class);
+        Mockito.when(currentProc.getStartTime()).thenReturn(1000L);
+        // Interval CPU should be 30%; cumulative fallback would differ.
+        Mockito.when(currentProc.getProcessCpuLoadBetweenTicks(prevProc)).thenReturn(0.30);
+        java.lang.reflect.Field currField = WindowsParser.class.getDeclaredField("currentSnapshots");
+        currField.setAccessible(true);
+        Map<String, OSProcess> currMap = (Map<String, OSProcess>) currField.get(parser);
+        currMap.put("4736", currentProc);
+
+        Map<String, ProcessData> result = parser.populateProcessesData(instances, filteredLines);
+
+        // Both instances must report the same CPU% — interval-based, not cumulative.
+        String javaCpu = result.get("java").getProcessMetrics().get(MonitorConstants.CPU_PERCENT);
+        String maCpu = result.get("MachineAgent").getProcessMetrics().get(MonitorConstants.CPU_PERCENT);
+        Assert.assertNotNull("java CPU% must not be null", javaCpu);
+        Assert.assertNotNull("MachineAgent CPU% must not be null", maCpu);
+        Assert.assertEquals("Overlapping rules must report the same CPU% for a shared PID", javaCpu, maCpu);
+        Assert.assertEquals("30.0", javaCpu);
+    }
+
+    /**
+     * Regression test: when a PID is reused (start time changed), CPU% must be null for ALL
+     * overlapping rules that match that PID in the same polling cycle.
+     */
+    @Test
+    public void testReusedPidSuppressesCpuForAllOverlappingRules() throws Exception {
+        Instance javaInstance = new Instance();
+        javaInstance.setDisplayName("java");
+        javaInstance.setRegex(".*java.exe.*");
+
+        Instance machineAgentInstance = new Instance();
+        machineAgentInstance.setDisplayName("MachineAgent");
+        machineAgentInstance.setRegex(".*java.exe .* machineagent.jar");
+
+        List<Instance> instances = new ArrayList<>();
+        instances.add(javaInstance);
+        instances.add(machineAgentInstance);
+
+        String sharedLine = "4736 C:\\Windows\\system32\\java.exe java -Dappdynamics.agent.maxMetrics=2000 -jar machineagent.jar";
+        ListMultimap<String, String> filteredLines = ArrayListMultimap.create();
+        filteredLines.put("java", sharedLine);
+        filteredLines.put("MachineAgent", sharedLine);
+
+        // Previous snapshot has a different start time — PID was reused.
+        OSProcess prevProc = Mockito.mock(OSProcess.class);
+        Mockito.when(prevProc.getStartTime()).thenReturn(1000L);
+        java.lang.reflect.Field prevField = WindowsParser.class.getDeclaredField("previousSnapshots");
+        prevField.setAccessible(true);
+        Map<String, OSProcess> prevMap = (ConcurrentHashMap<String, OSProcess>) prevField.get(null);
+        prevMap.put("4736", prevProc);
+
+        OSProcess currentProc = Mockito.mock(OSProcess.class);
+        Mockito.when(currentProc.getStartTime()).thenReturn(9999L); // different → reused PID
+        Mockito.when(currentProc.getResidentSetSize()).thenReturn(204800L);
+        java.lang.reflect.Field currField = WindowsParser.class.getDeclaredField("currentSnapshots");
+        currField.setAccessible(true);
+        Map<String, OSProcess> currMap = (Map<String, OSProcess>) currField.get(parser);
+        currMap.put("4736", currentProc);
+
+        Map<String, ProcessData> result = parser.populateProcessesData(instances, filteredLines);
+
+        // Neither rule should emit CPU% for the reused PID.
+        Assert.assertNull("java CPU% must be null for reused PID",
+                result.get("java").getProcessMetrics().get(MonitorConstants.CPU_PERCENT));
+        Assert.assertNull("MachineAgent CPU% must be null for reused PID",
+                result.get("MachineAgent").getProcessMetrics().get(MonitorConstants.CPU_PERCENT));
+        // Memory is a point-in-time metric — must still be reported even for reused PID.
+        Assert.assertEquals("200", result.get("java").getProcessMetrics().get(MonitorConstants.RSS));
+        Assert.assertEquals("200", result.get("MachineAgent").getProcessMetrics().get(MonitorConstants.RSS));
     }
 }

@@ -21,19 +21,18 @@ import com.appdynamics.extensions.process.common.MonitorConstants;
 import com.appdynamics.extensions.process.configuration.ConfigProcessor;
 import com.appdynamics.extensions.process.configuration.Instance;
 import com.appdynamics.extensions.process.data.ProcessData;
-import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.hyperic.sigar.ProcCpu;
-import org.hyperic.sigar.ProcMem;
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.SigarException;
+import oshi.SystemInfo;
+import oshi.software.os.OSProcess;
+import oshi.software.os.OperatingSystem;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.appdynamics.extensions.process.common.MonitorConstants.*;
 
@@ -41,43 +40,57 @@ public class WindowsParser extends Parser {
 
     public static final Logger logger = ExtensionsLoggerFactory.getLogger(WindowsParser.class);
 
+    // Previous OSProcess snapshots keyed by PID string; static so snapshots survive across
+    // parser instances (a new WindowsParser is created on every poll cycle).
+    private static final Map<String, OSProcess> previousSnapshots = new ConcurrentHashMap<>();
+
+    // Current-cycle snapshots populated once by fetchProcessList(); reused by getProcCPU/getProcMem.
+    private final Map<String, OSProcess> currentSnapshots = new java.util.HashMap<>();
+
     public Map<String, ProcessData> fetchMetrics(Map<String, ?> config) {
-        logger.debug("WindowsParser:: In fetchMetrics method");
         List<Instance> instances = new ConfigProcessor().processConfig(config);
-        // all process lines
-        List<String> processListOutput = fetchProcessListFromSigar();
-        // filter process lines based on configuration
-        ListMultimap<String, String> filteredProcessLines = filterProcessLinesFromCompleteList(processListOutput, instances, buildHeaderInfo());
-        // process the filtered lines and retrieve the data
-        Map<String, ProcessData> processesData = populateProcessesData(instances, filteredProcessLines);
-        return processesData;
+        List<String> processListOutput = fetchProcessList();
+        List<String> headerInfo = buildHeaderInfo();
+        ListMultimap<String, String> filteredProcessLines = filterProcessLinesFromCompleteList(processListOutput, instances, headerInfo);
+        for (Instance instance : instances) {
+            logger.debug("WindowsParser:: instance='{}' regex='{}' matched {} line(s)",
+                    instance.getDisplayName(), instance.getRegex(),
+                    filteredProcessLines.get(instance.getDisplayName()).size());
+        }
+        Map<String, ProcessData> result = populateProcessesData(instances, filteredProcessLines);
+        // Replace previous snapshots atomically after all instances are processed.
+        // Stale PIDs are dropped automatically; overlapping rules see the same baseline.
+        previousSnapshots.clear();
+        previousSnapshots.putAll(currentSnapshots);
+        return result;
     }
 
-    public List<String> fetchProcessListFromSigar() {
-        List<String> processLines = new ArrayList<String>();
-        logger.debug("WindowsParser:: In fetchProcessListFromSigar method ");
-        Sigar sigar = null;
+    public List<String> fetchProcessList() {
+        List<String> processLines = new ArrayList<>();
         try {
-            sigar = new Sigar();
-            logger.debug("Fetching process list from Sigar");
-            long[] pids = sigar.getProcList();
-            for (long pid : pids) {
-                String line = "";
+            OperatingSystem os = new SystemInfo().getOperatingSystem();
+            List<OSProcess> processes = os.getProcesses();
+            logger.debug("WindowsParser:: OSHI returned {} processes", processes.size());
+            int skipped = 0;
+            for (OSProcess proc : processes) {
                 try {
-                    String processName = sigar.getProcExe(pid).getName();
-                    String processArgs = Joiner.on(" ").join(sigar.getProcArgs(pid));
-                    line = pid + " " + processName + " " + processArgs;
+                    String pid = String.valueOf(proc.getProcessID());
+                    currentSnapshots.put(pid, proc);
+                    String executablePath = proc.getPath();
+                    String commandLine = proc.getCommandLine();
+                    String name = (executablePath != null && !executablePath.isEmpty()) ? executablePath : proc.getName();
+                    String args = (commandLine != null && !commandLine.isEmpty()) ? commandLine : "";
+                    processLines.add(pid + " " + name + " " + args);
                 } catch (Exception e) {
-                    logger.debug("Unable to retrieve process info for pid " + pid, e);
+                    skipped++;
+                    logger.debug("WindowsParser:: skipped pid={} due to exception: {}", proc.getProcessID(), e.toString());
                 }
-                processLines.add(line);
+            }
+            if (skipped > 0) {
+                logger.debug("WindowsParser:: {} processes skipped due to errors", skipped);
             }
         } catch (Exception e) {
-            logger.error("Exception while fetching metrics from Sigar", e);
-        } finally {
-            if (sigar != null) {
-                sigar.close();
-            }
+            logger.error("WindowsParser:: exception while fetching process list via OSHI", e);
         }
         return processLines;
     }
@@ -88,34 +101,26 @@ public class WindowsParser extends Parser {
             ProcessData processData = new ProcessData();
             Map<String, String> processMetrics = Maps.newHashMap();
             List<String> processLines = filteredProcessLines.get(instance.getDisplayName());
-            if (processLines.size() == 1) {
-                String pid = processLines.get(0).trim().split(MonitorConstants.SPACES)[0];
-                Double cpuPercent = getProcCPU(pid);
-                Long residentMem = getProcMem(pid);
+            if (!processLines.isEmpty()) {
+                Double cpuPercent = null;
+                Long residentMem = null;
+                for (String processLine : processLines) {
+                    String pid = processLine.trim().split(MonitorConstants.SPACES)[0];
+                    Double processCpuPercent = getProcCPU(pid);
+                    if (processCpuPercent != null) {
+                        cpuPercent = (cpuPercent == null ? 0.0 : cpuPercent) + processCpuPercent;
+                    }
+                    Long processResidentMem = getProcMem(pid);
+                    if (processResidentMem != null) {
+                        residentMem = (residentMem == null ? 0L : residentMem) + processResidentMem;
+                    }
+                }
                 if (cpuPercent != null) {
                     processMetrics.put(CPU_PERCENT, String.valueOf(cpuPercent));
                 }
                 if (residentMem != null) {
                     processMetrics.put(RSS, String.valueOf(residentMem));
                 }
-            } else if (processLines.size() > 1) {
-                Double cpuPercent = 0.0;
-                Double processCpuPercent;
-                Long residentMem = 0L;
-                Long processResidentMem;
-                for (String processLine : processLines) {
-                    String pid = processLine.trim().split(MonitorConstants.SPACES)[0];
-                    processCpuPercent = getProcCPU(pid);
-                    if (processCpuPercent != null) {
-                        cpuPercent += getProcCPU(pid);
-                    }
-                    processResidentMem = getProcMem(pid);
-                    if (processResidentMem != null) {
-                        residentMem += getProcMem(pid);
-                    }
-                }
-                processMetrics.put(CPU_PERCENT, String.valueOf(cpuPercent));
-                processMetrics.put(RSS, String.valueOf(residentMem));
             }
             processMetrics.put(MonitorConstants.RUNNING_INSTANCES_COUNT, String.valueOf(processLines.size()));
             processData.setProcessMetrics(processMetrics);
@@ -124,36 +129,49 @@ public class WindowsParser extends Parser {
         return processesData;
     }
 
+    private OSProcess fetchValidProcess(String pid) {
+        OSProcess current = currentSnapshots.get(pid);
+        if (current == null) {
+            return null;
+        }
+        OSProcess previous = previousSnapshots.get(pid);
+        if (previous != null && previous.getStartTime() != current.getStartTime()) {
+            logger.info("WindowsParser:: PID {} was reused (prev startTime={} current startTime={})",
+                    pid, previous.getStartTime(), current.getStartTime());
+            return null;
+        }
+        return current;
+    }
+
     protected Double getProcCPU(String pid) {
-        Sigar sigar = null;
         try {
-            sigar = new Sigar();
-            ProcCpu procCpu = sigar.getProcCpu(pid);
-            Double cpuPercent = procCpu.getPercent();
-            logger.debug("CPU% returned from Sigar for {} is {}", pid, cpuPercent);
-            return cpuPercent;
-        } catch (SigarException e) {
-            logger.error("Error while fetching cpu% for process " + pid, e);
-        } finally {
-            if (sigar != null) {
-                sigar.close();
+            OSProcess current = fetchValidProcess(pid);
+            if (current == null) {
+                return null;
             }
+            OSProcess previous = previousSnapshots.get(pid);
+            if (previous == null) {
+                logger.debug("WindowsParser:: pid={} first sample — CPU% available on next poll", pid);
+                return null;
+            }
+            double cpuPercent = current.getProcessCpuLoadBetweenTicks(previous) * 100.0;
+            logger.debug("WindowsParser:: pid={} CPU%={}", pid, cpuPercent);
+            return cpuPercent;
+        } catch (Exception e) {
+            logger.error("WindowsParser:: error fetching CPU% for pid={}", pid, e);
         }
         return null;
     }
 
     protected Long getProcMem(String pid) {
-        Sigar sigar = null;
         try {
-            sigar = new Sigar();
-            ProcMem procMem = sigar.getProcMem(pid);
-            return procMem.getResident();
-        } catch (SigarException e) {
-            logger.error("Error while fetching mem for process " + pid, e);
-        } finally {
-            if (sigar != null) {
-                sigar.close();
+            OSProcess proc = currentSnapshots.get(pid);
+            if (proc == null) {
+                return null;
             }
+            return proc.getResidentSetSize() / 1024;
+        } catch (Exception e) {
+            logger.error("WindowsParser:: error fetching RSS for pid={}", pid, e);
         }
         return null;
     }

@@ -1,5 +1,12 @@
 # AppDynamics Process Monitoring Extension
 
+## Version 2.3.5
+* Fixed incorrect 0% CPU reporting for Windows processes
+* Replaced Sigar library with OSHI for Windows process metrics collection
+* CPU% on Windows is now computed as an interval measurement between consecutive polls instead of a cumulative approximation
+* CPU% is skipped on the first poll cycle (no previous snapshot available) and when a PID is reused by a new process
+* When a regex matches multiple processes, CPU% is summed only from processes with a valid previous snapshot
+
 ## Version 2.3.4
 * Fix the issue with building the extension
 
