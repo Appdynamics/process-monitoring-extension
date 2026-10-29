@@ -13,7 +13,7 @@ process running ("Running Instances" metric value is "ONE").
 
 ## Prerequisites
 1. Before the extension is installed, the prerequisites mentioned [here](https://community.appdynamics.com/t5/Knowledge-Base/Extensions-Prerequisites-Guide/ta-p/35213) need to be met. Please do not proceed with the extension installation if the specified prerequisites are not met.
-2. Download and install [Apache Maven](https://maven.apache.org/) which is configured with `Java 8` to build the extension artifact from source. You can check the java version used in maven using command `mvn -v` or `mvn --version`. If your maven is using some other java version then please download java 8 for your platform and set JAVA_HOME parameter before starting maven.
+2. Download and install [Apache Maven](https://maven.apache.org/) which is configured with `Java 17` to build the extension artifact from source. You can check the java version used in maven using command `mvn -v` or `mvn --version`. If your maven is using some other java version then please download Java 17 for your platform and set JAVA_HOME parameter before starting maven. From version 2.3.6 the extension requires the Machine Agent to run on Java 17 or later.
 
 
 ## Installation

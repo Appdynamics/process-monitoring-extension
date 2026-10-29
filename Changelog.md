@@ -1,5 +1,11 @@
 # AppDynamics Process Monitoring Extension
 
+## Version 2.3.6
+* Updated appd-exts-commons 2.2.13 to 2.2.21 to fix vulnerabilities (Jetty 12.1.12, commons-lang3 3.20.0)
+* Pinned Jackson to 2.22.3 to fix CVE-2026-89407, CVE-2026-89425, CVE-2026-91776, CVE-2026-91777
+* Build now targets Java 17; the Machine Agent must run on Java 17 or later
+* Updated test dependencies (PowerMock 2.0.9, Mockito 3.12.4, JUnit 4.13.2) for Java 17
+
 ## Version 2.3.5
 * Fixed incorrect 0% CPU reporting for Windows processes
 * Replaced Sigar library with OSHI for Windows process metrics collection
